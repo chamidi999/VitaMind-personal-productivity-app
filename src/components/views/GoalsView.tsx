@@ -45,7 +45,7 @@ export default function GoalsView({
         </div>
         <button 
           onClick={() => setIsAdding(!isAdding)}
-          className="bg-royal text-white px-2 py-1 sm:px-4 sm:py-2 md:px-6 md:py-3 rounded-xl font-bold text-sm sm:text-base hover:bg-royal-light transition-all flex items-center gap-2 whitespace-nowrap"
+          className="h-11 bg-royal text-white px-4 md:px-6 rounded-lg font-bold text-sm sm:text-base hover:bg-royal-light transition-all flex items-center justify-center gap-2 whitespace-nowrap"
         >
           <Plus size={20} /> {isAdding ? 'Close' : 'New Goal'}
         </button>
@@ -81,7 +81,7 @@ export default function GoalsView({
                   />
                 </div>
                 <div className="md:col-span-3 flex justify-end">
-                  <button type="submit" className="bg-royal text-white px-2 py-1 sm:px-4 sm:py-2 md:px-10 md:py-3 rounded-xl font-bold text-sm sm:text-base hover:bg-royal-light transition-all whitespace-nowrap">
+                  <button type="submit" className="h-11 bg-royal text-white px-4 md:px-10 rounded-lg font-bold text-sm sm:text-base hover:bg-royal-light transition-all flex items-center justify-center whitespace-nowrap">
                     Launch Objective
                   </button>
                 </div>
