@@ -20,8 +20,8 @@ export default function AIOracleView({ chat, input, isLoading, onInputChange, on
   }, [chat]);
 
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-4xl mx-auto h-175 flex flex-col">
-      <div className="flex-1 overflow-y-auto pr-4 space-y-6 scrollbar-thin scrollbar-thumb-white/10">
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-4xl mx-auto h-full flex flex-col px-1 md:px-0">
+      <div className="flex-1 overflow-y-auto pr-1 md:pr-4 space-y-4 md:space-y-6 scrollbar-thin scrollbar-thumb-white/10">
         <AnimatePresence mode="popLayout">
           {chat.map((msg, i) => (
             <motion.div 
@@ -38,8 +38,8 @@ export default function AIOracleView({ chat, input, isLoading, onInputChange, on
                 </div>
                 <div className={`p-5 rounded-3xl ${
                   msg.role === 'user' 
-                    ? 'bg-royal/10 text-white border border-royal/20 rounded-tr-none' 
-                    : 'bg-card text-gray-300 border border-white/5 rounded-tl-none'
+                    ? 'bg-[#dbe7ff] text-[#191970] border border-[#b8ccff] rounded-tr-none' 
+                    : 'bg-card text-[#191970] border border-white/5 rounded-tl-none'
                 }`}>
                   <div className="markdown-body">
                     <Markdown>{msg.content}</Markdown>
@@ -68,20 +68,20 @@ export default function AIOracleView({ chat, input, isLoading, onInputChange, on
         <div ref={chatEndRef} />
       </div>
 
-      <div className="mt-8 bg-card p-4 rounded-3xl border border-white/5">
-        <form onSubmit={onSubmit} className="flex gap-3">
+      <div className="mt-4 md:mt-8 bg-card p-3 md:p-4 rounded-3xl border border-white/5">
+        <form onSubmit={onSubmit} className="flex gap-2 md:gap-3">
           <input 
             type="text" 
             placeholder="Ask the Oracle about your lifestyle complexity..." 
             value={input}
             onChange={e => onInputChange(e.target.value)}
             disabled={isLoading}
-            className="flex-1 bg-white border border-[#4169E1] rounded-2xl px-6 py-4 outline-none focus:border-[#4169E1] transition-all text-[#191970] placeholder:text-[#9CA3AF]"
+            className="flex-1 bg-white border border-[#4169E1] rounded-2xl px-4 md:px-6 py-3 md:py-4 text-sm md:text-base outline-none focus:border-[#4169E1] transition-all text-[#191970] placeholder:text-[#9CA3AF]"
           />
           <button 
             type="submit" 
             disabled={isLoading || !input.trim()}
-            className="bg-royal text-white px-6 rounded-2xl font-bold hover:bg-royal-light transition-all disabled:opacity-50 flex items-center justify-center"
+            className="bg-royal text-white px-4 md:px-6 rounded-2xl font-bold hover:bg-royal-light transition-all disabled:opacity-50 flex items-center justify-center"
           >
             <Send size={20} />
           </button>

@@ -15,7 +15,7 @@ interface SidebarProps {
 
 export default function Sidebar({ user, currentView, onViewChange, onLogout }: SidebarProps) {
   return (
-    <aside className="w-72 border-r border-[#0f1458] flex flex-col p-6 fixed h-full bg-[#191970] z-20">
+    <aside className="hidden md:flex w-72 border-r border-[#0f1458] flex-col p-6 fixed h-screen bg-[#191970] z-20">
       <div className="flex items-center gap-3 mb-12">
         <div className="h-10 w-10 bg-white rounded-xl flex items-center justify-center">
           <Zap className="text-royal h-6 w-6" />

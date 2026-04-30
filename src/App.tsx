@@ -272,10 +272,10 @@ USER CONTEXT: Name: ${user?.name}, Tasks: ${tasks.length}, Habits: ${habits.leng
   };
 
   return (
-    <div className="min-h-screen bg-background text-[#191970] flex font-sans selection:bg-royal/20">
+    <div className="h-screen bg-background text-[#191970] flex font-sans selection:bg-royal/20 overflow-hidden">
       <Sidebar user={user} currentView={currentView} onViewChange={setCurrentView} onLogout={handleLogout} />
       
-      <main className="flex-1 ml-72 p-10">
+      <main className="flex-1 ml-0 md:ml-72 p-4 md:p-10 h-screen overflow-hidden">
         <Header 
           viewTitle={currentView.charAt(0).toUpperCase() + currentView.slice(1)}
           notifications={notifications}
@@ -288,7 +288,7 @@ USER CONTEXT: Name: ${user?.name}, Tasks: ${tasks.length}, Habits: ${habits.leng
         />
 
         <AnimatePresence mode="wait">
-          <div key={currentView}>{renderView()}</div>
+          <div key={currentView} className="h-[calc(100vh-6rem)] overflow-y-auto pr-1">{renderView()}</div>
         </AnimatePresence>
       </main>
 
