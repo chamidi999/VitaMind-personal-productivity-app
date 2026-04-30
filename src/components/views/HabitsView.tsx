@@ -22,7 +22,7 @@ export default function HabitsView({ habits, onAdd, onComplete, onDelete, onUpda
   };
 
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-4xl space-y-8">
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-full xl:max-w-4xl space-y-8 overflow-x-hidden">
       <div className="bg-card p-8 rounded-3xl border border-white/5">
         <h3 className="text-xl font-bold text-[#191970] mb-6">New Ritual</h3>
         <form onSubmit={handleSubmit} className="flex gap-4">
@@ -33,7 +33,7 @@ export default function HabitsView({ habits, onAdd, onComplete, onDelete, onUpda
             onChange={e => setNewName(e.target.value)}
             className="flex-1 bg-background border border-white/10 rounded-xl px-4 py-3 focus:ring-2 focus:ring-royal/50 outline-none"
           />
-          <button type="submit" className="bg-royal text-white px-8 py-3 rounded-xl font-bold hover:bg-royal-light transition-all flex items-center gap-2">
+          <button type="submit" className="bg-royal text-white px-2 py-1 sm:px-4 sm:py-2 md:px-8 md:py-3 rounded-xl font-bold text-sm sm:text-base hover:bg-royal-light transition-all flex items-center gap-2 whitespace-nowrap">
             <Plus size={20} /> Create
           </button>
         </form>

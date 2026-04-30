@@ -34,7 +34,7 @@ export default function DashboardView({ stats, tasks, habits, onViewChange, onAd
     <motion.div 
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="space-y-8"
+      className="space-y-8 max-w-full overflow-x-hidden"
     >
       {/* Welcome Section */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
@@ -45,13 +45,13 @@ export default function DashboardView({ stats, tasks, habits, onViewChange, onAd
         <div className="flex items-center gap-3">
           <button 
             onClick={() => onViewChange('tasks')}
-            className="bg-white text-royal hover:bg-royal/10 px-4 py-2 rounded-xl font-semibold transition-all border border-royal/30 flex items-center gap-2"
+            className="bg-white text-royal hover:bg-royal/10 px-2 py-1 sm:px-4 sm:py-2 rounded-xl font-semibold text-sm sm:text-base transition-all border border-royal/30 flex items-center gap-2 whitespace-nowrap"
           >
             <Clock size={18} /> Focus Mode
           </button>
           <button 
             onClick={onAddTask}
-            className="bg-royal text-white hover:bg-[#3559c7] px-4 py-2 rounded-xl font-semibold transition-all shadow-lg shadow-royal/20 flex items-center gap-2"
+            className="bg-royal text-white hover:bg-[#3559c7] px-2 py-1 sm:px-4 sm:py-2 rounded-xl font-semibold text-sm sm:text-base transition-all shadow-lg shadow-royal/20 flex items-center gap-2 whitespace-nowrap"
           >
             <Plus size={18} /> New Objective
           </button>

@@ -25,7 +25,7 @@ export default function TasksView({ tasks, onUpdateTask, onDeleteTask, onAddTask
     <motion.div 
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="space-y-10"
+      className="space-y-10 max-w-full overflow-x-hidden"
     >
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 bg-card p-6 rounded-3xl border border-white/5">
         <div>
