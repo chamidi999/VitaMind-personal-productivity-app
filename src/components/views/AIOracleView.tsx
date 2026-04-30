@@ -76,7 +76,7 @@ export default function AIOracleView({ chat, input, isLoading, onInputChange, on
             value={input}
             onChange={e => onInputChange(e.target.value)}
             disabled={isLoading}
-            className="flex-1 bg-background border border-white/10 rounded-2xl px-6 py-4 outline-none focus:ring-2 focus:ring-royal/50 transition-all text-white placeholder:text-gray-600"
+            className="flex-1 bg-white border border-[#4169E1] rounded-2xl px-6 py-4 outline-none focus:border-[#4169E1] transition-all text-[#191970] placeholder:text-[#9CA3AF]"
           />
           <button 
             type="submit" 
