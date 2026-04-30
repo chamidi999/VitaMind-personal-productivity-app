@@ -275,7 +275,7 @@ USER CONTEXT: Name: ${user?.name}, Tasks: ${tasks.length}, Habits: ${habits.leng
     <div className="h-screen bg-background text-[#191970] flex font-sans selection:bg-royal/20 overflow-hidden">
       <Sidebar user={user} currentView={currentView} onViewChange={setCurrentView} onLogout={handleLogout} />
       
-      <main className="flex-1 ml-0 md:ml-72 p-6 pt-16 md:p-10 h-screen overflow-hidden max-w-full">
+      <main className="flex-1 ml-0 md:ml-72 px-4 pt-24 pb-6 md:p-10 h-screen overflow-hidden max-w-full">
         <Header 
           viewTitle={currentView.charAt(0).toUpperCase() + currentView.slice(1)}
           notifications={notifications}
@@ -302,7 +302,7 @@ USER CONTEXT: Name: ${user?.name}, Tasks: ${tasks.length}, Habits: ${habits.leng
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 onClick={() => setIsQuickActionOpen(false)}
-                className="fixed inset-0 z-[-1] bg-black/20 backdrop-blur-[2px]"
+                className="fixed inset-0 z-[-1] bg-black/20 backdrop-blur-md"
               />
               <motion.div 
                 initial={{ opacity: 0, y: 20 }}
@@ -419,11 +419,11 @@ USER CONTEXT: Name: ${user?.name}, Tasks: ${tasks.length}, Habits: ${habits.leng
 
 function QuickActionBtn({ onClick, label, color, icon }: any) {
   return (
-    <div className="flex items-center gap-4 justify-end group cursor-pointer" onClick={onClick}>
-      <span className="bg-card px-3 py-1.5 rounded-xl border border-gray-200 text-[10px] text-[#191970] font-black uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">
+    <div className="flex items-center gap-3 justify-end group cursor-pointer" onClick={onClick}>
+      <span className="bg-card/95 backdrop-blur-md px-3 py-2 rounded-lg border border-gray-200 text-[10px] text-[#191970] font-black uppercase tracking-widest opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
         {label}
       </span>
-      <div className={`h-12 w-12 rounded-2xl flex items-center justify-center text-white shadow-lg transition-all active:scale-95 ${color}`}>
+      <div className={`h-12 w-12 rounded-full flex items-center justify-center text-white shadow-lg transition-all active:scale-95 ${color}`}>
         {icon}
       </div>
     </div>

@@ -45,13 +45,13 @@ export default function DashboardView({ stats, tasks, habits, onViewChange, onAd
         <div className="flex items-center gap-3">
           <button 
             onClick={() => onViewChange('tasks')}
-            className="bg-white text-royal hover:bg-royal/10 px-2 py-1 sm:px-4 sm:py-2 rounded-xl font-semibold text-sm sm:text-base transition-all border border-royal/30 flex items-center gap-2 whitespace-nowrap"
+            className="h-11 bg-white text-royal hover:bg-royal/10 px-4 rounded-lg font-semibold text-sm sm:text-base transition-all border border-royal/30 flex items-center justify-center gap-2 whitespace-nowrap"
           >
             <Clock size={18} /> Focus Mode
           </button>
           <button 
             onClick={onAddTask}
-            className="bg-royal text-white hover:bg-[#3559c7] px-2 py-1 sm:px-4 sm:py-2 rounded-xl font-semibold text-sm sm:text-base transition-all shadow-lg shadow-royal/20 flex items-center gap-2 whitespace-nowrap"
+            className="h-11 bg-royal text-white hover:bg-[#3559c7] px-4 rounded-lg font-semibold text-sm sm:text-base transition-all shadow-lg shadow-royal/20 flex items-center justify-center gap-2 whitespace-nowrap"
           >
             <Plus size={18} /> New Objective
           </button>
