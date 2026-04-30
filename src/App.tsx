@@ -272,7 +272,7 @@ USER CONTEXT: Name: ${user?.name}, Tasks: ${tasks.length}, Habits: ${habits.leng
   };
 
   return (
-    <div className="min-h-screen bg-background text-white flex font-sans selection:bg-royal/30">
+    <div className="min-h-screen bg-background text-[#191970] flex font-sans selection:bg-royal/20">
       <Sidebar user={user} currentView={currentView} onViewChange={setCurrentView} onLogout={handleLogout} />
       
       <main className="flex-1 ml-72 p-10">
@@ -319,7 +319,7 @@ USER CONTEXT: Name: ${user?.name}, Tasks: ${tasks.length}, Habits: ${habits.leng
         </AnimatePresence>
         <button 
           onClick={() => setIsQuickActionOpen(!isQuickActionOpen)}
-          className={`h-16 w-16 rounded-full flex items-center justify-center shadow-2xl transition-all active:scale-95 ${isQuickActionOpen ? 'bg-white text-midnight rotate-45' : 'bg-royal text-white shadow-royal/40'}`}
+          className={`h-16 w-16 rounded-full flex items-center justify-center shadow-2xl transition-all active:scale-95 ${isQuickActionOpen ? 'bg-[#191970] text-white rotate-45' : 'bg-royal text-white shadow-royal/30'}`}
         >
           <Plus size={32} />
         </button>
@@ -329,10 +329,10 @@ USER CONTEXT: Name: ${user?.name}, Tasks: ${tasks.length}, Habits: ${habits.leng
       <AnimatePresence>
         {isTaskModalOpen && (
           <div className="fixed inset-0 z-100 flex items-center justify-center p-4">
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setIsTaskModalOpen(false)} className="absolute inset-0 bg-midnight/80 backdrop-blur-sm" />
-            <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }} className="bg-card w-full max-w-lg p-8 rounded-3xl border border-white/10 shadow-2xl relative z-10 overflow-hidden">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setIsTaskModalOpen(false)} className="absolute inset-0 bg-[#191970]/30 backdrop-blur-sm" />
+            <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }} className="bg-card w-full max-w-lg p-8 rounded-3xl border border-gray-200 shadow-xl relative z-10 overflow-hidden">
               <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-royal via-purple-500 to-emerald-500"></div>
-              <h3 className="text-xl font-bold mb-6 text-white">{editingTask ? 'Modify Objective' : 'Initialize Objective'}</h3>
+              <h3 className="text-xl font-bold mb-6 text-[#191970]">{editingTask ? 'Modify Objective' : 'Initialize Objective'}</h3>
               <form onSubmit={async (e) => {
                 e.preventDefault();
                 const taskData = { 
@@ -359,7 +359,7 @@ USER CONTEXT: Name: ${user?.name}, Tasks: ${tasks.length}, Habits: ${habits.leng
                     value={newTaskTitle}
                     onChange={e => setNewTaskTitle(e.target.value)}
                     placeholder="Operational objective..."
-                    className="w-full bg-background border border-white/5 rounded-2xl px-5 py-3 text-white outline-none focus:ring-2 focus:ring-royal/50 transition-all font-medium"
+                    className="w-full bg-white border border-gray-200 rounded-2xl px-5 py-3 text-gray-700 outline-none focus:ring-2 focus:ring-royal/50 transition-all font-medium"
                     required
                   />
                 </div>
@@ -370,7 +370,7 @@ USER CONTEXT: Name: ${user?.name}, Tasks: ${tasks.length}, Habits: ${habits.leng
                     value={newTaskDescription}
                     onChange={e => setNewTaskDescription(e.target.value)}
                     placeholder="Describe the mission parameters..."
-                    className="w-full bg-background border border-white/5 rounded-2xl px-5 py-3 text-white outline-none focus:ring-2 focus:ring-royal/50 transition-all min-h-25 resize-none"
+                    className="w-full bg-white border border-gray-200 rounded-2xl px-5 py-3 text-gray-700 outline-none focus:ring-2 focus:ring-royal/50 transition-all min-h-25 resize-none"
                   />
                 </div>
 
@@ -380,7 +380,7 @@ USER CONTEXT: Name: ${user?.name}, Tasks: ${tasks.length}, Habits: ${habits.leng
                     <select 
                       value={newTaskPriority}
                       onChange={e => setNewTaskPriority(e.target.value as Task['priority'])}
-                      className="w-full bg-background border border-white/5 rounded-2xl px-5 py-3 text-white outline-none focus:ring-2 focus:ring-royal/50 transition-all appearance-none"
+                      className="w-full bg-white border border-gray-200 rounded-2xl px-5 py-3 text-gray-700 outline-none focus:ring-2 focus:ring-royal/50 transition-all appearance-none"
                     >
                       <option value="low">Low Priority</option>
                       <option value="medium">Medium Priority</option>
@@ -393,14 +393,14 @@ USER CONTEXT: Name: ${user?.name}, Tasks: ${tasks.length}, Habits: ${habits.leng
                       type="date"
                       value={newTaskDueDate}
                       onChange={e => setNewTaskDueDate(e.target.value)}
-                      className="w-full bg-background border border-white/5 rounded-2xl px-5 py-3 text-white outline-none focus:ring-2 focus:ring-royal/50 transition-all"
+                      className="w-full bg-white border border-gray-200 rounded-2xl px-5 py-3 text-gray-700 outline-none focus:ring-2 focus:ring-royal/50 transition-all"
                       required
                     />
                   </div>
                 </div>
 
                 <div className="pt-4 flex justify-end gap-3">
-                  <button type="button" onClick={() => setIsTaskModalOpen(false)} className="px-6 py-3 text-gray-500 font-bold hover:text-white transition-colors">Abort Mission</button>
+                  <button type="button" onClick={() => setIsTaskModalOpen(false)} className="px-6 py-3 text-gray-500 font-bold hover:text-[#191970] transition-colors">Abort Mission</button>
                   <button type="submit" className="bg-royal text-white px-8 py-3 rounded-2xl font-bold shadow-lg shadow-royal/20 hover:bg-blue-600 transition-all active:scale-95">
                     {editingTask ? 'Save Changes' : 'Confirm Deployment'}
                   </button>
@@ -417,7 +417,7 @@ USER CONTEXT: Name: ${user?.name}, Tasks: ${tasks.length}, Habits: ${habits.leng
 function QuickActionBtn({ onClick, label, color, icon }: any) {
   return (
     <div className="flex items-center gap-4 justify-end group cursor-pointer" onClick={onClick}>
-      <span className="bg-card px-3 py-1.5 rounded-xl border border-white/5 text-[10px] font-black uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">
+      <span className="bg-card px-3 py-1.5 rounded-xl border border-gray-200 text-[10px] text-[#191970] font-black uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">
         {label}
       </span>
       <div className={`h-12 w-12 rounded-2xl flex items-center justify-center text-white shadow-lg transition-all active:scale-95 ${color}`}>

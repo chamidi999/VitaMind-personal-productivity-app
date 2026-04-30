@@ -39,19 +39,19 @@ export default function DashboardView({ stats, tasks, habits, onViewChange, onAd
       {/* Welcome Section */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight text-white mb-2">Welcome back, Strategist.</h2>
-          <p className="text-gray-400">Your systems are performing at 92% efficiency today.</p>
+          <h2 className="text-3xl font-bold tracking-tight text-[#191970] mb-2">Welcome back, Strategist.</h2>
+          <p className="text-gray-600">Your systems are performing at 92% efficiency today.</p>
         </div>
         <div className="flex items-center gap-3">
           <button 
             onClick={() => onViewChange('tasks')}
-            className="bg-royal/10 text-royal hover:bg-royal/20 px-4 py-2 rounded-xl font-semibold transition-all border border-royal/20 flex items-center gap-2"
+            className="bg-white text-royal hover:bg-royal/10 px-4 py-2 rounded-xl font-semibold transition-all border border-royal/30 flex items-center gap-2"
           >
             <Clock size={18} /> Focus Mode
           </button>
           <button 
             onClick={onAddTask}
-            className="bg-royal text-white hover:bg-royal-light px-4 py-2 rounded-xl font-semibold transition-all shadow-lg shadow-royal/20 flex items-center gap-2"
+            className="bg-royal text-white hover:bg-[#3559c7] px-4 py-2 rounded-xl font-semibold transition-all shadow-lg shadow-royal/20 flex items-center gap-2"
           >
             <Plus size={18} /> New Objective
           </button>
@@ -69,19 +69,19 @@ export default function DashboardView({ stats, tasks, habits, onViewChange, onAd
           <div 
             key={i} 
             onClick={() => onViewChange(stat.id as View)}
-            className="bg-card p-6 rounded-3xl border border-white/5 relative overflow-hidden group hover:border-white/10 transition-colors cursor-pointer active:scale-95"
+            className="bg-card p-6 rounded-3xl border border-gray-200 shadow-sm relative overflow-hidden group hover:border-white/10 transition-colors cursor-pointer active:scale-95"
           >
             <div className={`absolute top-0 right-0 w-24 h-24 bg-linear-to-br ${stat.color} to-transparent opacity-30 -mr-8 -mt-8 rounded-full blur-2xl group-hover:opacity-50 transition-opacity`}></div>
             <div className="flex justify-between items-start relative z-10">
               <div>
                 <p className="text-sm font-medium text-gray-500 mb-1">{stat.label}</p>
-                <h3 className="text-2xl font-bold text-white group-hover:text-royal transition-colors">{stat.value}</h3>
+                <h3 className="text-2xl font-bold text-[#191970] group-hover:text-royal transition-colors">{stat.value}</h3>
               </div>
-              <div className="bg-white/5 p-3 rounded-2xl group-hover:bg-white/10 transition-colors">
+              <div className="bg-[#f3f5fb] p-3 rounded-2xl group-hover:bg-[#e9eefb] transition-colors">
                 {stat.icon}
               </div>
             </div>
-            <p className="text-xs text-gray-400 mt-4 flex items-center gap-1 group-hover:text-gray-300 transition-colors">
+            <p className="text-xs text-gray-600 mt-4 flex items-center gap-1 group-hover:text-gray-300 transition-colors">
               <Activity size={12} className="text-royal" /> {stat.sub}
             </p>
           </div>
@@ -90,10 +90,10 @@ export default function DashboardView({ stats, tasks, habits, onViewChange, onAd
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Performance Chart */}
-        <div className="lg:col-span-2 bg-card p-8 rounded-3xl border border-white/5">
+        <div className="lg:col-span-2 bg-card p-8 rounded-3xl border border-gray-200 shadow-sm">
           <div className="flex items-center justify-between mb-8">
-            <h3 className="text-lg font-bold">System Performance</h3>
-            <select className="bg-white/5 border-none rounded-lg text-xs px-3 py-1 outline-none text-gray-400">
+            <h3 className="text-lg font-bold text-[#191970]">System Performance</h3>
+            <select className="bg-white/5 border-none rounded-lg text-xs px-3 py-1 outline-none text-gray-600">
               <option>Last 7 Days</option>
               <option>Last 30 Days</option>
             </select>
@@ -110,8 +110,8 @@ export default function DashboardView({ stats, tasks, habits, onViewChange, onAd
                 <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#666', fontSize: 12}} />
                 <YAxis hide />
                 <Tooltip 
-                  contentStyle={{ backgroundColor: '#161623', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px' }}
-                  itemStyle={{ color: '#fff' }}
+                  contentStyle={{ backgroundColor: '#ffffff', border: '1px solid #e5e7eb', borderRadius: '12px' }}
+                  itemStyle={{ color: '#191970' }}
                 />
                 <Area type="monotone" dataKey="completion" stroke="#4169e1" strokeWidth={3} fillOpacity={1} fill="url(#colorComp)" />
               </AreaChart>
@@ -120,9 +120,9 @@ export default function DashboardView({ stats, tasks, habits, onViewChange, onAd
         </div>
 
         {/* Up Next Section */}
-        <div className="bg-card p-8 rounded-3xl border border-white/5">
+        <div className="bg-card p-8 rounded-3xl border border-gray-200 shadow-sm">
           <div className="flex items-center justify-between mb-6">
-            <h3 className="text-lg font-bold">Priority Objectives</h3>
+            <h3 className="text-lg font-bold text-[#191970]">Priority Objectives</h3>
             <button onClick={() => onViewChange('tasks')} className="text-royal text-xs font-bold hover:underline">View All</button>
           </div>
           <div className="space-y-4">
@@ -136,7 +136,7 @@ export default function DashboardView({ stats, tasks, habits, onViewChange, onAd
                   <Calendar size={18} />
                 </div>
                 <div className="flex-1 overflow-hidden">
-                  <h4 className="font-semibold text-sm text-white truncate group-hover:text-royal transition-colors">{task.title}</h4>
+                  <h4 className="font-semibold text-sm text-[#191970] truncate group-hover:text-royal transition-colors">{task.title}</h4>
                   <p className="text-[10px] text-gray-500 uppercase tracking-widest mt-0.5">{task.priority} Priority</p>
                 </div>
                 <ChevronRight size={16} className="text-gray-600 opacity-0 group-hover:opacity-100 transition-all -translate-x-2 group-hover:translate-x-0" />

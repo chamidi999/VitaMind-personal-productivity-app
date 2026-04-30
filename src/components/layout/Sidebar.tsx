@@ -15,10 +15,10 @@ interface SidebarProps {
 
 export default function Sidebar({ user, currentView, onViewChange, onLogout }: SidebarProps) {
   return (
-    <aside className="w-72 border-r border-white/5 flex flex-col p-6 fixed h-full bg-background z-20">
+    <aside className="w-72 border-r border-[#0f1458] flex flex-col p-6 fixed h-full bg-[#191970] z-20">
       <div className="flex items-center gap-3 mb-12">
-        <div className="h-10 w-10 bg-royal rounded-xl flex items-center justify-center">
-          <Zap className="text-white h-6 w-6" />
+        <div className="h-10 w-10 bg-white rounded-xl flex items-center justify-center">
+          <Zap className="text-royal h-6 w-6" />
         </div>
         <span className="text-xl font-bold tracking-tight text-white">VitaMind</span>
       </div>
@@ -42,12 +42,12 @@ export default function Sidebar({ user, currentView, onViewChange, onLogout }: S
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-semibold truncate text-white">{user?.name}</p>
-            <p className="text-xs text-gray-500 truncate">{user?.email}</p>
+            <p className="text-xs text-blue-200 truncate">{user?.email}</p>
           </div>
         </div>
         <button 
           onClick={onLogout}
-          className="w-full flex items-center gap-3 p-3 rounded-xl text-gray-500 hover:bg-red-500/10 hover:text-red-500 transition-all group font-bold"
+          className="w-full flex items-center gap-3 p-3 rounded-xl text-blue-100 hover:bg-white/10 hover:text-white transition-all group font-bold"
         >
           <LogOut size={20} className="group-hover:translate-x-1 transition-transform" />
           <span className="text-sm">Logout / Sign Out</span>
@@ -63,11 +63,11 @@ function NavItem({ active, onClick, icon, label }: { active: boolean, onClick: (
       onClick={onClick}
       className={`w-full flex items-center gap-3 p-3 rounded-xl transition-all relative group ${
         active 
-          ? 'text-white bg-royal/10' 
-          : 'text-gray-500 hover:text-gray-300 hover:bg-white/5'
+          ? 'text-white bg-royal/25' 
+          : 'text-blue-100 hover:text-white hover:bg-white/10'
       }`}
     >
-      <div className={`${active ? 'text-royal' : 'group-hover:text-gray-300'} transition-colors`}>
+      <div className={`${active ? 'text-royal' : 'group-hover:text-white'} transition-colors`}>
         {icon}
       </div>
       <span className="font-semibold text-sm">{label}</span>
