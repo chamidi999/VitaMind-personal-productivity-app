@@ -90,7 +90,7 @@ export default function SettingsPanel({ user, onUpdateUser, onClose }: SettingsP
                       type="text" 
                       value={name}
                       onChange={e => setName(e.target.value)}
-                      className="w-full bg-midnight border border-white/10 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-royal/50 outline-none"
+                      className="w-full bg-white border border-[#D1D5DB] rounded-xl px-4 py-3 text-sm text-[#191970] placeholder:text-[#9CA3AF] focus:border-[#4169E1] outline-none"
                     />
                   </div>
                   <div>
@@ -99,7 +99,7 @@ export default function SettingsPanel({ user, onUpdateUser, onClose }: SettingsP
                       type="email" 
                       value={user.email}
                       disabled
-                      className="w-full bg-midnight/50 border border-white/5 rounded-xl px-4 py-3 text-sm text-gray-500 cursor-not-allowed"
+                      className="w-full bg-[#F9FAFB] border border-[#D1D5DB] rounded-xl px-4 py-3 text-sm text-[#191970] placeholder:text-[#9CA3AF] cursor-not-allowed"
                     />
                   </div>
                 </div>
@@ -111,7 +111,7 @@ export default function SettingsPanel({ user, onUpdateUser, onClose }: SettingsP
                     onChange={e => setBio(e.target.value)}
                     rows={4}
                     placeholder="Tell us about yourself..."
-                    className="w-full bg-midnight border border-white/10 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-royal/50 outline-none resize-none"
+                    className="w-full bg-white border border-[#D1D5DB] rounded-xl px-4 py-3 text-sm text-[#191970] placeholder:text-[#9CA3AF] focus:border-[#4169E1] outline-none resize-none"
                   />
                 </div>
 

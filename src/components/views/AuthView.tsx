@@ -82,7 +82,7 @@ export default function AuthView({ onLogin, onRegister }: AuthViewProps) {
                   type="text" 
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full bg-background border border-white/5 rounded-2xl px-5 py-3.5 text-white focus:outline-none focus:ring-2 focus:ring-royal/50 transition-all"
+                  className="w-full bg-white border border-[#D1D5DB] rounded-2xl px-5 py-3.5 text-[#191970] placeholder:text-[#9CA3AF] focus:outline-none focus:border-[#4169E1] transition-all"
                   placeholder="John Doe"
                   required
                 />
@@ -94,7 +94,7 @@ export default function AuthView({ onLogin, onRegister }: AuthViewProps) {
                 type="email" 
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full bg-background border border-white/5 rounded-2xl px-5 py-3.5 text-white focus:outline-none focus:ring-2 focus:ring-royal/50 transition-all"
+                className="w-full bg-white border border-[#D1D5DB] rounded-2xl px-5 py-3.5 text-[#191970] placeholder:text-[#9CA3AF] focus:outline-none focus:border-[#4169E1] transition-all"
                 placeholder="name@example.com"
                 required
               />
@@ -105,7 +105,7 @@ export default function AuthView({ onLogin, onRegister }: AuthViewProps) {
                 type="password" 
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full bg-background border border-white/5 rounded-2xl px-5 py-3.5 text-white focus:outline-none focus:ring-2 focus:ring-royal/50 transition-all"
+                className="w-full bg-white border border-[#D1D5DB] rounded-2xl px-5 py-3.5 text-[#191970] placeholder:text-[#9CA3AF] focus:outline-none focus:border-[#4169E1] transition-all"
                 placeholder="••••••••"
                 required
               />
