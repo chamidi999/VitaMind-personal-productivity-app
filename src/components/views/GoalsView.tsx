@@ -40,8 +40,8 @@ export default function GoalsView({
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-5xl space-y-8">
       <div className="flex justify-between items-center bg-card p-6 rounded-3xl border border-white/5">
         <div>
-          <h2 className="text-2xl font-bold text-white">Vision Horizon</h2>
-          <p className="text-gray-400 text-sm">Design your ultimate future architecture.</p>
+          <h2 className="text-2xl font-bold text-[#191970]">Vision Horizon</h2>
+          <p className="text-gray-700 text-sm">Design your ultimate future architecture.</p>
         </div>
         <button 
           onClick={() => setIsAdding(!isAdding)}
@@ -62,7 +62,7 @@ export default function GoalsView({
             <div className="bg-card p-8 rounded-3xl border border-white/5 mb-8">
               <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="md:col-span-2">
-                  <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Title</label>
+                  <label className="block text-xs font-bold text-[#191970] uppercase tracking-widest mb-2">Title</label>
                   <input 
                     type="text" 
                     placeholder="e.g. Master TypeScript 5.0"
@@ -72,7 +72,7 @@ export default function GoalsView({
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Target Date</label>
+                  <label className="block text-xs font-bold text-[#191970] uppercase tracking-widest mb-2">Target Date</label>
                   <input 
                     type="date" 
                     value={targetDate}
@@ -100,8 +100,8 @@ export default function GoalsView({
                    <Target size={24} />
                  </div>
                  <div>
-                   <h4 className="text-xl font-bold text-white">{goal.title}</h4>
-                   <p className="text-sm text-gray-500">Target: {goal.target_date || 'Ongoing'}</p>
+                   <h4 className="text-xl font-bold text-[#191970]">{goal.title}</h4>
+                   <p className="text-sm text-gray-700">Target: {goal.target_date || 'Ongoing'}</p>
                  </div>
                </div>
                
@@ -122,7 +122,7 @@ export default function GoalsView({
                    </button>
                    <button 
                     onClick={() => setExpandedGoal(expandedGoal === goal.id ? null : goal.id)}
-                    className="p-2 text-gray-500 hover:text-white"
+                    className="p-2 text-gray-700 hover:text-[#191970]"
                    >
                      {expandedGoal === goal.id ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
                    </button>
@@ -139,7 +139,7 @@ export default function GoalsView({
                   className="overflow-hidden border-t border-white/5 bg-white/2"
                 >
                   <div className="p-8">
-                    <h5 className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-6">Milestones Architecture</h5>
+                    <h5 className="text-xs font-bold text-[#191970] uppercase tracking-widest mb-6">Milestones Architecture</h5>
                     <MilestoneList 
                       milestones={goal.milestones}
                       onToggle={onToggleMilestone}

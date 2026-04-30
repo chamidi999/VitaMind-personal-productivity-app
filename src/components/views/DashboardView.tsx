@@ -81,7 +81,7 @@ export default function DashboardView({ stats, tasks, habits, onViewChange, onAd
                 {stat.icon}
               </div>
             </div>
-            <p className="text-xs text-gray-600 mt-4 flex items-center gap-1 group-hover:text-gray-300 transition-colors">
+            <p className="text-xs text-gray-600 mt-4 flex items-center gap-1 group-hover:text-gray-700 transition-colors">
               <Activity size={12} className="text-royal" /> {stat.sub}
             </p>
           </div>

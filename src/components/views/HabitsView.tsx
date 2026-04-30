@@ -24,7 +24,7 @@ export default function HabitsView({ habits, onAdd, onComplete, onDelete, onUpda
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-4xl space-y-8">
       <div className="bg-card p-8 rounded-3xl border border-white/5">
-        <h3 className="text-xl font-bold mb-6">New Ritual</h3>
+        <h3 className="text-xl font-bold text-[#191970] mb-6">New Ritual</h3>
         <form onSubmit={handleSubmit} className="flex gap-4">
           <input 
             type="text" 
@@ -82,19 +82,19 @@ function HabitItem({ habit, onComplete, onDelete, onUpdate }: {
             onChange={e => setName(e.target.value)}
             onBlur={save}
             onKeyPress={e => e.key === 'Enter' && save()}
-            className="bg-background text-white font-bold text-lg px-2 py-1 rounded w-full border border-royal/50"
+            className="bg-background text-[#191970] font-bold text-lg px-2 py-1 rounded w-full border border-royal/50"
           />
         ) : (
           <h4 
-            className="text-lg font-bold cursor-pointer hover:text-royal transition-colors" 
+            className="text-lg font-bold text-[#191970] cursor-pointer hover:text-royal transition-colors" 
             onClick={() => setIsEditing(true)}
           >
             {habit.name}
           </h4>
         )}
         <div className="flex items-center gap-2 mt-1">
-          <Flame size={16} className={habit.streak > 0 ? "text-orange-500" : "text-gray-600"} />
-          <span className="text-sm font-semibold text-gray-400">{habit.streak} day streak</span>
+          <Flame size={16} className={habit.streak > 0 ? "text-orange-500" : "text-gray-700"} />
+          <span className="text-sm font-semibold text-gray-700">{habit.streak} day streak</span>
         </div>
       </div>
       <div className="flex items-center gap-2">
