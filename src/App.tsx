@@ -275,7 +275,7 @@ USER CONTEXT: Name: ${user?.name}, Tasks: ${tasks.length}, Habits: ${habits.leng
     <div className="h-screen bg-background text-[#191970] flex font-sans selection:bg-royal/20 overflow-hidden">
       <Sidebar user={user} currentView={currentView} onViewChange={setCurrentView} onLogout={handleLogout} />
       
-      <main className="flex-1 ml-0 md:ml-72 p-4 md:p-10 h-screen overflow-hidden">
+      <main className="flex-1 ml-0 md:ml-72 p-6 pt-16 md:p-10 h-screen overflow-hidden max-w-full">
         <Header 
           viewTitle={currentView.charAt(0).toUpperCase() + currentView.slice(1)}
           notifications={notifications}
@@ -288,12 +288,12 @@ USER CONTEXT: Name: ${user?.name}, Tasks: ${tasks.length}, Habits: ${habits.leng
         />
 
         <AnimatePresence mode="wait">
-          <div key={currentView} className="h-[calc(100vh-6rem)] overflow-y-auto pr-1">{renderView()}</div>
+          <div key={currentView} className="h-[calc(100vh-6rem)] overflow-y-auto pr-1 max-w-full overflow-x-hidden">{renderView()}</div>
         </AnimatePresence>
       </main>
 
       {/* Floating Action Button */}
-      <div className="fixed bottom-10 right-10 z-60">
+      <div className="fixed bottom-6 right-4 md:bottom-10 md:right-10 z-60">
         <AnimatePresence>
           {isQuickActionOpen && (
             <>
@@ -310,16 +310,19 @@ USER CONTEXT: Name: ${user?.name}, Tasks: ${tasks.length}, Habits: ${habits.leng
                 exit={{ opacity: 0, y: 20 }}
                 className="absolute bottom-20 right-0 space-y-4"
               >
-                <QuickActionBtn onClick={() => { setIsTaskModalOpen(true); setIsQuickActionOpen(false); }} label="Task" color="bg-royal" icon={<Plus size={18} />} />
-                <QuickActionBtn onClick={() => { setCurrentView('habits'); setIsQuickActionOpen(false); }} label="Habit" color="bg-orange-500" icon={<Flame size={18} />} />
-                <QuickActionBtn onClick={() => { setCurrentView('goals'); setIsQuickActionOpen(false); }} label="Goal" color="bg-emerald-500" icon={<Target size={18} />} />
+                <QuickActionBtn onClick={() => { setCurrentView('dashboard'); setIsQuickActionOpen(false); }} label="Dashboard" color="bg-royal" icon={<Plus size={18} />} />
+                <QuickActionBtn onClick={() => { setCurrentView('tasks'); setIsQuickActionOpen(false); }} label="Tasks" color="bg-indigo-500" icon={<Plus size={18} />} />
+                <QuickActionBtn onClick={() => { setCurrentView('habits'); setIsQuickActionOpen(false); }} label="Habits" color="bg-orange-500" icon={<Flame size={18} />} />
+                <QuickActionBtn onClick={() => { setCurrentView('goals'); setIsQuickActionOpen(false); }} label="Goals" color="bg-emerald-500" icon={<Target size={18} />} />
+                <QuickActionBtn onClick={() => { setCurrentView('ai'); setIsQuickActionOpen(false); }} label="AI Mind" color="bg-purple-500" icon={<Plus size={18} />} />
+                <QuickActionBtn onClick={() => { setCurrentView('settings'); setIsQuickActionOpen(false); }} label="Settings" color="bg-slate-500" icon={<Plus size={18} />} />
               </motion.div>
             </>
           )}
         </AnimatePresence>
         <button 
           onClick={() => setIsQuickActionOpen(!isQuickActionOpen)}
-          className={`h-16 w-16 rounded-full flex items-center justify-center shadow-2xl transition-all active:scale-95 ${isQuickActionOpen ? 'bg-[#191970] text-white rotate-45' : 'bg-royal text-white shadow-royal/30'}`}
+          className={`h-14 w-14 md:h-16 md:w-16 rounded-full flex items-center justify-center shadow-2xl transition-all active:scale-95 ${isQuickActionOpen ? 'bg-[#191970] text-white rotate-45' : 'bg-royal text-white shadow-royal/30'}`}
         >
           <Plus size={32} />
         </button>

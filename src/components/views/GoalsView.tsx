@@ -37,7 +37,7 @@ export default function GoalsView({
   };
 
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-5xl space-y-8">
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-full xl:max-w-5xl space-y-8 overflow-x-hidden">
       <div className="flex justify-between items-center bg-card p-6 rounded-3xl border border-white/5">
         <div>
           <h2 className="text-2xl font-bold text-[#191970]">Vision Horizon</h2>
@@ -45,7 +45,7 @@ export default function GoalsView({
         </div>
         <button 
           onClick={() => setIsAdding(!isAdding)}
-          className="bg-royal text-white px-6 py-3 rounded-xl font-bold hover:bg-royal-light transition-all flex items-center gap-2"
+          className="bg-royal text-white px-2 py-1 sm:px-4 sm:py-2 md:px-6 md:py-3 rounded-xl font-bold text-sm sm:text-base hover:bg-royal-light transition-all flex items-center gap-2 whitespace-nowrap"
         >
           <Plus size={20} /> {isAdding ? 'Close' : 'New Goal'}
         </button>
@@ -81,7 +81,7 @@ export default function GoalsView({
                   />
                 </div>
                 <div className="md:col-span-3 flex justify-end">
-                  <button type="submit" className="bg-royal text-white px-10 py-3 rounded-xl font-bold hover:bg-royal-light transition-all">
+                  <button type="submit" className="bg-royal text-white px-2 py-1 sm:px-4 sm:py-2 md:px-10 md:py-3 rounded-xl font-bold text-sm sm:text-base hover:bg-royal-light transition-all whitespace-nowrap">
                     Launch Objective
                   </button>
                 </div>

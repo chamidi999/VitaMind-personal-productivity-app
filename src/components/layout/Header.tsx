@@ -13,7 +13,7 @@ interface HeaderProps {
 
 export default function Header({ viewTitle, notifications, isNoteOpen, setIsNoteOpen, onReadNotification }: HeaderProps) {
   return (
-    <header className="flex justify-between items-center mb-10">
+    <header className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 mb-8 px-1">
       <div>
         <h2 className="text-3xl font-bold tracking-tight text-[#191970]">{viewTitle}</h2>
         <p className="text-gray-600 mt-1">{format(new Date(), 'EEEE, MMMM do')}</p>
