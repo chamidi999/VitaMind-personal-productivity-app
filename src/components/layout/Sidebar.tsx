@@ -37,8 +37,12 @@ export default function Sidebar({ user, currentView, onViewChange, onLogout }: S
 
       <div className="mt-auto space-y-4 pt-6 border-t border-white/5">
         <div className="flex items-center gap-3 p-2">
-          <div className="h-10 w-10 bg-royal/10 rounded-full flex items-center justify-center text-royal font-bold border border-royal/20">
-            {user?.name?.[0]?.toUpperCase()}
+          <div className="h-10 w-10 bg-royal/10 rounded-full flex items-center justify-center text-royal font-bold border border-royal/20 overflow-hidden">
+            {user?.profile_pic ? (
+              <img src={user.profile_pic} alt="Profile" className="h-full w-full object-cover" />
+            ) : (
+              user?.name?.[0]?.toUpperCase()
+            )}
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-semibold truncate text-white">{user?.name}</p>
