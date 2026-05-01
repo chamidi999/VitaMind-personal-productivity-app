@@ -155,6 +155,37 @@ export default function App() {
     setIsTaskModalOpen(true);
   };
 
+  const handleToggleMilestone = async (id: number, isCompleted: boolean) => {
+    if (!token) return;
+
+    const previousGoals = goals;
+
+    setGoals(prevGoals =>
+      prevGoals.map(goal => {
+        const updatedMilestones = goal.milestones.map(m =>
+          m.id === id ? { ...m, is_completed: isCompleted } : m
+        );
+        const totalMilestones = updatedMilestones.length;
+        const completedMilestones = updatedMilestones.filter(m => m.is_completed).length;
+        const progress = totalMilestones > 0 ? (completedMilestones / totalMilestones) * 100 : 0;
+
+        return {
+          ...goal,
+          milestones: updatedMilestones,
+          progress
+        };
+      })
+    );
+
+    try {
+      await api.milestones.update(token, id, isCompleted);
+      await refreshData();
+    } catch (error) {
+      setGoals(previousGoals);
+      console.error('Failed to toggle milestone', error);
+    }
+  };
+
   const askAI = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!aiInput.trim() || !token) return;
@@ -249,7 +280,7 @@ USER CONTEXT: Name: ${user?.name}, Tasks: ${tasks.length}, Habits: ${habits.leng
             onAdd={(d) => api.goals.create(token, d).then(refreshData)}
             onDelete={(id) => api.goals.delete(token, id).then(refreshData)}
             onAddMilestone={(id, t) => api.goals.addMilestone(token, id, t).then(refreshData)}
-            onToggleMilestone={(id, c) => api.milestones.update(token, id, c).then(refreshData)}
+            onToggleMilestone={handleToggleMilestone}
             onDeleteMilestone={(id) => api.milestones.delete(token, id).then(refreshData)}
           />
         );
