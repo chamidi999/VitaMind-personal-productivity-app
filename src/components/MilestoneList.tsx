@@ -49,18 +49,18 @@ export default function MilestoneList({ milestones, onToggle, onDelete, onAdd }:
         ))}
       </div>
 
-      <form onSubmit={handleSubmit} className="mt-4 flex gap-2">
+      <form onSubmit={handleSubmit} className="mt-4 flex items-center gap-2">
         <input 
           type="text" 
           value={newMilestone}
           onChange={e => setNewMilestone(e.target.value)}
           placeholder="New milestone..."
-          className="flex-1 bg-midnight border border-white/10 rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-royal/50 outline-none"
+          className="flex-1 bg-background border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-[#191970] placeholder:text-gray-400 focus:ring-2 focus:ring-royal/50 outline-none"
         />
         <button 
           type="submit"
           disabled={!newMilestone.trim()}
-          className="bg-royal text-white p-2 rounded-xl disabled:opacity-50"
+          className="bg-royal text-white px-3 py-2.5 rounded-xl hover:bg-royal-light transition-colors disabled:opacity-50"
         >
           <Plus size={18} />
         </button>
