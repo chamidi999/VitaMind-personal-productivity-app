@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Plus, Flame, Target } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { GoogleGenAI } from "@google/genai";
@@ -51,28 +51,7 @@ export default function App() {
   const [aiChat, setAiChat] = useState<ChatMessage[]>([]);
   const [isAiLoading, setIsAiLoading] = useState(false);
 
-  useEffect(() => {
-    if (token) {
-      loadInitialData();
-    }
-  }, [token]);
-
-  const loadInitialData = async () => {
-    if (!token) return;
-    try {
-      const u = await api.auth.me(token);
-      if (u.id) {
-        setUser(u);
-        refreshData();
-      } else {
-        handleLogout();
-      }
-    } catch (e) {
-      handleLogout();
-    }
-  };
-
-  const refreshData = async () => {
+  const refreshData = useCallback(async () => {
     if (!token) return;
     try {
       // Fetch core data
@@ -96,7 +75,29 @@ export default function App() {
     } catch (e) {
       console.error('Refresh failed', e);
     }
+  }, [token]);
+
+  useEffect(() => {
+    if (token) {
+      loadInitialData();
+    }
+  }, [token, refreshData]);
+
+  const loadInitialData = async () => {
+    if (!token) return;
+    try {
+      const u = await api.auth.me(token);
+      if (u.id) {
+        setUser(u);
+        await refreshData();
+      } else {
+        handleLogout();
+      }
+    } catch (e) {
+      handleLogout();
+    }
   };
+
 
   const handleLogin = async (email: string, pass: string) => {
     try {
@@ -283,7 +284,7 @@ USER CONTEXT: Name: ${user?.name}, Tasks: ${tasks.length}, Habits: ${habits.leng
           setIsNoteOpen={setIsNoteOpen}
           onReadNotification={async (id) => {
             await fetch(`/api/notifications/${id}/read`, { method: 'PATCH', headers: { 'Authorization': `Bearer ${token}` } });
-            refreshData();
+            await refreshData();
           }}
         />
 
@@ -353,7 +354,7 @@ USER CONTEXT: Name: ${user?.name}, Tasks: ${tasks.length}, Habits: ${habits.leng
                 }
                 
                 setIsTaskModalOpen(false);
-                refreshData();
+                await refreshData();
               }} className="space-y-5">
                 <div>
                   <label className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 block">Title</label>
