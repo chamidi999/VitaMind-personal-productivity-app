@@ -295,17 +295,7 @@ USER CONTEXT: Name: ${user?.name}, Tasks: ${tasks.length}, Habits: ${habits.leng
           />
         );
       case 'settings':
-        return (
-          <SettingsPanel
-            user={user}
-            onUpdateUser={async (d) => {
-              await api.auth.updateProfile(token, d);
-              const refreshedUser = await api.auth.me(token);
-              setUser(refreshedUser);
-            }}
-            onClose={() => setCurrentView('dashboard')}
-          />
-        );
+        return <SettingsPanel user={user} onUpdateUser={(d) => api.auth.updateProfile(token, d).then(loadInitialData)} onClose={() => setCurrentView('dashboard')} />;
       case 'admin':
         return <AdminPanel token={token} />;
       default:

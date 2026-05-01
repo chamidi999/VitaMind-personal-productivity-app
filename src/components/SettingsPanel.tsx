@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useState } from 'react';
 import { User, Shield, Info, Image, Bell, CreditCard, CheckSquare, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { User as UserType } from '../types';
@@ -14,39 +14,11 @@ export default function SettingsPanel({ user, onUpdateUser, onClose }: SettingsP
   const [bio, setBio] = useState(user.bio || '');
   const [isSaving, setIsSaving] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
-  const [profilePic, setProfilePic] = useState(user.profile_pic || '');
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const fileToBase64 = (file: File): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(String(reader.result || ''));
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
-    });
-  };
-
-  const handleAvatarSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    if (file.size > 800 * 1024) {
-      alert('Image is too large. Please select an image under 800KB.');
-      e.target.value = '';
-      return;
-    }
-
-    try {
-      const base64 = await fileToBase64(file);
-      setProfilePic(base64);
-    } catch (error) {
-      console.error('Failed to convert image to Base64', error);
-    }
-  };
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSaving(true);
-    await onUpdateUser({ name, bio, profile_pic: profilePic });
+    await onUpdateUser({ name, bio });
     setIsSaving(false);
     setShowSuccess(true);
     setTimeout(() => {
@@ -100,26 +72,11 @@ export default function SettingsPanel({ user, onUpdateUser, onClose }: SettingsP
               <h3 className="text-xl font-bold mb-8">Public Profile</h3>
               <form onSubmit={handleSave} className="space-y-6">
                 <div className="flex items-center gap-6 mb-8">
-                  <div className="h-20 w-20 bg-royal/10 rounded-full flex items-center justify-center text-royal font-black text-2xl border-2 border-royal/30 overflow-hidden">
-                    {profilePic ? (
-                      <img src={profilePic} alt="Profile" className="h-full w-full object-cover" />
-                    ) : (
-                      user.name?.[0]?.toUpperCase()
-                    )}
+                  <div className="h-20 w-20 bg-royal/10 rounded-full flex items-center justify-center text-royal font-black text-2xl border-2 border-royal/30">
+                    {user.name?.[0]?.toUpperCase()}
                   </div>
                   <div>
-                    <input
-                      ref={fileInputRef}
-                      type="file"
-                      accept="image/*"
-                      onChange={handleAvatarSelect}
-                      className="hidden"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => fileInputRef.current?.click()}
-                      className="text-royal text-sm font-bold hover:underline mb-1 flex items-center gap-2"
-                    >
+                    <button type="button" className="text-royal text-sm font-bold hover:underline mb-1 flex items-center gap-2">
                       <Image size={14} /> Change Avatar
                     </button>
                     <p className="text-gray-500 text-xs">JPG, GIF or PNG. Max size of 800K</p>
