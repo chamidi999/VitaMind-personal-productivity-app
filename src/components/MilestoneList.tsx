@@ -28,14 +28,14 @@ export default function MilestoneList({ milestones, onToggle, onDelete, onAdd }:
 
       <div className="space-y-2">
         {milestones.map(m => (
-          <div key={m.id} className="flex items-center gap-3 p-3 bg-midnight/50 rounded-xl border border-white/5 group hover:border-white/10 transition-all">
+          <div key={m.id} className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl border border-gray-200 group hover:border-gray-300 transition-all">
             <button 
               onClick={() => onToggle(m.id, !m.is_completed)}
-              className={`transition-colors ${m.is_completed ? 'text-emerald-500' : 'text-gray-600 hover:text-white'}`}
+              className={`transition-colors ${m.is_completed ? 'text-emerald-500' : 'text-gray-600 hover:text-[#191970]'}`}
             >
               {m.is_completed ? <CheckCircle2 size={18} /> : <Circle size={18} />}
             </button>
-            <span className={`flex-1 text-sm ${m.is_completed ? 'text-gray-600 line-through' : 'text-white'}`}>
+            <span className={`flex-1 text-sm ${m.is_completed ? 'text-gray-400 line-through' : 'text-[#191970]'}`}>
               {m.title}
             </span>
             <button 
@@ -55,12 +55,12 @@ export default function MilestoneList({ milestones, onToggle, onDelete, onAdd }:
           value={newMilestone}
           onChange={e => setNewMilestone(e.target.value)}
           placeholder="New milestone..."
-          className="flex-1 bg-background border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-[#191970] placeholder:text-gray-400 focus:ring-2 focus:ring-royal/50 outline-none"
+          className="h-10 flex-1 bg-background border border-gray-200 rounded-xl px-4 text-sm text-[#191970] placeholder:text-gray-400 focus:ring-2 focus:ring-royal/50 outline-none"
         />
         <button 
           type="submit"
           disabled={!newMilestone.trim()}
-          className="bg-royal text-white px-3 py-2.5 rounded-xl hover:bg-royal-light transition-colors disabled:opacity-50"
+          className="h-10 w-10 bg-royal text-white rounded-xl hover:bg-royal-light transition-colors disabled:opacity-50 inline-flex items-center justify-center"
         >
           <Plus size={18} />
         </button>
