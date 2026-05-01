@@ -37,8 +37,8 @@ export default function GoalsView({
   };
 
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-full xl:max-w-5xl space-y-8 overflow-x-hidden">
-      <div className="flex justify-between items-center bg-card p-6 rounded-3xl border border-white/5">
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="w-full max-w-4xl xl:max-w-5xl mx-auto space-y-6 overflow-x-hidden px-3 md:px-0 pt-20 md:pt-10 pb-8">
+      <div className="flex flex-wrap sm:flex-nowrap justify-between items-start sm:items-center gap-4 bg-card p-5 md:p-6 rounded-2xl border border-gray-200/80 shadow-[0_1px_4px_rgba(15,23,42,0.06)]">
         <div>
           <h2 className="text-2xl font-bold text-[#191970]">Vision Horizon</h2>
           <p className="text-gray-700 text-sm">Design your ultimate future architecture.</p>
@@ -91,43 +91,43 @@ export default function GoalsView({
         )}
       </AnimatePresence>
 
-      <div className="grid grid-cols-1 gap-6">
+      <div className="grid grid-cols-1 gap-4 md:gap-5">
         {goals.map(goal => (
-          <div key={goal.id} className="bg-card rounded-3xl border border-white/5 overflow-hidden group">
-            <div className="p-6 flex items-center justify-between gap-6">
-               <div className="flex items-center gap-4">
-                 <div className="h-12 w-12 bg-royal/10 rounded-2xl flex items-center justify-center text-royal">
-                   <Target size={24} />
-                 </div>
-                 <div>
-                   <h4 className="text-xl font-bold text-[#191970]">{goal.title}</h4>
-                   <p className="text-sm text-gray-700">Target: {goal.target_date || 'Ongoing'}</p>
-                 </div>
-               </div>
-               
-               <div className="flex items-center gap-6">
-                 <div className="hidden md:block w-32 h-2 bg-white/5 rounded-full overflow-hidden">
-                   <div 
-                    className="h-full bg-royal transition-all duration-1000" 
-                    style={{ width: `${goal.progress}%` }}
-                   />
-                 </div>
-                 <div className="flex items-center gap-2">
-                   {goal.status === 'completed' && <div className="h-3 w-3 bg-emerald-500 rounded-full animate-pulse shadow-[0_0_15px_#10b981]"></div>}
-                   <button 
-                    onClick={() => onDelete(goal.id)}
-                    className="text-gray-500 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all p-2 hover:bg-red-500/10 rounded-xl"
-                   >
-                     <Trash2 size={20} />
-                   </button>
-                   <button 
-                    onClick={() => setExpandedGoal(expandedGoal === goal.id ? null : goal.id)}
-                    className="p-2 text-gray-700 hover:text-[#191970]"
-                   >
-                     {expandedGoal === goal.id ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
-                   </button>
-                 </div>
-               </div>
+          <div key={goal.id} className="bg-card rounded-2xl border border-gray-200/80 shadow-[0_1px_5px_rgba(15,23,42,0.06)] overflow-hidden group">
+            <div className="p-4 md:p-5 flex items-center justify-between gap-3 md:gap-4">
+              <div className="min-w-0 flex-1 flex items-center gap-3 md:gap-4">
+                <div className="h-11 w-11 md:h-12 md:w-12 bg-royal/10 rounded-xl flex items-center justify-center text-royal shrink-0">
+                  <Target size={22} />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <h4 className="text-base md:text-lg font-bold text-[#191970] truncate">{goal.title}</h4>
+                  <div className="mt-1 flex items-center gap-3">
+                    <p className="text-xs md:text-sm text-gray-700 truncate">Target: {goal.target_date || 'Ongoing'}</p>
+                    {goal.status === 'completed' && <div className="h-2.5 w-2.5 bg-emerald-500 rounded-full animate-pulse shadow-[0_0_10px_#10b981] shrink-0"></div>}
+                  </div>
+                  <div className="mt-2 h-2.5 w-full max-w-md bg-gray-200 rounded-full overflow-hidden">
+                    <div 
+                      className="h-full bg-[#191970] transition-all duration-1000" 
+                      style={{ width: `${goal.progress}%` }}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-1 md:gap-2 shrink-0">
+                <button 
+                  onClick={() => onDelete(goal.id)}
+                  className="text-gray-500 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all p-2 hover:bg-red-500/10 rounded-lg"
+                >
+                  <Trash2 size={18} />
+                </button>
+                <button 
+                  onClick={() => setExpandedGoal(expandedGoal === goal.id ? null : goal.id)}
+                  className="p-2 text-gray-700 hover:text-[#191970]"
+                >
+                  {expandedGoal === goal.id ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                </button>
+              </div>
             </div>
 
             <AnimatePresence>
