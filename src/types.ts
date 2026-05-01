@@ -5,6 +5,7 @@ export interface User {
   role: 'user' | 'admin';
   bio?: string;
   avatar_url?: string;
+  profile_pic?: string;
 }
 
 export interface Task {

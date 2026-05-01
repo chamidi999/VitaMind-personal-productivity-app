@@ -33,7 +33,7 @@ router.post('/register', async (req, res) => {
     );
     const userId = result.insertId;
     const token = jwt.sign({ id: userId, email }, JWT_SECRET, { expiresIn: '7d' });
-    res.json({ token, user: { id: userId, email, name, role: 'user' } });
+    res.json({ token, user: { id: userId, email, name, role: 'user', profile_pic: null } });
   } catch (e: any) {
     console.error('Registration error:', e);
     if (e.code === 'ER_DUP_ENTRY') {
@@ -57,7 +57,7 @@ router.post('/login', async (req, res) => {
     }
     
     const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, { expiresIn: '7d' });
-    res.json({ token, user: { id: user.id, email: user.email, name: user.name, role: user.role } });
+    res.json({ token, user: { id: user.id, email: user.email, name: user.name, role: user.role, profile_pic: user.profile_pic || null } });
   } catch (error) {
     console.error('Login error:', error);
     res.status(500).json({ error: 'Internal server error during login' });
@@ -67,7 +67,7 @@ router.post('/login', async (req, res) => {
 router.get('/me', authenticateToken, async (req: AuthRequest, res) => {
   try {
     const [rows]: any = await pool.query(
-      'SELECT id, email, name, role, bio, avatar_url FROM users WHERE id = ?',
+      'SELECT id, email, name, role, bio, avatar_url, profile_pic FROM users WHERE id = ?',
       [req.user?.id]
     );
     res.json(rows[0]);
@@ -78,9 +78,9 @@ router.get('/me', authenticateToken, async (req: AuthRequest, res) => {
 });
 
 router.patch('/profile', authenticateToken, async (req: AuthRequest, res) => {
-  const { name, bio } = req.body;
+  const { name, bio, profile_pic } = req.body;
   try {
-    await pool.query('UPDATE users SET name = ?, bio = ? WHERE id = ?', [name, bio, req.user?.id]);
+    await pool.query('UPDATE users SET name = ?, bio = ?, profile_pic = ? WHERE id = ?', [name, bio, profile_pic || null, req.user?.id]);
     res.json({ success: true });
   } catch (error) {
     console.error('Profile update error:', error);
