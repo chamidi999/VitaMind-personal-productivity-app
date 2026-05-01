@@ -20,7 +20,7 @@ export default function AIOracleView({ chat, input, isLoading, onInputChange, on
   }, [chat]);
 
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-4xl mx-auto h-full flex flex-col px-1 md:px-0">
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-4xl mx-auto h-full flex flex-col px-3 md:px-0 pt-20 md:pt-10 pb-8">
       <div className="flex-1 overflow-y-auto pr-1 md:pr-4 space-y-4 md:space-y-6 scrollbar-thin scrollbar-thumb-white/10">
         <AnimatePresence mode="popLayout">
           {chat.map((msg, i) => (
@@ -30,16 +30,16 @@ export default function AIOracleView({ chat, input, isLoading, onInputChange, on
               animate={{ opacity: 1, y: 0 }}
               className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
             >
-              <div className={`flex gap-4 max-w-[85%] ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}>
+              <div className={`flex gap-3 md:gap-4 max-w-[92%] md:max-w-[85%] ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}>
                 <div className={`h-10 w-10 min-w-10 rounded-2xl flex items-center justify-center ${
                   msg.role === 'user' ? 'bg-royal text-white' : 'bg-card border border-white/5 text-royal'
                 }`}>
                   {msg.role === 'user' ? <User size={20} /> : <BrainCircuit size={20} />}
                 </div>
-                <div className={`p-5 rounded-3xl ${
+                <div className={`p-4 md:p-5 rounded-3xl shadow-sm ${
                   msg.role === 'user' 
-                    ? 'bg-[#dbe7ff] text-[#191970] border border-[#b8ccff] rounded-tr-none' 
-                    : 'bg-card text-[#191970] border border-white/5 rounded-tl-none'
+                    ? 'bg-[#dbe7ff] text-[#191970] border border-[#b8ccff] rounded-tr-none shadow-[#4169E1]/10' 
+                    : 'bg-[#F8FAFF] text-[#191970] border border-[#E3EBFF] rounded-tl-none shadow-[#191970]/5'
                 }`}>
                   <div className="markdown-body">
                     <Markdown>{msg.content}</Markdown>
@@ -54,7 +54,7 @@ export default function AIOracleView({ chat, input, isLoading, onInputChange, on
                 <div className="h-10 w-10 rounded-2xl bg-card border border-white/5 flex items-center justify-center text-royal animate-pulse">
                   <BrainCircuit size={20} />
                 </div>
-                <div className="bg-card p-4 rounded-3xl rounded-tl-none border border-white/5">
+                <div className="bg-[#F8FAFF] p-4 rounded-3xl rounded-tl-none border border-[#E3EBFF] shadow-sm shadow-[#191970]/5">
                   <div className="flex gap-1">
                     <div className="h-2 w-2 bg-royal rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
                     <div className="h-2 w-2 bg-royal rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
@@ -68,25 +68,25 @@ export default function AIOracleView({ chat, input, isLoading, onInputChange, on
         <div ref={chatEndRef} />
       </div>
 
-      <div className="mt-4 md:mt-8 bg-card p-3 md:p-4 rounded-3xl border border-white/5">
-        <form onSubmit={onSubmit} className="flex gap-2 md:gap-3">
+      <div className="mt-4 md:mt-8 bg-card/95 p-3 md:p-4 rounded-3xl border border-white/10 shadow-lg sticky bottom-0">
+        <form onSubmit={onSubmit} className="flex w-full gap-2 md:gap-3">
           <input 
             type="text" 
             placeholder="Ask the Oracle about your lifestyle complexity..." 
             value={input}
             onChange={e => onInputChange(e.target.value)}
             disabled={isLoading}
-            className="flex-1 bg-white border border-[#4169E1] rounded-2xl px-4 md:px-6 py-3 md:py-4 text-sm md:text-base outline-none focus:border-[#4169E1] transition-all text-[#191970] placeholder:text-[#9CA3AF]"
+            className="flex-1 bg-white border border-[#4169E1] rounded-2xl px-4 md:px-6 py-3 md:py-4 text-sm md:text-base outline-none focus:border-[#4169E1] focus:ring-2 focus:ring-[#4169E1]/20 transition-all text-[#191970] placeholder:text-[#9CA3AF] shadow-lg"
           />
           <button 
             type="submit" 
             disabled={isLoading || !input.trim()}
-            className="bg-royal text-white px-4 md:px-6 rounded-2xl font-bold hover:bg-royal-light transition-all disabled:opacity-50 flex items-center justify-center"
+            className="bg-royal text-white px-4 md:px-6 min-w-12 md:min-w-14 rounded-2xl font-bold hover:bg-royal-light transition-all disabled:opacity-50 flex items-center justify-center shadow-lg"
           >
             <Send size={20} />
           </button>
         </form>
-        <p className="text-[10px] text-gray-600 mt-3 text-center uppercase tracking-[0.2em]">
+        <p className="text-[10px] text-[#191970]/55 mt-3 text-center md:text-right uppercase tracking-[0.2em]">
           <Zap size={10} className="inline mr-1" /> Powered by VitaMind Neural Infrastructure
         </p>
       </div>
