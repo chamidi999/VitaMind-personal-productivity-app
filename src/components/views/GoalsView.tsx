@@ -65,7 +65,7 @@ export default function GoalsView({
                   <label className="block text-xs font-bold text-[#191970] uppercase tracking-widest mb-2">Title</label>
                   <input 
                     type="text" 
-                    placeholder="e.g. Master TypeScript 5.0"
+                    placeholder="Set a new target..."
                     value={title}
                     onChange={e => setTitle(e.target.value)}
                     className="w-full bg-background border border-white/10 rounded-xl px-4 py-3 outline-none"
