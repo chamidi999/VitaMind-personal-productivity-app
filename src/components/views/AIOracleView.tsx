@@ -87,7 +87,7 @@ export default function AIOracleView({ chat, input, isLoading, onInputChange, on
           </button>
         </form>
         <p className="text-[10px] text-gray-600 mt-3 text-center uppercase tracking-[0.2em]">
-          <Zap size={10} className="inline mr-1" /> Powered by Zenith Neural Infrastructure
+          <Zap size={10} className="inline mr-1" /> Powered by VitaMind Neural Infrastructure
         </p>
       </div>
     </motion.div>
