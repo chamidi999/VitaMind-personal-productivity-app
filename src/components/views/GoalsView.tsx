@@ -93,10 +93,9 @@ export default function GoalsView({
 
       <div className="grid grid-cols-1 gap-4 md:gap-5">
         {goals.map(goal => {
-          const totalMilestones = goal.milestones.length;
-          const completedMilestones = goal.milestones.filter(m => m.is_completed).length;
-          const calculatedProgress = totalMilestones > 0 ? (completedMilestones / totalMilestones) * 100 : 0;
-          const normalizedProgress = Math.min(100, Math.max(0, calculatedProgress));
+          const totalMilestones = goal.milestones?.length || 0;
+          const completedMilestones = goal.milestones?.filter(m => m.is_completed).length || 0;
+          const finalProgress = totalMilestones > 0 ? Math.round((completedMilestones / totalMilestones) * 100) : 0;
           return (
           <div key={goal.id} className="bg-card rounded-2xl border border-gray-200/80 shadow-[0_1px_5px_rgba(15,23,42,0.06)] overflow-hidden group">
             <div className="p-4 md:p-5 flex items-center justify-between gap-3 md:gap-4">
@@ -112,8 +111,8 @@ export default function GoalsView({
                   </div>
                   <div className="mt-2 h-2.5 w-full max-w-md bg-gray-200 rounded-full overflow-hidden">
                     <div 
-                      className="h-full bg-[#191970] transition-[width] duration-500 ease-out" 
-                      style={{ width: `${normalizedProgress}%` }}
+                      className="h-full bg-[#191970] transition-all duration-500 ease-out" 
+                      style={{ width: `${finalProgress}%` }}
                     />
                   </div>
                 </div>
