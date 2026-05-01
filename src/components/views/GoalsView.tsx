@@ -23,15 +23,17 @@ export default function GoalsView({
 }: GoalsViewProps) {
   const [title, setTitle] = useState('');
   const [category, setCategory] = useState('Personal');
+  const [description, setDescription] = useState('');
   const [targetDate, setTargetDate] = useState('');
   const [isAdding, setIsAdding] = useState(false);
   const [expandedGoal, setExpandedGoal] = useState<number | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim()) return;
-    onAdd({ title, category, target_date: targetDate });
+    await onAdd({ title, description, category, target_date: targetDate });
     setTitle('');
+    setDescription('');
     setTargetDate('');
     setIsAdding(false);
   };
@@ -68,6 +70,16 @@ export default function GoalsView({
                     placeholder="Set a new target..."
                     value={title}
                     onChange={e => setTitle(e.target.value)}
+                    className="w-full bg-background border border-white/10 rounded-xl px-4 py-3 outline-none"
+                  />
+                </div>
+                <div className="md:col-span-3">
+                  <label className="block text-xs font-bold text-[#191970] uppercase tracking-widest mb-2">Description</label>
+                  <input 
+                    type="text" 
+                    placeholder="Optional details..."
+                    value={description}
+                    onChange={e => setDescription(e.target.value)}
                     className="w-full bg-background border border-white/10 rounded-xl px-4 py-3 outline-none"
                   />
                 </div>
