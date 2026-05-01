@@ -115,7 +115,7 @@ export default function AuthView({ onLogin, onRegister }: AuthViewProps) {
               type="submit"
               className="w-full bg-royal hover:bg-royal-light text-white font-bold py-4 px-4 rounded-2xl shadow-lg shadow-royal/20 transition-all active:scale-[0.98] mt-4"
             >
-              {authMode === 'login' ? 'Sign In to Zenith' : 'Initialize Account'}
+              {authMode === 'login' ? 'Sign In to VitaMind' : 'Initialize Account'}
             </button>
           </form>
           
