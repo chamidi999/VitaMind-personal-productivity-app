@@ -75,8 +75,9 @@ export const initDB = async () => {
       CREATE TABLE IF NOT EXISTS notifications (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         user_id INTEGER NOT NULL,
-        title TEXT NOT NULL,
-        message TEXT,
+        title TEXT,
+        message TEXT NOT NULL,
+        type TEXT NOT NULL CHECK(type IN ('task', 'habit')),
         is_read BOOLEAN DEFAULT FALSE,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE

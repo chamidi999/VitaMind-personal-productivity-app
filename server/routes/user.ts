@@ -25,7 +25,7 @@ router.get('/user-stats', authenticateToken, async (req: AuthRequest, res) => {
 router.get('/notifications', authenticateToken, async (req: AuthRequest, res) => {
   try {
     const [notes] = await pool.query(
-      'SELECT * FROM notifications WHERE user_id = ? ORDER BY created_at DESC LIMIT 50',
+      'SELECT id, user_id, title, message, type, is_read, created_at FROM notifications WHERE user_id = ? ORDER BY created_at DESC LIMIT 50',
       [req.user?.id]
     );
     res.json(notes);

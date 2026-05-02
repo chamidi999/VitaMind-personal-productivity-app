@@ -5,7 +5,7 @@ import { GoogleGenAI } from "@google/genai";
 import { format } from 'date-fns';
 
 // Types & Services
-import { User, Task, Habit, Goal, DashboardStats, ChatMessage, View } from './types';
+import { User, Task, Habit, Goal, DashboardStats, ChatMessage, View, Notification } from './types';
 import { api } from './services/api';
 
 // Components
@@ -33,7 +33,7 @@ export default function App() {
   const [habits, setHabits] = useState<Habit[]>([]);
   const [goals, setGoals] = useState<Goal[]>([]);
   const [stats, setStats] = useState<DashboardStats | null>(null);
-  const [notifications, setNotifications] = useState<any[]>([]);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
   
   // UI States
   const [isNoteOpen, setIsNoteOpen] = useState(false);
@@ -313,6 +313,8 @@ USER CONTEXT: Name: ${user?.name}, Tasks: ${tasks.length}, Habits: ${habits.leng
           notifications={notifications}
           isNoteOpen={isNoteOpen}
           setIsNoteOpen={setIsNoteOpen}
+          setNotifications={setNotifications}
+          token={token}
           onReadNotification={async (id) => {
             await fetch(`/api/notifications/${id}/read`, { method: 'PATCH', headers: { 'Authorization': `Bearer ${token}` } });
             await refreshData();
