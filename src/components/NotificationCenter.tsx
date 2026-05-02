@@ -1,17 +1,36 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Bell, Check, Trash2, ExternalLink } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Notification } from '../types';
 
 interface NotificationCenterProps {
   notifications: Notification[];
-  onRead: (id: number) => void;
+  setNotifications: React.Dispatch<React.SetStateAction<Notification[]>>;
+  onRead: (id: number) => Promise<void>;
   isOpen: boolean;
   onClose: () => void;
+  token: string | null;
 }
 
-export default function NotificationCenter({ notifications, onRead, isOpen, onClose }: NotificationCenterProps) {
+export default function NotificationCenter({ notifications, setNotifications, onRead, isOpen, onClose, token }: NotificationCenterProps) {
   const unreadCount = notifications.filter(n => !n.is_read).length;
+
+  useEffect(() => {
+    if (!isOpen || !token) return;
+
+    const loadNotifications = async () => {
+      const response = await fetch('/api/notifications', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setNotifications(data);
+      }
+    };
+
+    loadNotifications().catch((error) => console.error('Failed to load notifications', error));
+  }, [isOpen, token, setNotifications]);
 
   return (
     <>

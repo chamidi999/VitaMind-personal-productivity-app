@@ -1,17 +1,20 @@
 import React from 'react';
+import { Notification } from '../../types';
 import { Search, Bell } from 'lucide-react';
 import { format } from 'date-fns';
 import NotificationCenter from '../NotificationCenter';
 
 interface HeaderProps {
   viewTitle: string;
-  notifications: any[];
+  notifications: Notification[];
   isNoteOpen: boolean;
   setIsNoteOpen: (open: boolean) => void;
+  setNotifications: React.Dispatch<React.SetStateAction<Notification[]>>;
   onReadNotification: (id: number) => Promise<void>;
+  token: string | null;
 }
 
-export default function Header({ viewTitle, notifications, isNoteOpen, setIsNoteOpen, onReadNotification }: HeaderProps) {
+export default function Header({ viewTitle, notifications, isNoteOpen, setIsNoteOpen, setNotifications, onReadNotification, token }: HeaderProps) {
   return (
     <header className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 mb-8 px-1">
       <div>
@@ -33,7 +36,9 @@ export default function Header({ viewTitle, notifications, isNoteOpen, setIsNote
         >
            <Bell size={20} className="group-hover:rotate-12 transition-transform" />
            {notifications.some(n => !n.is_read) && (
-             <span className="absolute top-3 right-3 h-2 w-2 bg-royal rounded-full border-2 border-white shadow-[0_0_8px_#4169e1]"></span>
+             <span className="absolute -top-1 -right-1 min-w-5 h-5 px-1 bg-royal rounded-full border-2 border-white shadow-[0_0_8px_#4169e1] text-[10px] font-black text-white flex items-center justify-center">
+               {notifications.filter(n => !n.is_read).length}
+             </span>
            )}
         </button>
         <NotificationCenter 
@@ -41,6 +46,8 @@ export default function Header({ viewTitle, notifications, isNoteOpen, setIsNote
           onClose={() => setIsNoteOpen(false)} 
           notifications={notifications} 
           onRead={onReadNotification}
+          setNotifications={setNotifications}
+          token={token}
         />
       </div>
     </header>

@@ -59,6 +59,7 @@ export interface Notification {
   user_id: number;
   title: string;
   message: string;
+  type: 'task' | 'habit';
   is_read: boolean;
   created_at: string;
 }

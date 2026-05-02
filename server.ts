@@ -16,6 +16,7 @@ import goalRoutes from './server/routes/goals';
 import milestoneRoutes from './server/routes/milestones';
 import adminRoutes from './server/routes/admin';
 import userRoutes from './server/routes/user';
+import { runNotificationChecks } from './server/services/notificationService';
 
 dotenv.config();
 
@@ -53,6 +54,10 @@ async function startServer() {
     // Initialize MySQL Database
     await initDB();
     dbInitialized = true;
+    await runNotificationChecks();
+    setInterval(() => {
+      runNotificationChecks().catch((error) => console.error('Notification check failed:', error));
+    }, 5 * 60 * 1000);
   } catch (error) {
     console.error('Database initialization failed:', error);
     // We continue so the Express server can still serve the frontend/Vite
