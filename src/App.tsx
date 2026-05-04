@@ -115,7 +115,11 @@ export default function App() {
       }
       return data.error || 'Login failed';
     } catch (e) {
-      return 'Connection timed out. Please try again.';
+      const message = e instanceof Error ? e.message : '';
+      if (message.toLowerCase().includes('failed to fetch')) {
+        return 'Unable to connect to server. Please check your network and try again.';
+      }
+      return 'Login request failed. Please try again.';
     }
   };
 
@@ -135,7 +139,11 @@ export default function App() {
       }
       return data.error || 'Registration failed';
     } catch (e) {
-      return 'Connection timed out. Please try again.';
+      const message = e instanceof Error ? e.message : '';
+      if (message.toLowerCase().includes('failed to fetch')) {
+        return 'Unable to connect to server. Please check your network and try again.';
+      }
+      return 'Registration request failed. Please try again.';
     }
   };
 
