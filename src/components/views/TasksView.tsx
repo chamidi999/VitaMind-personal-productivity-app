@@ -25,9 +25,9 @@ export default function TasksView({ tasks, onUpdateTask, onDeleteTask, onAddTask
     <motion.div 
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="w-full space-y-10 overflow-x-hidden px-0"
+      className="w-full flex flex-col items-start space-y-10 overflow-x-hidden px-0"
     >
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 bg-card p-6 rounded-3xl border border-white/5">
+      <div className="w-full flex flex-col md:flex-row justify-between items-start md:items-center gap-6 bg-card p-6 rounded-3xl border border-white/5">
         <div>
           <h2 className="text-2xl font-bold text-[#191970] mb-1">Strategic Operations</h2>
           <p className="text-sm text-gray-700">Manage your active mission parameters.</p>

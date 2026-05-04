@@ -49,7 +49,7 @@ export default function AIOracleView({ chat, input, isLoading, contextSummary, o
     initial={{ opacity: 0 }} 
     animate={{ opacity: 1 }} 
     className="w-full h-full flex flex-col items-start px-0 pt-2 pb-8">
-      <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl p-4 md:p-5 mb-6">
+      <div className="w-full bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl p-4 md:p-5 mb-6">
         <div className="flex items-start gap-3">
           <div className="h-10 w-10 rounded-2xl bg-card border border-white/10 text-royal flex items-center justify-center">
             <Sparkles size={18} />
@@ -60,7 +60,7 @@ export default function AIOracleView({ chat, input, isLoading, contextSummary, o
           </div>
         </div>
       </div>
-      <div className="flex-1 overflow-y-auto pr-1 md:pr-4 space-y-4 md:space-y-6 scrollbar-thin scrollbar-thumb-white/10 min-h-0">
+      <div className="w-full flex-1 overflow-y-auto pr-1 md:pr-4 space-y-4 md:space-y-6 scrollbar-thin scrollbar-thumb-white/10 min-h-0">
         <AnimatePresence mode="popLayout">
           {chat.map((msg, i) => (
             <motion.div 
