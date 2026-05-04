@@ -10,10 +10,14 @@ const buildOracleTip = (summary: {
   completedCount: number;
   habitStreak: number;
   overdueTasks: Array<{ id: number; title: string; due_date: string; priority: string }>;
+  highPriorityTodoCount: number;
 }) => {
   if (summary.overdueTasks.length > 0) {
     const highest = summary.overdueTasks.find(t => t.priority === 'high') || summary.overdueTasks[0];
     return `Strategist, you have ${summary.overdueTasks.length} overdue objective(s). Start with "${highest.title}" to rapidly stabilize your momentum.`;
+  }
+  if (summary.highPriorityTodoCount > 0) {
+    return `Strategist, you have ${summary.highPriorityTodoCount} high-priority objective(s) pending. Focus on the shortest one first to build momentum.`;
   }
   if (summary.todoCount > 0) {
     return `Strategist, you have ${summary.todoCount} active objective(s) and ${summary.completedCount} completed. Tackle your shortest high-priority task first to build momentum.`;
@@ -74,7 +78,9 @@ router.get('/oracle-daily-insight', authenticateToken, async (req: AuthRequest, 
       `Tasks To Do: ${summary.todoCount}`,
       `Tasks Completed: ${summary.completedCount}`,
       `Habit Streak: ${summary.habitStreak}`,
-      `Overdue Tasks: ${summary.overdueTasks.length}`
+      `Overdue Tasks: ${summary.overdueTasks.length}`,
+      `High Priority Pending: ${summary.highPriorityTodoCount}`,
+      `Overdue Task Titles: ${summary.overdueTasks.map(task => task.title).join(', ') || 'None'}`
     ].join(' | ');
 
     res.json({
