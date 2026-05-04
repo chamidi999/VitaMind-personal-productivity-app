@@ -16,6 +16,7 @@ import goalRoutes from './server/routes/goals';
 import milestoneRoutes from './server/routes/milestones';
 import adminRoutes from './server/routes/admin';
 import userRoutes from './server/routes/user';
+import analyticsRoutes from './server/routes/analytics';
 import { runNotificationChecks } from './server/services/notificationService';
 
 dotenv.config();
@@ -46,6 +47,7 @@ app.use('/api/habits', habitRoutes);
 app.use('/api/goals', goalRoutes);
 app.use('/api/milestones', milestoneRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/analytics', analyticsRoutes);
 app.use('/api', userRoutes);
 
 async function startServer() {
