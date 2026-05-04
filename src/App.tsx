@@ -119,12 +119,12 @@ export default function App() {
     }
   };
 
-  const handleRegister = async (name: string, email: string, pass: string) => {
+  const handleRegister = async (name: string, email: string, pass: string, role: 'user' | 'admin', adminKey?: string) => {
     try {
       const res = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, password: pass })
+        body: JSON.stringify({ name, email, password: pass, role, adminKey })
       });
       const data = await res.json();
       if (res.ok) {
@@ -297,6 +297,21 @@ USER CONTEXT: Name: ${user?.name}, Tasks: ${tasks.length}, Habits: ${habits.leng
       case 'settings':
         return <SettingsPanel user={user} onUpdateUser={(d) => api.auth.updateProfile(token, d).then(loadInitialData)} onClose={() => setCurrentView('dashboard')} />;
       case 'admin':
+        if (user.role !== 'admin') return <DashboardView 
+            stats={stats} 
+            tasks={tasks} 
+            habits={habits} 
+            onViewChange={setCurrentView} 
+            onAddTask={() => {
+                setEditingTask(null);
+                setNewTaskTitle('');
+                setNewTaskDescription('');
+                setNewTaskPriority('medium');
+                setNewTaskDueDate(format(new Date(), 'yyyy-MM-dd'));
+                setIsTaskModalOpen(true);
+            }} 
+            onEditTask={handleEditTask}
+          />;
         return <AdminPanel token={token} />;
       default:
         return null;

@@ -12,6 +12,8 @@ const registerSchema = z.object({
   email: z.string().email(),
   password: z.string().min(6),
   name: z.string().min(2),
+  role: z.enum(['user', 'admin']).optional().default('user'),
+  adminKey: z.string().optional(),
 });
 
 const loginSchema = z.object({
@@ -23,17 +25,27 @@ router.post('/register', async (req, res) => {
   const result = registerSchema.safeParse(req.body);
   if (!result.success) return res.status(400).json({ error: result.error.issues[0].message });
   
-  const { email, password, name } = result.data;
+  const { email, password, name, role, adminKey } = result.data;
+  const requestedRole = role || 'user';
+  const shouldCreateAdmin = requestedRole === 'admin';
+  const adminSignupKey = process.env.ADMIN_SIGNUP_KEY;
+
+  if (shouldCreateAdmin) {
+    if (!adminSignupKey || adminKey !== adminSignupKey) {
+      return res.status(403).json({ error: 'Invalid admin signup key' });
+    }
+  }
+
   const hashedPassword = await bcrypt.hash(password, 10);
   
   try {
     const [result]: any = await pool.query(
-      'INSERT INTO users (email, password, name) VALUES (?, ?, ?)',
-      [email, hashedPassword, name]
+      'INSERT INTO users (email, password, name, role) VALUES (?, ?, ?, ?)',
+      [email, hashedPassword, name, requestedRole]
     );
     const userId = result.insertId;
     const token = jwt.sign({ id: userId, email }, JWT_SECRET, { expiresIn: '7d' });
-    res.json({ token, user: { id: userId, email, name, role: 'user' } });
+    res.json({ token, user: { id: userId, email, name, role: requestedRole } });
   } catch (e: any) {
     console.error('Registration error:', e);
     if (e.code === 'ER_DUP_ENTRY') {
