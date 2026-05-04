@@ -22,10 +22,10 @@ export default function HabitsView({ habits, onAdd, onComplete, onDelete, onUpda
   };
 
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="w-full space-y-8 overflow-x-hidden px-0">
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="w-full max-w-[1200px] ml-0 space-y-8 overflow-x-hidden px-0">
       <div className="w-full bg-card p-8 rounded-3xl border border-white/5">
         <h3 className="text-xl font-bold text-[#191970] mb-6">New Ritual</h3>
-        <form onSubmit={handleSubmit} className="flex flex-col min-[420px]:flex-row gap-3 min-[420px]:items-center">
+        <form onSubmit={handleSubmit} className="w-full max-w-[600px] ml-0 flex flex-col min-[420px]:flex-row gap-3 min-[420px]:items-center">
           <input 
             type="text" 
             placeholder="Atomic habit name..." 
