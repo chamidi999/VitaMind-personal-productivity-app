@@ -84,6 +84,13 @@ export const initDB = async () => {
       )
     `);
 
+    const notificationColumns = db.prepare("PRAGMA table_info(notifications)").all() as Array<{ name: string }>;
+    const hasTypeColumn = notificationColumns.some((column) => column.name === 'type');
+    if (!hasTypeColumn) {
+      db.exec("ALTER TABLE notifications ADD COLUMN type TEXT");
+      db.exec("UPDATE notifications SET type = 'task' WHERE type IS NULL");
+    }
+
     console.log('SQLite Database (better-sqlite3) initialized successfully');
   } catch (error) {
     console.error('Error initializing database:', error);
