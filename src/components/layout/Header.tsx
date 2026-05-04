@@ -1,8 +1,8 @@
 import React from 'react';
 import { Notification } from '../../types';
 import { Search, Bell } from 'lucide-react';
-import { format } from 'date-fns';
 import NotificationCenter from '../NotificationCenter';
+import PageHeader from './PageHeader';
 
 interface HeaderProps {
   viewTitle: string;
@@ -18,8 +18,7 @@ export default function Header({ viewTitle, notifications, isNoteOpen, setIsNote
   return (
     <header className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 mb-8 px-1">
       <div>
-        <h2 className="text-3xl font-bold tracking-tight text-[#191970]">{viewTitle}</h2>
-        <p className="text-gray-600 mt-1">{format(new Date(), 'EEEE, MMMM do')}</p>
+        <PageHeader title={viewTitle} />
       </div>
       <div className="flex items-center gap-4">
         <div className="relative hidden md:block">
