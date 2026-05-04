@@ -1,6 +1,6 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Send, Zap, BrainCircuit, User } from 'lucide-react';
+import { Send, Zap, BrainCircuit, User, Sparkles } from 'lucide-react';
 import Markdown from 'react-markdown';
 import { ChatMessage } from '../../types';
 
@@ -14,13 +14,43 @@ interface AIOracleViewProps {
 
 export default function AIOracleView({ chat, input, isLoading, onInputChange, onSubmit }: AIOracleViewProps) {
   const chatEndRef = useRef<HTMLDivElement>(null);
+  const [insight, setInsight] = useState('Loading Oracle insight...');
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [chat]);
 
+  useEffect(() => {
+    const loadInsight = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) return;
+        const response = await fetch('/api/oracle-daily-insight', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (!response.ok) return;
+        const data = await response.json();
+        setInsight(data.insight || 'Momentum is stable. Keep advancing one objective at a time.');
+      } catch (error) {
+        setInsight('Momentum is stable. Keep advancing one objective at a time.');
+      }
+    };
+    loadInsight();
+  }, []);
+
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-4xl mx-auto h-full flex flex-col px-3 md:px-0 pt-20 md:pt-10 pb-8">
+      <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl p-4 md:p-5 mb-4 md:mb-6">
+        <div className="flex items-start gap-3">
+          <div className="h-10 w-10 rounded-2xl bg-card border border-white/10 text-royal flex items-center justify-center">
+            <Sparkles size={18} />
+          </div>
+          <div>
+            <p className="text-[10px] text-[#191970]/55 uppercase tracking-[0.2em] mb-1">Proactive Insight</p>
+            <p className="text-sm md:text-base text-[#191970] font-medium">{insight}</p>
+          </div>
+        </div>
+      </div>
       <div className="flex-1 overflow-y-auto pr-1 md:pr-4 space-y-4 md:space-y-6 scrollbar-thin scrollbar-thumb-white/10">
         <AnimatePresence mode="popLayout">
           {chat.map((msg, i) => (

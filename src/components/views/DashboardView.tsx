@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'motion/react';
 import { 
   Plus, Calendar, CheckSquare, Target, Activity, 
@@ -20,6 +20,7 @@ interface DashboardProps {
 }
 
 export default function DashboardView({ stats, tasks, habits, onViewChange, onAddTask, onEditTask }: DashboardProps) {
+  const [dailyInsight, setDailyInsight] = useState('Calibrating Oracle...');
   const chartData = [
     { name: 'Mon', completion: 40 },
     { name: 'Tue', completion: 65 },
@@ -29,6 +30,24 @@ export default function DashboardView({ stats, tasks, habits, onViewChange, onAd
     { name: 'Sat', completion: 90 },
     { name: 'Sun', completion: 100 },
   ];
+
+  useEffect(() => {
+    const loadInsight = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) return;
+        const response = await fetch('/api/oracle-daily-insight', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (!response.ok) return;
+        const data = await response.json();
+        setDailyInsight(data.insight || 'Complete one priority objective before noon.');
+      } catch (error) {
+        setDailyInsight('Complete one priority objective before noon.');
+      }
+    };
+    loadInsight();
+  }, []);
 
   return (
     <motion.div 
@@ -59,6 +78,18 @@ export default function DashboardView({ stats, tasks, habits, onViewChange, onAd
       </div>
 
       {/* Stats Grid */}
+      <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl p-4 md:p-5">
+        <div className="flex items-center gap-3">
+          <div className="h-10 w-10 rounded-2xl bg-card border border-white/10 text-royal flex items-center justify-center">
+            <BrainCircuit size={18} />
+          </div>
+          <div>
+            <p className="text-[10px] text-[#191970]/55 uppercase tracking-[0.2em] mb-1">Oracle&apos;s Daily Insight</p>
+            <p className="text-sm md:text-base text-[#191970] font-medium">{dailyInsight}</p>
+          </div>
+        </div>
+      </div>
+
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {[
           { id: 'tasks', label: 'Active Tasks', value: stats?.tasks.total || 0, sub: `${stats?.tasks.completed || 0} completed`, icon: <CheckSquare className="text-royal" />, color: 'from-royal/20' },

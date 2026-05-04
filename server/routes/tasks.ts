@@ -5,6 +5,32 @@ import { authenticateToken, AuthRequest } from '../middleware/auth';
 
 const router = Router();
 
+export const getUserContextSummary = async (userId: number) => {
+  const [todoRows]: any = await pool.query(
+    "SELECT COUNT(*) as count FROM tasks WHERE user_id = ? AND status IN ('todo', 'in-progress')",
+    [userId]
+  );
+  const [completedRows]: any = await pool.query(
+    "SELECT COUNT(*) as count FROM tasks WHERE user_id = ? AND status = 'completed'",
+    [userId]
+  );
+  const [habitRows]: any = await pool.query(
+    'SELECT COALESCE(MAX(streak), 0) as streak FROM habits WHERE user_id = ?',
+    [userId]
+  );
+  const [overdueRows]: any = await pool.query(
+    "SELECT id, title, due_date, priority FROM tasks WHERE user_id = ? AND status != 'completed' AND due_date < CURDATE() ORDER BY due_date ASC",
+    [userId]
+  );
+
+  return {
+    todoCount: Number(todoRows[0].count || 0),
+    completedCount: Number(completedRows[0].count || 0),
+    habitStreak: Number(habitRows[0].streak || 0),
+    overdueTasks: overdueRows
+  };
+};
+
 const taskCreateSchema = z.object({
   title: z.string().min(1).max(100),
   status: z.enum(['todo', 'in-progress', 'completed']),
