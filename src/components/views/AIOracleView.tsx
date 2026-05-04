@@ -8,11 +8,12 @@ interface AIOracleViewProps {
   chat: ChatMessage[];
   input: string;
   isLoading: boolean;
+  contextSummary: any;
   onInputChange: (value: string) => void;
   onSubmit: (e: React.FormEvent) => void;
 }
 
-export default function AIOracleView({ chat, input, isLoading, onInputChange, onSubmit }: AIOracleViewProps) {
+export default function AIOracleView({ chat, input, isLoading, contextSummary, onInputChange, onSubmit }: AIOracleViewProps) {
   const chatEndRef = useRef<HTMLDivElement>(null);
   const [insight, setInsight] = useState('Loading Oracle insight...');
 
@@ -30,13 +31,18 @@ export default function AIOracleView({ chat, input, isLoading, onInputChange, on
         });
         if (!response.ok) return;
         const data = await response.json();
-        setInsight(data.insight || 'Momentum is stable. Keep advancing one objective at a time.');
+        const topHabit = contextSummary?.topHabits?.[0];
+        const topGoal = contextSummary?.activeGoals?.[0];
+        const contextualInsight = topHabit && topGoal
+          ? `Habit "${topHabit.name}" (${topHabit.streak}-day streak) is supporting your goal "${topGoal.title}" (${topGoal.progress}% complete).`
+          : data.insight;
+        setInsight(contextualInsight || 'Momentum is stable. Keep advancing one objective at a time.');
       } catch (error) {
         setInsight('Momentum is stable. Keep advancing one objective at a time.');
       }
     };
     loadInsight();
-  }, []);
+  }, [contextSummary]);
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-4xl mx-auto h-full flex flex-col px-3 md:px-0 pt-20 md:pt-10 pb-8">

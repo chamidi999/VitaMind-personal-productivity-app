@@ -34,6 +34,7 @@ export default function App() {
   const [goals, setGoals] = useState<Goal[]>([]);
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [userContextSummary, setUserContextSummary] = useState<any>(null);
   
   // UI States
   const [isNoteOpen, setIsNoteOpen] = useState(false);
@@ -59,11 +60,13 @@ export default function App() {
       const h = await api.habits.list(token).catch(() => []);
       const g = await api.goals.list(token).catch(() => []);
       const s = await api.stats.get(token).catch(() => null);
+      const contextSummary = await api.user.contextSummary(token).catch(() => null);
       
       setTasks(t);
       setHabits(h);
       setGoals(g || []);
       setStats(s);
+      setUserContextSummary(contextSummary);
       
       const nRes = await fetch('/api/notifications', { 
         headers: { 'Authorization': `Bearer ${token}` } 
@@ -210,11 +213,12 @@ export default function App() {
         .slice(0, 5)
         .map(task => `${task.title} (priority: ${task.priority}, due: ${task.due_date || 'none'})`);
 
-      const systemInstruction = `SYSTEM ROLE: You are the VitaMind Lifestyle Oracle. 
+      const systemInstruction = `SYSTEM ROLE: You are the VitaMind Lifestyle Oracle.
+MISSION: You now have full access to the user's Tasks, Habits, and Vision Goals. Your mission is to help the user align their daily actions (Tasks/Habits) with their long-term Vision Goals. If a user asks for advice, check if their current habits support their goals and suggest improvements.
 MANDATE: You ONLY discuss personal productivity, the VitaMind app's features (Kanban, Habits, Vision Goals, Pomodoro), and strategies based on user data.
 ENFORCEMENT: If asked out-of-scope questions, guide back to productivity.
 TASK NAMING RULE: You now have access to specific task names. Never say "Task 1" or placeholders. Use exact task titles from context (for example, "task5" or "Cardio Session") when giving advice.
-USER CONTEXT: Name: ${user?.name}, Tasks: ${tasks.length}, Habits: ${habits.length}, Goals: ${goals.length}, Top Pending Tasks: ${prioritizedTasks.join('; ') || 'None'}`;
+USER CONTEXT: Name: ${user?.name}, Tasks: ${tasks.length}, Habits: ${habits.length}, Goals: ${goals.length}, Top Pending Tasks: ${prioritizedTasks.join('; ') || 'None'}, Top Habits: ${userContextSummary?.topHabits?.map((h: any) => `${h.name} (${h.streak})`).join('; ') || 'None'}, Active Goals: ${userContextSummary?.activeGoals?.map((g: any) => `${g.title} (${g.progress}%)`).join('; ') || 'None'}`;
 
       const contents = aiChat.map(m => ({
         role: m.role === 'user' ? 'user' : 'model',
@@ -248,6 +252,7 @@ USER CONTEXT: Name: ${user?.name}, Tasks: ${tasks.length}, Habits: ${habits.leng
             stats={stats} 
             tasks={tasks} 
             habits={habits} 
+            contextSummary={userContextSummary}
             onViewChange={setCurrentView} 
             onAddTask={() => {
                 setEditingTask(null);
@@ -305,6 +310,7 @@ USER CONTEXT: Name: ${user?.name}, Tasks: ${tasks.length}, Habits: ${habits.leng
             chat={aiChat} 
             input={aiInput} 
             isLoading={isAiLoading}
+            contextSummary={userContextSummary}
             onInputChange={setAiInput}
             onSubmit={askAI}
           />

@@ -100,5 +100,8 @@ export const api = {
   },
   stats: {
     get: (token: string) => fetchWithTimeout('/api/user-stats', { headers: getHeaders(token) }),
+  },
+  user: {
+    contextSummary: (token: string) => fetchWithTimeout('/api/context-summary', { headers: getHeaders(token) }),
   }
 };
