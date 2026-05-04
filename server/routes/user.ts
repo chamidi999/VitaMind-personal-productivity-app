@@ -1,8 +1,28 @@
 import { Router } from 'express';
 import pool from '../db';
 import { authenticateToken, AuthRequest } from '../middleware/auth';
+import { getUserContextSummary } from './tasks';
 
 const router = Router();
+
+const buildOracleTip = (summary: {
+  todoCount: number;
+  completedCount: number;
+  habitStreak: number;
+  overdueTasks: Array<{ id: number; title: string; due_date: string; priority: string }>;
+}) => {
+  if (summary.overdueTasks.length > 0) {
+    const highest = summary.overdueTasks.find(t => t.priority === 'high') || summary.overdueTasks[0];
+    return `Strategist, you have ${summary.overdueTasks.length} overdue objective(s). Start with "${highest.title}" to rapidly stabilize your momentum.`;
+  }
+  if (summary.todoCount > 0) {
+    return `Strategist, you have ${summary.todoCount} active objective(s) and ${summary.completedCount} completed. Tackle your shortest high-priority task first to build momentum.`;
+  }
+  if (summary.habitStreak > 0) {
+    return `Strong cadence: ${summary.habitStreak}-day streak. Keep your streak alive with one fast win today.`;
+  }
+  return 'Fresh board detected. Set one clear objective and complete it early to define your day.';
+};
 
 router.get('/user-stats', authenticateToken, async (req: AuthRequest, res) => {
   try {
@@ -29,6 +49,38 @@ router.get('/notifications', authenticateToken, async (req: AuthRequest, res) =>
       [req.user?.id]
     );
     res.json(notes);
+  } catch (error) {
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+router.get('/context-summary', authenticateToken, async (req: AuthRequest, res) => {
+  try {
+    const userId = req.user?.id;
+    if (!userId) return res.status(401).json({ error: 'Unauthorized' });
+    const summary = await getUserContextSummary(userId);
+    res.json(summary);
+  } catch (error) {
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+router.get('/oracle-daily-insight', authenticateToken, async (req: AuthRequest, res) => {
+  try {
+    const userId = req.user?.id;
+    if (!userId) return res.status(401).json({ error: 'Unauthorized' });
+    const summary = await getUserContextSummary(userId);
+    const contextPrompt = [
+      `Tasks To Do: ${summary.todoCount}`,
+      `Tasks Completed: ${summary.completedCount}`,
+      `Habit Streak: ${summary.habitStreak}`,
+      `Overdue Tasks: ${summary.overdueTasks.length}`
+    ].join(' | ');
+
+    res.json({
+      insight: buildOracleTip(summary),
+      contextPrompt
+    });
   } catch (error) {
     res.status(500).json({ error: 'Internal server error' });
   }
