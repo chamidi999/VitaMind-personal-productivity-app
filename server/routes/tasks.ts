@@ -6,34 +6,45 @@ import { authenticateToken, AuthRequest } from '../middleware/auth';
 const router = Router();
 
 export const getUserContextSummary = async (userId: number) => {
-  const [todoRows]: any = await pool.query(
-    "SELECT COUNT(*) as count FROM tasks WHERE user_id = ? AND status IN ('todo', 'in-progress')",
-    [userId]
-  );
-  const [completedRows]: any = await pool.query(
-    "SELECT COUNT(*) as count FROM tasks WHERE user_id = ? AND status = 'completed'",
-    [userId]
-  );
-  const [habitRows]: any = await pool.query(
-    'SELECT COALESCE(MAX(streak), 0) as streak FROM habits WHERE user_id = ?',
-    [userId]
-  );
-  const [overdueRows]: any = await pool.query(
-    "SELECT id, title, due_date, priority FROM tasks WHERE user_id = ? AND status != 'completed' AND due_date < CURDATE() ORDER BY due_date ASC",
-    [userId]
-  );
-  const [highPriorityRows]: any = await pool.query(
-    "SELECT COUNT(*) as count FROM tasks WHERE user_id = ? AND status IN ('todo', 'in-progress') AND priority = 'high'",
-    [userId]
-  );
+  try {
+    const [todoRows]: any = await pool.query(
+      "SELECT COUNT(*) as count FROM tasks WHERE user_id = ? AND status IN ('todo', 'in-progress')",
+      [userId]
+    );
+    const [completedRows]: any = await pool.query(
+      "SELECT COUNT(*) as count FROM tasks WHERE user_id = ? AND status = 'completed'",
+      [userId]
+    );
+    const [habitRows]: any = await pool.query(
+      'SELECT COALESCE(MAX(streak), 0) as streak FROM habits WHERE user_id = ?',
+      [userId]
+    );
+    const [overdueRows]: any = await pool.query(
+      "SELECT id, title, due_date, priority FROM tasks WHERE user_id = ? AND status != 'completed' AND due_date < date('now') ORDER BY due_date ASC",
+      [userId]
+    );
+    const [highPriorityRows]: any = await pool.query(
+      "SELECT COUNT(*) as count FROM tasks WHERE user_id = ? AND status IN ('todo', 'in-progress') AND priority = 'high'",
+      [userId]
+    );
 
-  return {
-    todoCount: Number(todoRows[0].count || 0),
-    completedCount: Number(completedRows[0].count || 0),
-    habitStreak: Number(habitRows[0].streak || 0),
-    overdueTasks: overdueRows,
-    highPriorityTodoCount: Number(highPriorityRows[0].count || 0)
-  };
+    return {
+      todoCount: Number(todoRows[0].count || 0),
+      completedCount: Number(completedRows[0].count || 0),
+      habitStreak: Number(habitRows[0].streak || 0),
+      overdueTasks: overdueRows,
+      highPriorityTodoCount: Number(highPriorityRows[0].count || 0)
+    };
+  } catch (error) {
+    console.error('Error building user context summary:', error);
+    return {
+      todoCount: 0,
+      completedCount: 0,
+      habitStreak: 0,
+      overdueTasks: [],
+      highPriorityTodoCount: 0
+    };
+  }
 };
 
 const taskCreateSchema = z.object({
