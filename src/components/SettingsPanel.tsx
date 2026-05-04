@@ -37,7 +37,7 @@ export default function SettingsPanel({ user, onUpdateUser, onClose }: SettingsP
   const [activeTab, setActiveTab] = useState('profile');
 
   return (
-    <div className="max-w-4xl relative">
+    <div className="w-full relative">
       <button 
         onClick={onClose}
         className="absolute -top-12 right-0 p-2 text-gray-500 hover:text-white transition-colors"
@@ -45,7 +45,7 @@ export default function SettingsPanel({ user, onUpdateUser, onClose }: SettingsP
       >
         <X size={24} />
       </button>
-      <div className="flex flex-col md:flex-row items-start gap-10">
+      <div className="w-full flex flex-col md:flex-row items-start gap-10">
       <div className="w-full md:w-64 space-y-2 flex flex-col items-start">
         {tabs.map(tab => (
           <button
