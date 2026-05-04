@@ -375,7 +375,7 @@ const getViewTitle = (pathname: string) => ({
       <Sidebar user={user} onLogout={handleLogout} />
       
       <main className="flex-1 ml-0 md:ml-72 pt-24 md:pt-8 pb-6 h-screen overflow-hidden max-w-full">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex flex-col">
+        <div className="w-full px-6 md:px-10 h-full flex flex-col">
           <Header 
             viewTitle={getViewTitle(location.pathname)}
             notifications={notifications}

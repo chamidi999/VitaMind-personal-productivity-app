@@ -48,7 +48,7 @@ export default function AIOracleView({ chat, input, isLoading, contextSummary, o
   <motion.div 
     initial={{ opacity: 0 }} 
     animate={{ opacity: 1 }} 
-    className="max-w-4xl mx-auto h-full flex flex-col px-1 md:px-0 pt-2 pb-8">
+    className="w-full h-full flex flex-col pt-2 pb-8">
       <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl p-4 md:p-5 mb-6">
         <div className="flex items-start gap-3">
           <div className="h-10 w-10 rounded-2xl bg-card border border-white/10 text-royal flex items-center justify-center">
