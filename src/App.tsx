@@ -199,6 +199,10 @@ export default function App() {
     setIsAiLoading(true);
 
     try {
+      const normalizedInput = aiInput.trim();
+      const isLikelyUrl = /(?:https?:\/\/|www\.|localhost|(?:[a-z0-9-]+\.)+[a-z]{2,})(?:[/:?#]|$)/i.test(normalizedInput);
+      const isLikelyNonsense = normalizedInput.length < 3 || (!/[a-zA-Z]/.test(normalizedInput) && !/\d{2,}/.test(normalizedInput));
+
       const prioritizedTasks = tasks
         .filter(task => task.status !== 'completed')
         .sort((a, b) => {
@@ -212,11 +216,33 @@ export default function App() {
         })
         .slice(0, 5)
         .map(task => `${task.title} (priority: ${task.priority}, due: ${task.due_date || 'none'})`);
+      const topTaskTitle = tasks
+        .filter(task => task.status !== 'completed')
+        .sort((a, b) => {
+          const priorityRank = { high: 1, medium: 2, low: 3 } as const;
+          const priorityDiff = priorityRank[a.priority] - priorityRank[b.priority];
+          if (priorityDiff !== 0) return priorityDiff;
+          if (!a.due_date && !b.due_date) return 0;
+          if (!a.due_date) return 1;
+          if (!b.due_date) return -1;
+          return a.due_date.localeCompare(b.due_date);
+        })[0]?.title || 'your highest-priority task';
+
+      if (isLikelyUrl || isLikelyNonsense) {
+        setAiChat(prev => [...prev, {
+          role: 'ai',
+          content: `Strategist, that looks like invalid input. Please ask a specific productivity question so I can help you execute ${topTaskTitle}.`
+        }]);
+        return;
+      }
 
       const systemInstruction = `SYSTEM ROLE: You are the VitaMind Lifestyle Oracle.
-MISSION: You now have full access to the user's Tasks, Habits, and Vision Goals. Your mission is to help the user align their daily actions (Tasks/Habits) with their long-term Vision Goals. If a user asks for advice, check if their current habits support their goals and suggest improvements.
-MANDATE: You ONLY discuss personal productivity, the VitaMind app's features (Kanban, Habits, Vision Goals, Pomodoro), and strategies based on user data.
-ENFORCEMENT: If asked out-of-scope questions, guide back to productivity.
+MISSION: You now have full access to the user's Tasks, Habits, and Vision Goals. Your mission is to help the user align their daily actions (Tasks/Habits) with their long-term Vision Goals.
+CRITICAL RULE: You must only discuss topics related to productivity, time management, tasks, habits, and personal goals.
+If a user asks about anything outside this domain (e.g., politics, celebrities, general knowledge, math, or external links like "http://localhost"), you must politely but firmly decline.
+Response for Out-of-Domain queries: "Strategist, my neural processors are dedicated exclusively to your lifestyle optimization. I cannot assist with [User's Topic], but I am ready to help you conquer your pending objectives like [Top Task]."
+INVALID INPUT RULE: If the user message contains a URL, random symbols, or nonsensical text, treat it as Invalid Input and respond briefly: ask for a specific productivity-related question tied to their dashboard tasks.
+REFUSAL STYLE: Keep refusals brief (1-2 sentences), stay in character, and redirect to dashboard data (especially Top Pending Tasks).
 TASK NAMING RULE: You now have access to specific task names. Never say "Task 1" or placeholders. Use exact task titles from context (for example, "task5" or "Cardio Session") when giving advice.
 USER CONTEXT: Name: ${user?.name}, Tasks: ${tasks.length}, Habits: ${habits.length}, Goals: ${goals.length}, Top Pending Tasks: ${prioritizedTasks.join('; ') || 'None'}, Top Habits: ${userContextSummary?.topHabits?.map((h: any) => `${h.name} (${h.streak})`).join('; ') || 'None'}, Active Goals: ${userContextSummary?.activeGoals?.map((g: any) => `${g.title} (${g.progress}%)`).join('; ') || 'None'}`;
 
