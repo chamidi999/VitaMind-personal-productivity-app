@@ -22,12 +22,17 @@ export const getUserContextSummary = async (userId: number) => {
     "SELECT id, title, due_date, priority FROM tasks WHERE user_id = ? AND status != 'completed' AND due_date < CURDATE() ORDER BY due_date ASC",
     [userId]
   );
+  const [highPriorityRows]: any = await pool.query(
+    "SELECT COUNT(*) as count FROM tasks WHERE user_id = ? AND status IN ('todo', 'in-progress') AND priority = 'high'",
+    [userId]
+  );
 
   return {
     todoCount: Number(todoRows[0].count || 0),
     completedCount: Number(completedRows[0].count || 0),
     habitStreak: Number(habitRows[0].streak || 0),
-    overdueTasks: overdueRows
+    overdueTasks: overdueRows,
+    highPriorityTodoCount: Number(highPriorityRows[0].count || 0)
   };
 };
 
