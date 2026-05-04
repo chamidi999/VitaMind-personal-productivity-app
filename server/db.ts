@@ -47,6 +47,19 @@ export const initDB = async () => {
     `);
 
     db.exec(`
+      CREATE TABLE IF NOT EXISTS habit_completions (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        habit_id INTEGER NOT NULL,
+        user_id INTEGER NOT NULL,
+        completed_on TEXT NOT NULL,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(habit_id, completed_on),
+        FOREIGN KEY (habit_id) REFERENCES habits(id) ON DELETE CASCADE,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+      )
+    `);
+
+    db.exec(`
       CREATE TABLE IF NOT EXISTS goals (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         user_id INTEGER NOT NULL,
