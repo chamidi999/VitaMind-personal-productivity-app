@@ -23,32 +23,34 @@ export default function HabitsView({ habits, onAdd, onComplete, onDelete, onUpda
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="w-full max-w-[1200px] ml-0 space-y-8 overflow-x-hidden px-0">
-      <div className="w-full bg-card p-8 rounded-3xl border border-white/5">
-        <h3 className="text-xl font-bold text-[#191970] mb-6">New Ritual</h3>
-        <form onSubmit={handleSubmit} className="w-full max-w-[600px] ml-0 flex flex-col min-[420px]:flex-row gap-3 min-[420px]:items-center">
-          <input 
-            type="text" 
-            placeholder="Atomic habit name..." 
-            value={newName}
-            onChange={e => setNewName(e.target.value)}
-            className="w-full min-[420px]:flex-1 bg-background border border-white/10 rounded-xl px-4 py-3 focus:ring-2 focus:ring-royal/50 outline-none"
-          />
-          <button type="submit" className="h-11 w-full min-[420px]:w-auto bg-royal text-white px-4 md:px-8 rounded-lg font-bold text-sm sm:text-base hover:bg-royal-light transition-all flex items-center justify-center gap-2 whitespace-nowrap">
-            <Plus size={20} /> Create
-          </button>
-        </form>
-      </div>
+      <div className="max-w-[800px] w-full ml-0 space-y-8">
+        <div className="w-full bg-card p-8 rounded-3xl border border-white/5">
+          <h3 className="text-xl font-bold text-[#191970] mb-6">New Ritual</h3>
+          <form onSubmit={handleSubmit} className="w-full max-w-[600px] ml-0 flex flex-col min-[420px]:flex-row gap-3 min-[420px]:items-center">
+            <input 
+              type="text" 
+              placeholder="Atomic habit name..." 
+              value={newName}
+              onChange={e => setNewName(e.target.value)}
+              className="w-full min-[420px]:flex-1 bg-background border border-white/10 rounded-xl px-4 py-3 focus:ring-2 focus:ring-royal/50 outline-none"
+            />
+            <button type="submit" className="h-11 w-full min-[420px]:w-auto bg-royal text-white px-4 md:px-8 rounded-lg font-bold text-sm sm:text-base hover:bg-royal-light transition-all flex items-center justify-center gap-2 whitespace-nowrap">
+              <Plus size={20} /> Create
+            </button>
+          </form>
+        </div>
 
-      <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-6">
-        {habits.map(habit => (
-          <HabitItem 
-            key={habit.id} 
-            habit={habit} 
-            onComplete={onComplete} 
-            onDelete={onDelete} 
-            onUpdate={onUpdate}
-          />
-        ))}
+        <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-6">
+          {habits.map(habit => (
+            <HabitItem 
+              key={habit.id} 
+              habit={habit} 
+              onComplete={onComplete} 
+              onDelete={onDelete} 
+              onUpdate={onUpdate}
+            />
+          ))}
+        </div>
       </div>
     </motion.div>
   );

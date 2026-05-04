@@ -25,7 +25,7 @@ export default function TasksView({ tasks, onUpdateTask, onDeleteTask, onAddTask
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="w-full max-w-[1200px] flex flex-col items-start space-y-10 overflow-x-hidden px-0 ml-0"
+      className="max-w-[1200px] w-full ml-0 mr-auto flex flex-col items-start space-y-10 overflow-x-hidden px-0"
     >
       <div className="w-full flex flex-col md:flex-row justify-between items-start md:items-center gap-6 bg-card p-6 rounded-3xl border border-white/5">
         <div>
