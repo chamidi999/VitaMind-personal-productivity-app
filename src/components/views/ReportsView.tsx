@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { CSSProperties, useEffect, useMemo, useState } from 'react';
 import { motion } from 'motion/react';
 import { Download, TrendingUp, Flame, Target } from 'lucide-react';
 import html2canvas from 'html2canvas';
@@ -28,6 +28,40 @@ interface AnalyticsSummary {
   aiInsight: string;
   chartData: AnalyticsPoint[];
 }
+
+
+const PDF_CAPTURE_SAFE_COLORS = {
+  pageBg: '#FFFFFF',
+  pageText: '#0F172A',
+  cardBg: '#F1F5F9',
+  cardBorder: '#E2E8F0',
+  mutedText: '#475569',
+  panelBg: '#F8FAFC',
+  panelBorder: '#E5E7EB',
+  insightBorder: '#CBD5E1',
+  insightAccent: '#1E3A8A'
+} as const;
+
+const PDF_CAPTURE_ROOT_STYLE: CSSProperties = {
+  backgroundColor: PDF_CAPTURE_SAFE_COLORS.pageBg,
+  color: PDF_CAPTURE_SAFE_COLORS.pageText,
+  fontFamily: 'Inter, Arial, sans-serif'
+};
+
+const PDF_CAPTURE_STYLE_BLOCK = `
+  #reports-content, #reports-content * {
+    --tw-ring-color: transparent !important;
+    --tw-ring-offset-color: transparent !important;
+    --tw-shadow: none !important;
+    --tw-shadow-colored: none !important;
+    --tw-backdrop-blur: initial !important;
+    filter: none !important;
+  }
+`;
+
+const OKLCH_SUSPECT_PROPERTIES = [
+  'color','backgroundColor','borderColor','borderTopColor','borderRightColor','borderBottomColor','borderLeftColor','outlineColor','textDecorationColor','caretColor','fill','stroke','boxShadow'
+] as const;
 
 const defaultSummary: AnalyticsSummary = {
   taskEfficiency: 0,
@@ -104,7 +138,41 @@ export default function ReportsView() {
       const canvas = await html2canvas(reportsContent, {
         scale: 2,
         useCORS: true,
-        backgroundColor: '#ffffff'
+        backgroundColor: '#ffffff',
+        ignoreElements: (element) => element.classList.contains('no-pdf'),
+        onclone: (clonedDoc) => {
+          const clonedRoot = clonedDoc.getElementById('reports-content');
+          if (clonedRoot) {
+            clonedRoot.setAttribute('style', `${clonedRoot.getAttribute('style') || ''};background:#FFFFFF;color:#0F172A;`);
+          }
+
+          const safeStyle = clonedDoc.createElement('style');
+          safeStyle.setAttribute('data-pdf-capture-safe-style', 'true');
+          safeStyle.textContent = PDF_CAPTURE_STYLE_BLOCK;
+          clonedDoc.head.appendChild(safeStyle);
+
+          const allElements = clonedDoc.querySelectorAll('*');
+          allElements.forEach((element) => {
+            const el = element as HTMLElement;
+            const computed = clonedDoc.defaultView?.getComputedStyle(el);
+            if (!computed) return;
+
+            OKLCH_SUSPECT_PROPERTIES.forEach((property) => {
+              const value = computed[property as keyof CSSStyleDeclaration];
+              if (typeof value === 'string' && value.toLowerCase().includes('oklch')) {
+                if (property === 'boxShadow') {
+                  el.style.boxShadow = 'none';
+                } else {
+                  (el.style as CSSStyleDeclaration)[property as any] = 'rgb(255, 255, 255)';
+                }
+              }
+            });
+
+            if (computed.backdropFilter && computed.backdropFilter !== 'none') {
+              el.style.backdropFilter = 'none';
+            }
+          });
+        }
       });
 
       const imageData = canvas.toDataURL('image/png');
@@ -148,7 +216,7 @@ export default function ReportsView() {
       initial={{ opacity: 0, y: 14 }}
       animate={{ opacity: 1, y: 0 }}
       className="space-y-6 max-w-[1200px] ml-0"
-      style={isPdfCaptureMode ? { backgroundColor: '#FFFFFF', color: '#0F172A' } : undefined}
+      style={isPdfCaptureMode ? PDF_CAPTURE_ROOT_STYLE : undefined}
     >
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
@@ -173,24 +241,24 @@ export default function ReportsView() {
           <div
             key={card.label}
             className="bg-white/40 backdrop-blur-xl border border-white/50 rounded-2xl p-5"
-            style={isPdfCaptureMode ? { backgroundColor: '#F1F5F9', borderColor: '#E2E8F0', backdropFilter: 'none', color: '#0F172A' } : undefined}
+            style={isPdfCaptureMode ? { backgroundColor: PDF_CAPTURE_SAFE_COLORS.cardBg, borderColor: PDF_CAPTURE_SAFE_COLORS.cardBorder, backdropFilter: 'none', color: PDF_CAPTURE_SAFE_COLORS.pageText } : undefined}
           >
             <div className="flex items-center justify-between mb-2">
-              <p className="text-xs font-semibold uppercase tracking-widest text-gray-500" style={isPdfCaptureMode ? { color: '#475569' } : undefined}>{card.label}</p>
+              <p className="text-xs font-semibold uppercase tracking-widest text-gray-500" style={isPdfCaptureMode ? { color: PDF_CAPTURE_SAFE_COLORS.mutedText } : undefined}>{card.label}</p>
               <card.Icon size={18} style={isPdfCaptureMode ? { color: card.iconColor } : undefined} className={isPdfCaptureMode ? undefined : card.iconColor === '#4169e1' ? 'text-royal' : card.iconColor === '#f97316' ? 'text-orange-500' : 'text-emerald-500'} />
             </div>
-            <p className="text-3xl font-bold text-[#191970]" style={isPdfCaptureMode ? { color: '#0F172A' } : undefined}>{isLoading ? '--' : card.value}</p>
+            <p className="text-3xl font-bold text-[#191970]" style={isPdfCaptureMode ? { color: PDF_CAPTURE_SAFE_COLORS.pageText } : undefined}>{isLoading ? '--' : card.value}</p>
           </div>
         ))}
       </div>
 
       <div
         className="bg-white/40 backdrop-blur-xl border border-white/50 rounded-2xl p-5"
-        style={isPdfCaptureMode ? { backgroundColor: '#f8fafc', borderColor: '#e5e7eb', backdropFilter: 'none' } : undefined}
+        style={isPdfCaptureMode ? { backgroundColor: PDF_CAPTURE_SAFE_COLORS.panelBg, borderColor: PDF_CAPTURE_SAFE_COLORS.panelBorder, backdropFilter: 'none' } : undefined}
       >
         <h3 className="text-base font-bold text-[#191970] mb-4">Performance Overview</h3>
         <div style={{ width: '100%', height: isPdfCaptureMode ? 350 : 320, minHeight: 300 }}>
-          <ResponsiveContainer width="100%" height={isPdfCaptureMode ? 350 : '100%'} minHeight={300}>
+          <ResponsiveContainer width={isPdfCaptureMode ? 1000 : '100%'} height={isPdfCaptureMode ? 350 : '100%'} minHeight={300}>
             <ComposedChart data={chartData} margin={{ top: 10, right: 12, left: 0, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
               <XAxis dataKey="label" tick={{ fill: '#6b7280', fontSize: 12 }} />
@@ -220,12 +288,12 @@ export default function ReportsView() {
 
       <div
         className="rounded-2xl border border-royal/20 bg-royal/5 px-5 py-4"
-        style={isPdfCaptureMode ? { backgroundColor: '#F1F5F9', borderColor: '#CBD5E1', color: '#0F172A' } : undefined}
+        style={isPdfCaptureMode ? { backgroundColor: PDF_CAPTURE_SAFE_COLORS.cardBg, borderColor: PDF_CAPTURE_SAFE_COLORS.insightBorder, color: PDF_CAPTURE_SAFE_COLORS.pageText } : undefined}
       >
-        <p className="text-xs uppercase tracking-[0.2em] text-royal font-semibold mb-2" style={isPdfCaptureMode ? { color: '#1E3A8A' } : undefined}>
+        <p className="text-xs uppercase tracking-[0.2em] text-royal font-semibold mb-2" style={isPdfCaptureMode ? { color: PDF_CAPTURE_SAFE_COLORS.insightAccent } : undefined}>
           Proactive Insight
         </p>
-        <p className="text-sm md:text-base text-[#191970] font-medium" style={isPdfCaptureMode ? { color: '#0F172A' } : undefined}>{summary.aiInsight}</p>
+        <p className="text-sm md:text-base text-[#191970] font-medium" style={isPdfCaptureMode ? { color: PDF_CAPTURE_SAFE_COLORS.pageText } : undefined}>{summary.aiInsight}</p>
       </div>
     </motion.div>
   );
