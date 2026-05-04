@@ -22,15 +22,15 @@ interface DashboardProps {
 
 export default function DashboardView({ stats, tasks, habits, contextSummary, onViewChange, onAddTask, onEditTask }: DashboardProps) {
   const [dailyInsight, setDailyInsight] = useState('Calibrating Oracle...');
-  const chartData = [
-    { name: 'Mon', completion: 40 },
-    { name: 'Tue', completion: 65 },
-    { name: 'Wed', completion: 55 },
-    { name: 'Thu', completion: 80 },
-    { name: 'Fri', completion: 70 },
-    { name: 'Sat', completion: 90 },
-    { name: 'Sun', completion: 100 },
-  ];
+  const [chartData, setChartData] = useState([
+    { name: 'Mon', completion: 0 },
+    { name: 'Tue', completion: 0 },
+    { name: 'Wed', completion: 0 },
+    { name: 'Thu', completion: 0 },
+    { name: 'Fri', completion: 0 },
+    { name: 'Sat', completion: 0 },
+    { name: 'Sun', completion: 0 },
+  ]);
 
   const activeTasks = tasks.filter((t) => t.status !== 'completed');
   const habitCount = habits.length;
@@ -60,6 +60,38 @@ export default function DashboardView({ stats, tasks, habits, contextSummary, on
     };
     loadInsight();
   }, [contextSummary]);
+
+  useEffect(() => {
+    let isCancelled = false;
+
+    const loadPerformance = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) return;
+        const response = await fetch('/api/habits/history', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (!response.ok) return;
+
+        const history: Array<{ date: string; score: number }> = await response.json();
+        const formatted = history.map((day) => ({
+          name: new Date(`${day.date}T00:00:00`).toLocaleDateString('en-US', { weekday: 'short' }),
+          completion: day.score ?? 0,
+        }));
+
+        if (!isCancelled && formatted.length === 7) {
+          setChartData(formatted);
+        }
+      } catch (error) {
+        // Keep baseline chart data on fetch error.
+      }
+    };
+
+    loadPerformance();
+    return () => {
+      isCancelled = true;
+    };
+  }, []);
 
   const priorityTone = (priority: string) => {
     const tone = priority.toLowerCase();

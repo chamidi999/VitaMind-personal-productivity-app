@@ -59,7 +59,43 @@ router.post('/:id/complete', authenticateToken, async (req: AuthRequest, res) =>
 
     const newStreak = habit.streak + 1;
     await pool.query('UPDATE habits SET streak = ?, last_completed = ? WHERE id = ?', [newStreak, today, req.params.id]);
+    await pool.query(
+      'INSERT OR IGNORE INTO habit_completions (habit_id, user_id, completed_on) VALUES (?, ?, ?)',
+      [req.params.id, req.user?.id, today]
+    );
     res.json({ ...habit, streak: newStreak, last_completed: today });
+  } catch (error) {
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+router.get('/history', authenticateToken, async (req: AuthRequest, res) => {
+  try {
+    const [habitRows]: any = await pool.query('SELECT COUNT(*) as total FROM habits WHERE user_id = ?', [req.user?.id]);
+    const totalHabits = habitRows[0]?.total || 0;
+
+    const [completionRows]: any = await pool.query(
+      `SELECT completed_on, COUNT(DISTINCT habit_id) as completed
+       FROM habit_completions
+       WHERE user_id = ? AND date(completed_on) >= date('now', '-6 days')
+       GROUP BY completed_on`,
+      [req.user?.id]
+    );
+
+    const completionMap = new Map<string, number>(
+      completionRows.map((row: any) => [row.completed_on, row.completed])
+    );
+
+    const history = Array.from({ length: 7 }, (_, index) => {
+      const date = new Date();
+      date.setDate(date.getDate() - (6 - index));
+      const isoDay = date.toISOString().split('T')[0];
+      const completed = completionMap.get(isoDay) || 0;
+      const score = totalHabits > 0 ? Math.round((completed / totalHabits) * 100) : 0;
+      return { date: isoDay, completed, total: totalHabits, score };
+    });
+
+    res.json(history);
   } catch (error) {
     res.status(500).json({ error: 'Internal server error' });
   }
