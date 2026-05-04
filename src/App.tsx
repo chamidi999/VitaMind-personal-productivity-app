@@ -196,10 +196,25 @@ export default function App() {
     setIsAiLoading(true);
 
     try {
+      const prioritizedTasks = tasks
+        .filter(task => task.status !== 'completed')
+        .sort((a, b) => {
+          const priorityRank = { high: 1, medium: 2, low: 3 } as const;
+          const priorityDiff = priorityRank[a.priority] - priorityRank[b.priority];
+          if (priorityDiff !== 0) return priorityDiff;
+          if (!a.due_date && !b.due_date) return 0;
+          if (!a.due_date) return 1;
+          if (!b.due_date) return -1;
+          return a.due_date.localeCompare(b.due_date);
+        })
+        .slice(0, 5)
+        .map(task => `${task.title} (priority: ${task.priority}, due: ${task.due_date || 'none'})`);
+
       const systemInstruction = `SYSTEM ROLE: You are the VitaMind Lifestyle Oracle. 
 MANDATE: You ONLY discuss personal productivity, the VitaMind app's features (Kanban, Habits, Vision Goals, Pomodoro), and strategies based on user data.
 ENFORCEMENT: If asked out-of-scope questions, guide back to productivity.
-USER CONTEXT: Name: ${user?.name}, Tasks: ${tasks.length}, Habits: ${habits.length}, Goals: ${goals.length}`;
+TASK NAMING RULE: You now have access to specific task names. Never say "Task 1" or placeholders. Use exact task titles from context (for example, "task5" or "Cardio Session") when giving advice.
+USER CONTEXT: Name: ${user?.name}, Tasks: ${tasks.length}, Habits: ${habits.length}, Goals: ${goals.length}, Top Pending Tasks: ${prioritizedTasks.join('; ') || 'None'}`;
 
       const contents = aiChat.map(m => ({
         role: m.role === 'user' ? 'user' : 'model',

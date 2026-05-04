@@ -11,6 +11,7 @@ const buildOracleTip = (summary: {
   habitStreak: number;
   overdueTasks: Array<{ id: number; title: string; due_date: string; priority: string }>;
   highPriorityTodoCount: number;
+  pendingTasks: Array<{ title: string; priority: string; due_date: string | null }>;
 }) => {
   if (summary.overdueTasks.length > 0) {
     const highest = summary.overdueTasks.find(t => t.priority === 'high') || summary.overdueTasks[0];
@@ -80,7 +81,8 @@ router.get('/oracle-daily-insight', authenticateToken, async (req: AuthRequest, 
       `Habit Streak: ${summary.habitStreak}`,
       `Overdue Tasks: ${summary.overdueTasks.length}`,
       `High Priority Pending: ${summary.highPriorityTodoCount}`,
-      `Overdue Task Titles: ${summary.overdueTasks.map(task => task.title).join(', ') || 'None'}`
+      `Overdue Task Titles: ${summary.overdueTasks.map(task => task.title).join(', ') || 'None'}`,
+      `Top Pending Tasks: ${summary.pendingTasks.map(task => `${task.title} (${task.priority}, due ${task.due_date || 'no due date'})`).join('; ') || 'None'}`
     ].join(' | ');
 
     res.json({

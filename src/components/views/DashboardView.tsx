@@ -136,8 +136,8 @@ export default function DashboardView({ stats, tasks, habits, onViewChange, onAd
               <option>Last 30 Days</option>
             </select>
           </div>
-          <div className="w-full h-[300px] min-h-[300px]">
-            <ResponsiveContainer width="100%" height="100%" debounce={100}>
+          <div style={{ width: '100%', height: 300, minHeight: 300 }}>
+            <ResponsiveContainer width="99%" height="100%" debounce={100}>
               <AreaChart data={chartData}>
                 <defs>
                   <linearGradient id="performanceGradient" x1="0" y1="0" x2="0" y2="1">

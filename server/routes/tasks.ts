@@ -11,6 +11,10 @@ export const getUserContextSummary = async (userId: number) => {
       "SELECT COUNT(*) as count FROM tasks WHERE user_id = ? AND status IN ('todo', 'in-progress')",
       [userId]
     );
+    const [pendingTaskRows]: any = await pool.query(
+      "SELECT title, priority, due_date FROM tasks WHERE user_id = ? AND status IN ('todo', 'in-progress') ORDER BY CASE priority WHEN 'high' THEN 1 WHEN 'medium' THEN 2 ELSE 3 END, CASE WHEN due_date IS NULL THEN 1 ELSE 0 END, due_date ASC LIMIT 5",
+      [userId]
+    );
     const [completedRows]: any = await pool.query(
       "SELECT COUNT(*) as count FROM tasks WHERE user_id = ? AND status = 'completed'",
       [userId]
@@ -33,7 +37,8 @@ export const getUserContextSummary = async (userId: number) => {
       completedCount: Number(completedRows[0].count || 0),
       habitStreak: Number(habitRows[0].streak || 0),
       overdueTasks: overdueRows,
-      highPriorityTodoCount: Number(highPriorityRows[0].count || 0)
+      highPriorityTodoCount: Number(highPriorityRows[0].count || 0),
+      pendingTasks: pendingTaskRows
     };
   } catch (error) {
     console.error('Error building user context summary:', error);
@@ -42,7 +47,8 @@ export const getUserContextSummary = async (userId: number) => {
       completedCount: 0,
       habitStreak: 0,
       overdueTasks: [],
-      highPriorityTodoCount: 0
+      highPriorityTodoCount: 0,
+      pendingTasks: []
     };
   }
 };
