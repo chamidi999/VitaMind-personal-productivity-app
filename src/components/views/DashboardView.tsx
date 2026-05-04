@@ -59,7 +59,14 @@ export default function DashboardView({ stats, tasks, habits, onViewChange, onAd
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
           <h2 className="text-3xl font-bold tracking-tight text-[#191970] mb-2">Welcome back, Strategist.</h2>
-          <p className="text-gray-600">Your systems are performing at 92% efficiency today.</p>
+          <p className="text-gray-600 flex items-center gap-2">
+            Your systems are performing at
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-2 py-0.5 text-emerald-600">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              92% efficiency
+            </span>
+            today.
+          </p>
         </div>
         <div className="flex items-center gap-3">
           <button 
@@ -129,22 +136,30 @@ export default function DashboardView({ stats, tasks, habits, onViewChange, onAd
               <option>Last 30 Days</option>
             </select>
           </div>
-          <div className="h-75 w-full">
-            <ResponsiveContainer width="100%" height="100%">
+          <div className="w-full h-[300px] min-h-[300px]">
+            <ResponsiveContainer width="100%" height="100%" debounce={100}>
               <AreaChart data={chartData}>
                 <defs>
-                  <linearGradient id="colorComp" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#4169e1" stopOpacity={0.3}/>
+                  <linearGradient id="performanceGradient" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#4169e1" stopOpacity={0.38}/>
                     <stop offset="95%" stopColor="#4169e1" stopOpacity={0}/>
                   </linearGradient>
                 </defs>
                 <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#666', fontSize: 12}} />
                 <YAxis hide />
                 <Tooltip 
-                  contentStyle={{ backgroundColor: '#ffffff', border: '1px solid #e5e7eb', borderRadius: '12px' }}
-                  itemStyle={{ color: '#191970' }}
+                  contentStyle={{
+                    backgroundColor: '#111827',
+                    border: '1px solid rgba(255, 255, 255, 0.12)',
+                    borderRadius: '12px',
+                    color: '#e5e7eb',
+                    boxShadow: '0 10px 30px rgba(17, 24, 39, 0.45)'
+                  }}
+                  labelStyle={{ color: '#9ca3af', fontWeight: 600 }}
+                  itemStyle={{ color: '#bfdbfe', fontSize: 12 }}
+                  cursor={{ stroke: '#4169e1', strokeOpacity: 0.25 }}
                 />
-                <Area type="monotone" dataKey="completion" stroke="#4169e1" strokeWidth={3} fillOpacity={1} fill="url(#colorComp)" />
+                <Area type="monotone" dataKey="completion" stroke="#4169e1" strokeWidth={3} fillOpacity={1} fill="url(#performanceGradient)" />
               </AreaChart>
             </ResponsiveContainer>
           </div>
