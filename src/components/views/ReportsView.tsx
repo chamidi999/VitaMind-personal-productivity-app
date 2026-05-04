@@ -1,6 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { motion } from 'motion/react';
 import { Download, TrendingUp, Flame, Target } from 'lucide-react';
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
 import {
   ResponsiveContainer,
   ComposedChart,
@@ -38,6 +40,7 @@ const defaultSummary: AnalyticsSummary = {
 export default function ReportsView() {
   const [summary, setSummary] = useState<AnalyticsSummary>(defaultSummary);
   const [isLoading, setIsLoading] = useState(true);
+  const [isDownloadingPdf, setIsDownloadingPdf] = useState(false);
 
   useEffect(() => {
     let isCancelled = false;
@@ -75,8 +78,56 @@ export default function ReportsView() {
     };
   }, []);
 
-  const handleDownloadPdf = () => {
-    console.log('Generating PDF...');
+  const chartData = useMemo(
+    () =>
+      summary.chartData.map((point) => ({
+        label: point.label,
+        taskData: Number(point.taskData) || 0,
+        habitData: Number(point.habitData) || 0
+      })),
+    [summary.chartData]
+  );
+
+  const handleDownloadPdf = async () => {
+    const reportsContent = document.getElementById('reports-content');
+    if (!reportsContent) {
+      return;
+    }
+
+    try {
+      setIsDownloadingPdf(true);
+      const canvas = await html2canvas(reportsContent, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: '#ffffff'
+      });
+
+      const imageData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      const imageWidth = pageWidth;
+      const imageHeight = (canvas.height * imageWidth) / canvas.width;
+
+      let heightLeft = imageHeight;
+      let position = 0;
+
+      pdf.addImage(imageData, 'PNG', 0, position, imageWidth, imageHeight);
+      heightLeft -= pageHeight;
+
+      while (heightLeft > 0) {
+        position = heightLeft - imageHeight;
+        pdf.addPage();
+        pdf.addImage(imageData, 'PNG', 0, position, imageWidth, imageHeight);
+        heightLeft -= pageHeight;
+      }
+
+      pdf.save('VitaMind-Performance-Report.pdf');
+    } catch (error) {
+      console.error('Failed to generate PDF report', error);
+    } finally {
+      setIsDownloadingPdf(false);
+    }
   };
 
   const statCards = [
@@ -87,6 +138,7 @@ export default function ReportsView() {
 
   return (
     <motion.div
+      id="reports-content"
       initial={{ opacity: 0, y: 14 }}
       animate={{ opacity: 1, y: 0 }}
       className="space-y-6 max-w-[1200px] ml-0"
@@ -98,11 +150,16 @@ export default function ReportsView() {
         </div>
         <button
           onClick={handleDownloadPdf}
-          className="inline-flex items-center justify-center gap-2 h-10 px-4 rounded-lg bg-royal text-white font-semibold hover:bg-[#3559c7] transition-colors"
+          disabled={isDownloadingPdf}
+          className="inline-flex items-center justify-center gap-2 h-10 px-4 rounded-lg bg-royal text-white font-semibold hover:bg-[#3559c7] transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
         >
-          <Download size={16} /> Download PDF Report
+          <Download size={16} /> {isDownloadingPdf ? 'Generating PDF...' : 'Download PDF Report'}
         </button>
       </div>
+
+      {isLoading ? (
+        <div className="bg-white/40 backdrop-blur-xl border border-white/50 rounded-2xl p-6 text-sm font-medium text-gray-600">Loading...</div>
+      ) : null}
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {statCards.map((card) => (
@@ -120,12 +177,19 @@ export default function ReportsView() {
         <h3 className="text-base font-bold text-[#191970] mb-4">Performance Overview</h3>
         <div style={{ width: '100%', height: 320 }}>
           <ResponsiveContainer width="100%" height="100%">
-            <ComposedChart data={summary.chartData} margin={{ top: 10, right: 12, left: 0, bottom: 0 }}>
+            <ComposedChart data={chartData} margin={{ top: 10, right: 12, left: 0, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
               <XAxis dataKey="label" tick={{ fill: '#6b7280', fontSize: 12 }} />
               <YAxis yAxisId="left" tick={{ fill: '#6b7280', fontSize: 12 }} />
               <YAxis yAxisId="right" orientation="right" tick={{ fill: '#6b7280', fontSize: 12 }} domain={[0, 100]} />
               <Tooltip
+                formatter={(value: number, name: string) => {
+                  if (name === 'Habit Completion %') {
+                    return [`${value}%`, name];
+                  }
+
+                  return [value, name];
+                }}
                 contentStyle={{
                   borderRadius: '12px',
                   border: '1px solid rgba(99, 102, 241, 0.2)',
