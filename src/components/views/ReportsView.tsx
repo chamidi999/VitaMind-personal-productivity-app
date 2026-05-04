@@ -99,6 +99,7 @@ export default function ReportsView() {
       setIsDownloadingPdf(true);
       setIsPdfCaptureMode(true);
       await new Promise((resolve) => window.requestAnimationFrame(() => resolve(null)));
+      await new Promise((resolve) => window.setTimeout(resolve, 500));
 
       const canvas = await html2canvas(reportsContent, {
         scale: 2,
@@ -136,9 +137,9 @@ export default function ReportsView() {
   };
 
   const statCards = [
-    { label: 'Task Efficiency', value: `${summary.taskEfficiency}%`, icon: <TrendingUp className="text-royal" size={18} /> },
-    { label: 'Habit Consistency', value: `${summary.habitConsistency}%`, icon: <Flame className="text-orange-500" size={18} /> },
-    { label: 'Goal Achievement Rate', value: `${summary.goalAchievementRate}%`, icon: <Target className="text-emerald-500" size={18} /> }
+    { label: 'Task Efficiency', value: `${summary.taskEfficiency}%`, iconColor: '#4169e1', Icon: TrendingUp },
+    { label: 'Habit Consistency', value: `${summary.habitConsistency}%`, iconColor: '#f97316', Icon: Flame },
+    { label: 'Goal Achievement Rate', value: `${summary.goalAchievementRate}%`, iconColor: '#10b981', Icon: Target }
   ];
 
   return (
@@ -147,7 +148,7 @@ export default function ReportsView() {
       initial={{ opacity: 0, y: 14 }}
       animate={{ opacity: 1, y: 0 }}
       className="space-y-6 max-w-[1200px] ml-0"
-      style={isPdfCaptureMode ? { backgroundColor: '#ffffff', color: '#111827' } : undefined}
+      style={isPdfCaptureMode ? { backgroundColor: '#FFFFFF', color: '#0F172A' } : undefined}
     >
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
@@ -172,13 +173,13 @@ export default function ReportsView() {
           <div
             key={card.label}
             className="bg-white/40 backdrop-blur-xl border border-white/50 rounded-2xl p-5"
-            style={isPdfCaptureMode ? { backgroundColor: '#f8fafc', borderColor: '#e5e7eb', backdropFilter: 'none' } : undefined}
+            style={isPdfCaptureMode ? { backgroundColor: '#F1F5F9', borderColor: '#E2E8F0', backdropFilter: 'none', color: '#0F172A' } : undefined}
           >
             <div className="flex items-center justify-between mb-2">
-              <p className="text-xs font-semibold uppercase tracking-widest text-gray-500">{card.label}</p>
-              {card.icon}
+              <p className="text-xs font-semibold uppercase tracking-widest text-gray-500" style={isPdfCaptureMode ? { color: '#475569' } : undefined}>{card.label}</p>
+              <card.Icon size={18} style={isPdfCaptureMode ? { color: card.iconColor } : undefined} className={isPdfCaptureMode ? undefined : card.iconColor === '#4169e1' ? 'text-royal' : card.iconColor === '#f97316' ? 'text-orange-500' : 'text-emerald-500'} />
             </div>
-            <p className="text-3xl font-bold text-[#191970]">{isLoading ? '--' : card.value}</p>
+            <p className="text-3xl font-bold text-[#191970]" style={isPdfCaptureMode ? { color: '#0F172A' } : undefined}>{isLoading ? '--' : card.value}</p>
           </div>
         ))}
       </div>
@@ -188,8 +189,8 @@ export default function ReportsView() {
         style={isPdfCaptureMode ? { backgroundColor: '#f8fafc', borderColor: '#e5e7eb', backdropFilter: 'none' } : undefined}
       >
         <h3 className="text-base font-bold text-[#191970] mb-4">Performance Overview</h3>
-        <div style={{ width: '100%', height: 320, minHeight: 300 }}>
-          <ResponsiveContainer width="100%" height="100%" minHeight={300}>
+        <div style={{ width: '100%', height: isPdfCaptureMode ? 350 : 320, minHeight: 300 }}>
+          <ResponsiveContainer width="100%" height={isPdfCaptureMode ? 350 : '100%'} minHeight={300}>
             <ComposedChart data={chartData} margin={{ top: 10, right: 12, left: 0, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
               <XAxis dataKey="label" tick={{ fill: '#6b7280', fontSize: 12 }} />
@@ -219,12 +220,12 @@ export default function ReportsView() {
 
       <div
         className="rounded-2xl border border-royal/20 bg-royal/5 px-5 py-4"
-        style={isPdfCaptureMode ? { backgroundColor: '#eef2ff', borderColor: '#c7d2fe' } : undefined}
+        style={isPdfCaptureMode ? { backgroundColor: '#F1F5F9', borderColor: '#CBD5E1', color: '#0F172A' } : undefined}
       >
-        <p className="text-xs uppercase tracking-[0.2em] text-royal font-semibold mb-2" style={isPdfCaptureMode ? { color: '#1d4ed8' } : undefined}>
+        <p className="text-xs uppercase tracking-[0.2em] text-royal font-semibold mb-2" style={isPdfCaptureMode ? { color: '#1E3A8A' } : undefined}>
           Proactive Insight
         </p>
-        <p className="text-sm md:text-base text-[#191970] font-medium">{summary.aiInsight}</p>
+        <p className="text-sm md:text-base text-[#191970] font-medium" style={isPdfCaptureMode ? { color: '#0F172A' } : undefined}>{summary.aiInsight}</p>
       </div>
     </motion.div>
   );
