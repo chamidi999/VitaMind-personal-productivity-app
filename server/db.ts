@@ -91,7 +91,6 @@ export const initDB = async () => {
       db.exec("UPDATE notifications SET type = 'task' WHERE type IS NULL");
     }
 
-    console.log('SQLite Database (better-sqlite3) initialized successfully');
   } catch (error) {
     console.error('Error initializing database:', error);
     throw error;
