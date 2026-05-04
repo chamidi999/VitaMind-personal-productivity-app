@@ -14,12 +14,13 @@ interface DashboardProps {
   stats: DashboardStats | null;
   tasks: Task[];
   habits: Habit[];
+  contextSummary: any;
   onViewChange: (view: View) => void;
   onAddTask: () => void;
   onEditTask: (task: Task) => void;
 }
 
-export default function DashboardView({ stats, tasks, habits, onViewChange, onAddTask, onEditTask }: DashboardProps) {
+export default function DashboardView({ stats, tasks, habits, contextSummary, onViewChange, onAddTask, onEditTask }: DashboardProps) {
   const [dailyInsight, setDailyInsight] = useState('Calibrating Oracle...');
   const chartData = [
     { name: 'Mon', completion: 40 },
@@ -41,13 +42,18 @@ export default function DashboardView({ stats, tasks, habits, onViewChange, onAd
         });
         if (!response.ok) return;
         const data = await response.json();
-        setDailyInsight(data.insight || 'Complete one priority objective before noon.');
+        const topHabit = contextSummary?.topHabits?.[0];
+        const daysToRecord = topHabit ? (7 - (topHabit.streak % 7 || 7)) : null;
+        const enhancedInsight = (daysToRecord && daysToRecord <= 3)
+          ? `You're ${daysToRecord} day(s) away from a Habit record on "${topHabit.name}". Keep it up.`
+          : data.insight;
+        setDailyInsight(enhancedInsight || 'Complete one priority objective before noon.');
       } catch (error) {
         setDailyInsight('Complete one priority objective before noon.');
       }
     };
     loadInsight();
-  }, []);
+  }, [contextSummary]);
 
   return (
     <motion.div 

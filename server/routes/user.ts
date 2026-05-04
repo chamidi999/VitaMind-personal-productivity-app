@@ -12,6 +12,8 @@ const buildOracleTip = (summary: {
   overdueTasks: Array<{ id: number; title: string; due_date: string; priority: string }>;
   highPriorityTodoCount: number;
   pendingTasks: Array<{ title: string; priority: string; due_date: string | null }>;
+  topHabits: Array<{ name: string; streak: number }>;
+  activeGoals: Array<{ title: string; progress: number }>;
 }) => {
   if (summary.overdueTasks.length > 0) {
     const highest = summary.overdueTasks.find(t => t.priority === 'high') || summary.overdueTasks[0];
@@ -24,6 +26,12 @@ const buildOracleTip = (summary: {
     return `Strategist, you have ${summary.todoCount} active objective(s) and ${summary.completedCount} completed. Tackle your shortest high-priority task first to build momentum.`;
   }
   if (summary.habitStreak > 0) {
+    const nearestHabitRecord = summary.topHabits[0]
+      ? 7 - (summary.topHabits[0].streak % 7 || 7)
+      : null;
+    if (nearestHabitRecord && nearestHabitRecord <= 3) {
+      return `You're ${nearestHabitRecord} day(s) away from a habit record on "${summary.topHabits[0].name}". Keep the streak alive today.`;
+    }
     return `Strong cadence: ${summary.habitStreak}-day streak. Keep your streak alive with one fast win today.`;
   }
   return 'Fresh board detected. Set one clear objective and complete it early to define your day.';
@@ -82,7 +90,9 @@ router.get('/oracle-daily-insight', authenticateToken, async (req: AuthRequest, 
       `Overdue Tasks: ${summary.overdueTasks.length}`,
       `High Priority Pending: ${summary.highPriorityTodoCount}`,
       `Overdue Task Titles: ${summary.overdueTasks.map(task => task.title).join(', ') || 'None'}`,
-      `Top Pending Tasks: ${summary.pendingTasks.map(task => `${task.title} (${task.priority}, due ${task.due_date || 'no due date'})`).join('; ') || 'None'}`
+      `Top Pending Tasks: ${summary.pendingTasks.map(task => `${task.title} (${task.priority}, due ${task.due_date || 'no due date'})`).join('; ') || 'None'}`,
+      `Top Habits: ${summary.topHabits.map(habit => `${habit.name} (${habit.streak}-day streak)`).join('; ') || 'None'}`,
+      `Active Vision Goals: ${summary.activeGoals.map(goal => `${goal.title} (${goal.progress}% complete)`).join('; ') || 'None'}`
     ].join(' | ');
 
     res.json({

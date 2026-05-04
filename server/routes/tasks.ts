@@ -23,6 +23,14 @@ export const getUserContextSummary = async (userId: number) => {
       'SELECT COALESCE(MAX(streak), 0) as streak FROM habits WHERE user_id = ?',
       [userId]
     );
+    const [topHabitsRows]: any = await pool.query(
+      "SELECT name, streak FROM habits WHERE user_id = ? ORDER BY streak DESC, id DESC LIMIT 3",
+      [userId]
+    );
+    const [activeGoalsRows]: any = await pool.query(
+      "SELECT title, progress FROM goals WHERE user_id = ? AND status = 'active' ORDER BY progress DESC, id DESC",
+      [userId]
+    );
     const [overdueRows]: any = await pool.query(
       "SELECT id, title, due_date, priority FROM tasks WHERE user_id = ? AND status != 'completed' AND due_date < date('now') ORDER BY due_date ASC",
       [userId]
@@ -38,7 +46,9 @@ export const getUserContextSummary = async (userId: number) => {
       habitStreak: Number(habitRows[0].streak || 0),
       overdueTasks: overdueRows,
       highPriorityTodoCount: Number(highPriorityRows[0].count || 0),
-      pendingTasks: pendingTaskRows
+      pendingTasks: pendingTaskRows,
+      topHabits: topHabitsRows,
+      activeGoals: activeGoalsRows
     };
   } catch (error) {
     console.error('Error building user context summary:', error);
@@ -48,7 +58,9 @@ export const getUserContextSummary = async (userId: number) => {
       habitStreak: 0,
       overdueTasks: [],
       highPriorityTodoCount: 0,
-      pendingTasks: []
+      pendingTasks: [],
+      topHabits: [],
+      activeGoals: []
     };
   }
 };
