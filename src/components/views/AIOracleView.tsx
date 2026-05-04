@@ -60,7 +60,7 @@ export default function AIOracleView({ chat, input, isLoading, contextSummary, o
           </div>
         </div>
       </div>
-      <div className="flex-1 overflow-y-auto pr-1 md:pr-4 space-y-4 md:space-y-6 scrollbar-thin scrollbar-thumb-white/10">
+      <div className="flex-1 overflow-y-auto pr-1 md:pr-4 space-y-4 md:space-y-6 scrollbar-thin scrollbar-thumb-white/10 min-h-0">
         <AnimatePresence mode="popLayout">
           {chat.map((msg, i) => (
             <motion.div 
@@ -107,7 +107,7 @@ export default function AIOracleView({ chat, input, isLoading, contextSummary, o
         <div ref={chatEndRef} />
       </div>
 
-      <div className="mt-4 md:mt-8 bg-card/95 p-3 md:p-4 rounded-3xl border border-white/10 shadow-lg sticky bottom-0">
+      <div className="bg-card/95 p-3 md:p-4 rounded-3xl border border-white/10 shadow-lg sticky bottom-0">
         <form onSubmit={onSubmit} className="flex w-full gap-2 md:gap-3">
           <input 
             type="text" 
