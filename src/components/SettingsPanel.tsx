@@ -37,7 +37,7 @@ export default function SettingsPanel({ user, onUpdateUser, onClose }: SettingsP
   const [activeTab, setActiveTab] = useState('profile');
 
   return (
-    <div className="max-w-4xl mx-auto relative">
+    <div className="max-w-4xl relative">
       <button 
         onClick={onClose}
         className="absolute -top-12 right-0 p-2 text-gray-500 hover:text-white transition-colors"
@@ -45,13 +45,13 @@ export default function SettingsPanel({ user, onUpdateUser, onClose }: SettingsP
       >
         <X size={24} />
       </button>
-      <div className="flex flex-col md:flex-row gap-10">
-      <div className="w-full md:w-64 space-y-2">
+      <div className="flex flex-col md:flex-row items-start gap-10">
+      <div className="w-full md:w-64 space-y-2 flex flex-col items-start">
         {tabs.map(tab => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold transition-all ${activeTab === tab.id ? 'bg-royal text-white' : 'text-gray-500 hover:bg-white/5'}`}
+            className={`w-full flex items-start gap-3 px-4 py-3 rounded-xl font-bold transition-all text-left ${activeTab === tab.id ? 'bg-royal text-white' : 'text-gray-500 hover:bg-white/5'}`}
           >
             {tab.icon}
             <span className="text-sm">{tab.label}</span>
@@ -59,7 +59,7 @@ export default function SettingsPanel({ user, onUpdateUser, onClose }: SettingsP
         ))}
       </div>
 
-      <div className="flex-1">
+      <div className="flex-1 w-full">
         <AnimatePresence mode="wait">
           {activeTab === 'profile' && (
             <motion.div
