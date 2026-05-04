@@ -26,10 +26,16 @@ export const initDB = async () => {
         password VARCHAR(255) NOT NULL,
         name VARCHAR(100) NOT NULL,
         role VARCHAR(20) DEFAULT 'user',
+        is_active BOOLEAN DEFAULT TRUE,
         bio TEXT,
         avatar_url TEXT,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
       )
+    `);
+
+    await connection.query(`
+      ALTER TABLE users
+      ADD COLUMN IF NOT EXISTS is_active BOOLEAN DEFAULT TRUE
     `);
 
     // Tasks Table
