@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
-import { Plus, Flame, Target } from 'lucide-react';
+import { Plus, Flame, Target, BarChart3 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { GoogleGenAI } from "@google/genai";
 import { format } from 'date-fns';
@@ -18,6 +18,7 @@ import TasksView from './components/views/TasksView';
 import HabitsView from './components/views/HabitsView';
 import GoalsView from './components/views/GoalsView';
 import AIOracleView from './components/views/AIOracleView';
+import ReportsView from './components/views/ReportsView';
 import SettingsPanel from './components/SettingsPanel';
 import AdminPanel from './components/AdminPanel';
 
@@ -353,6 +354,7 @@ USER CONTEXT: Name: ${user?.name}, Tasks: ${tasks.length}, Habits: ${habits.leng
           />
         }
       />
+      <Route path="/reports" element={<ReportsView />} />
       <Route path="/settings" element={<SettingsPanel user={user} onUpdateUser={(d) => api.auth.updateProfile(token, d).then(loadInitialData)} onClose={() => navigate('/dashboard')} />} />
       <Route path="/admin" element={<AdminPanel token={token} />} />
       <Route path="/" element={<Navigate to="/dashboard" replace />} />
@@ -367,6 +369,7 @@ const getViewTitle = (pathname: string) => ({
   '/habits': 'Habits',
   '/goals': 'Goals',
   '/oracle': 'VitaMind',
+  '/reports': 'Reports & Insights',
   '/settings': 'Settings',
   '/admin': 'Admin Panel'
 }[pathname] || 'Dashboard');
@@ -418,6 +421,7 @@ const getViewTitle = (pathname: string) => ({
                 <QuickActionBtn onClick={() => { navigate('/habits'); setIsQuickActionOpen(false); }} label="Habits" color="bg-orange-500" icon={<Flame size={18} />} />
                 <QuickActionBtn onClick={() => { navigate('/goals'); setIsQuickActionOpen(false); }} label="Goals" color="bg-emerald-500" icon={<Target size={18} />} />
                 <QuickActionBtn onClick={() => { navigate('/oracle'); setIsQuickActionOpen(false); }} label="AI Mind" color="bg-purple-500" icon={<Plus size={18} />} />
+                <QuickActionBtn onClick={() => { navigate('/reports'); setIsQuickActionOpen(false); }} label="Reports" color="bg-cyan-600" icon={<BarChart3 size={18} />} />
                 <QuickActionBtn onClick={() => { navigate('/settings'); setIsQuickActionOpen(false); }} label="Settings" color="bg-slate-500" icon={<Plus size={18} />} />
               </motion.div>
             </>

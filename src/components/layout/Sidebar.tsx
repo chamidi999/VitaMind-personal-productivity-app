@@ -1,7 +1,7 @@
 import React from 'react';
 import { 
   Zap, LayoutDashboard, CheckSquare, Flame, 
-  Target, MessageSquare, ShieldAlert, Settings as SettingsIcon, LogOut 
+  Target, MessageSquare, BarChart3, ShieldAlert, Settings as SettingsIcon, LogOut 
 } from 'lucide-react';
 import { motion } from 'motion/react';
 import { NavLink } from 'react-router-dom';
@@ -28,6 +28,7 @@ export default function Sidebar({ user, onLogout }: SidebarProps) {
         <NavItem to="/habits" icon={<Flame size={20} />} label="Habits" />
         <NavItem to="/goals" icon={<Target size={20} />} label="Goals" />
         <NavItem to="/oracle" icon={<MessageSquare size={20} />} label="VitaMind" />
+        <NavItem to="/reports" icon={<BarChart3 size={20} />} label="Reports" />
         {user?.role === 'admin' && (
           <NavItem to="/admin" icon={<ShieldAlert size={20} />} label="Admin Panel" />
         )}
