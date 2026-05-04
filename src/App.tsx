@@ -374,23 +374,25 @@ const getViewTitle = (pathname: string) => ({
     <div className="h-screen bg-background text-midnight flex font-sans selection:bg-royal/20 overflow-hidden">
       <Sidebar user={user} onLogout={handleLogout} />
       
-      <main className="flex-1 ml-0 md:ml-72 px-4 pt-24 md:pt-10 pb-6 md:px-10 h-screen overflow-hidden max-w-full">
-        <Header 
-          viewTitle={getViewTitle(location.pathname)}
-          notifications={notifications}
-          isNoteOpen={isNoteOpen}
-          setIsNoteOpen={setIsNoteOpen}
-          setNotifications={setNotifications}
-          token={token}
-          onReadNotification={async (id) => {
-            await fetch(`/api/notifications/${id}/read`, { method: 'PATCH', headers: { 'Authorization': `Bearer ${token}` } });
-            await refreshData();
-          }}
-        />
+      <main className="flex-1 ml-0 md:ml-72 pt-24 md:pt-8 pb-6 h-screen overflow-hidden max-w-full">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex flex-col">
+          <Header 
+            viewTitle={getViewTitle(location.pathname)}
+            notifications={notifications}
+            isNoteOpen={isNoteOpen}
+            setIsNoteOpen={setIsNoteOpen}
+            setNotifications={setNotifications}
+            token={token}
+            onReadNotification={async (id) => {
+              await fetch(`/api/notifications/${id}/read`, { method: 'PATCH', headers: { 'Authorization': `Bearer ${token}` } });
+              await refreshData();
+            }}
+          />
 
-        <AnimatePresence mode="wait">
-          <div key={location.pathname} className="h-[calc(100vh-7.5rem)] overflow-y-auto pr-1 max-w-full overflow-x-hidden">{renderView()}</div>
-        </AnimatePresence>
+          <AnimatePresence mode="wait">
+            <div key={location.pathname} className="flex-1 overflow-y-auto pr-1 max-w-full overflow-x-hidden py-6">{renderView()}</div>
+          </AnimatePresence>
+        </div>
       </main>
 
       {/* Floating Action Button */}
