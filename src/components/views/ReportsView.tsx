@@ -41,6 +41,7 @@ export default function ReportsView() {
   const [summary, setSummary] = useState<AnalyticsSummary>(defaultSummary);
   const [isLoading, setIsLoading] = useState(true);
   const [isDownloadingPdf, setIsDownloadingPdf] = useState(false);
+  const [isPdfCaptureMode, setIsPdfCaptureMode] = useState(false);
 
   useEffect(() => {
     let isCancelled = false;
@@ -88,7 +89,7 @@ export default function ReportsView() {
     [summary.chartData]
   );
 
-  const handleDownloadPdf = async () => {
+  const handleDownloadPDF = async () => {
     const reportsContent = document.getElementById('reports-content');
     if (!reportsContent) {
       return;
@@ -96,6 +97,9 @@ export default function ReportsView() {
 
     try {
       setIsDownloadingPdf(true);
+      setIsPdfCaptureMode(true);
+      await new Promise((resolve) => window.requestAnimationFrame(() => resolve(null)));
+
       const canvas = await html2canvas(reportsContent, {
         scale: 2,
         useCORS: true,
@@ -126,6 +130,7 @@ export default function ReportsView() {
     } catch (error) {
       console.error('Failed to generate PDF report', error);
     } finally {
+      setIsPdfCaptureMode(false);
       setIsDownloadingPdf(false);
     }
   };
@@ -142,6 +147,7 @@ export default function ReportsView() {
       initial={{ opacity: 0, y: 14 }}
       animate={{ opacity: 1, y: 0 }}
       className="space-y-6 max-w-[1200px] ml-0"
+      style={isPdfCaptureMode ? { backgroundColor: '#ffffff', color: '#111827' } : undefined}
     >
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
@@ -149,7 +155,7 @@ export default function ReportsView() {
           <p className="text-sm text-gray-600">Track your weekly performance and behavior trends.</p>
         </div>
         <button
-          onClick={handleDownloadPdf}
+          onClick={handleDownloadPDF}
           disabled={isDownloadingPdf}
           className="inline-flex items-center justify-center gap-2 h-10 px-4 rounded-lg bg-royal text-white font-semibold hover:bg-[#3559c7] transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
         >
@@ -163,7 +169,11 @@ export default function ReportsView() {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {statCards.map((card) => (
-          <div key={card.label} className="bg-white/40 backdrop-blur-xl border border-white/50 rounded-2xl p-5">
+          <div
+            key={card.label}
+            className="bg-white/40 backdrop-blur-xl border border-white/50 rounded-2xl p-5"
+            style={isPdfCaptureMode ? { backgroundColor: '#f8fafc', borderColor: '#e5e7eb', backdropFilter: 'none' } : undefined}
+          >
             <div className="flex items-center justify-between mb-2">
               <p className="text-xs font-semibold uppercase tracking-widest text-gray-500">{card.label}</p>
               {card.icon}
@@ -173,10 +183,13 @@ export default function ReportsView() {
         ))}
       </div>
 
-      <div className="bg-white/40 backdrop-blur-xl border border-white/50 rounded-2xl p-5">
+      <div
+        className="bg-white/40 backdrop-blur-xl border border-white/50 rounded-2xl p-5"
+        style={isPdfCaptureMode ? { backgroundColor: '#f8fafc', borderColor: '#e5e7eb', backdropFilter: 'none' } : undefined}
+      >
         <h3 className="text-base font-bold text-[#191970] mb-4">Performance Overview</h3>
-        <div style={{ width: '100%', height: 320 }}>
-          <ResponsiveContainer width="100%" height="100%">
+        <div style={{ width: '100%', height: 320, minHeight: 300 }}>
+          <ResponsiveContainer width="100%" height="100%" minHeight={300}>
             <ComposedChart data={chartData} margin={{ top: 10, right: 12, left: 0, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
               <XAxis dataKey="label" tick={{ fill: '#6b7280', fontSize: 12 }} />
@@ -204,8 +217,13 @@ export default function ReportsView() {
         </div>
       </div>
 
-      <div className="rounded-2xl border border-royal/20 bg-royal/5 px-5 py-4">
-        <p className="text-xs uppercase tracking-[0.2em] text-royal font-semibold mb-2">Proactive Insight</p>
+      <div
+        className="rounded-2xl border border-royal/20 bg-royal/5 px-5 py-4"
+        style={isPdfCaptureMode ? { backgroundColor: '#eef2ff', borderColor: '#c7d2fe' } : undefined}
+      >
+        <p className="text-xs uppercase tracking-[0.2em] text-royal font-semibold mb-2" style={isPdfCaptureMode ? { color: '#1d4ed8' } : undefined}>
+          Proactive Insight
+        </p>
         <p className="text-sm md:text-base text-[#191970] font-medium">{summary.aiInsight}</p>
       </div>
     </motion.div>
