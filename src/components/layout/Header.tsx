@@ -16,7 +16,7 @@ interface HeaderProps {
 
 export default function Header({ viewTitle, notifications, isNoteOpen, setIsNoteOpen, setNotifications, onReadNotification, token }: HeaderProps) {
   return (
-    <header className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 mb-8 px-1">
+    <header className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between sm:items-center gap-4 mt-6 mb-8 px-1 md:px-0">
       <div>
         <PageHeader title={viewTitle} />
       </div>
