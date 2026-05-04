@@ -48,7 +48,7 @@ export default function AIOracleView({ chat, input, isLoading, contextSummary, o
   <motion.div 
     initial={{ opacity: 0 }} 
     animate={{ opacity: 1 }} 
-    className="max-w-4xl h-full flex flex-col px-0 pt-2 pb-8">
+    className="w-full h-full flex flex-col items-start px-0 pt-2 pb-8">
       <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl p-4 md:p-5 mb-6">
         <div className="flex items-start gap-3">
           <div className="h-10 w-10 rounded-2xl bg-card border border-white/10 text-royal flex items-center justify-center">
@@ -69,7 +69,7 @@ export default function AIOracleView({ chat, input, isLoading, contextSummary, o
               animate={{ opacity: 1, y: 0 }}
               className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
             >
-              <div className={`flex gap-3 md:gap-4 max-w-[92%] md:max-w-[85%] ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}>
+              <div className={`flex gap-3 md:gap-4 ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}>
                 <div className={`h-10 w-10 min-w-10 rounded-2xl flex items-center justify-center ${
                   msg.role === 'user' ? 'bg-royal text-white' : 'bg-card border border-white/5 text-royal'
                 }`}>
@@ -107,7 +107,7 @@ export default function AIOracleView({ chat, input, isLoading, contextSummary, o
         <div ref={chatEndRef} />
       </div>
 
-      <div className="bg-card/95 p-3 md:p-4 rounded-3xl border border-white/10 shadow-lg sticky bottom-0">
+      <div className="w-full bg-card/95 p-3 md:p-4 rounded-3xl border border-white/10 shadow-lg sticky bottom-0">
         <form onSubmit={onSubmit} className="flex w-full gap-2 md:gap-3">
           <input 
             type="text" 
@@ -125,7 +125,7 @@ export default function AIOracleView({ chat, input, isLoading, contextSummary, o
             <Send size={20} />
           </button>
         </form>
-        <p className="text-[10px] text-[#191970]/55 mt-3 text-center md:text-right uppercase tracking-[0.2em]">
+        <p className="text-[10px] text-[#191970]/55 mt-3 text-left uppercase tracking-[0.2em]">
           <Zap size={10} className="inline mr-1" /> Powered by VitaMind Neural Infrastructure
         </p>
       </div>
