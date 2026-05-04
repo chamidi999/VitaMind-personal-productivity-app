@@ -39,7 +39,7 @@ export default function GoalsView({
   };
 
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="w-full space-y-6 overflow-x-hidden px-0 pt-20 md:pt-10 pb-8">
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="w-full max-w-[1200px] ml-0 space-y-6 overflow-x-hidden px-0 pt-20 md:pt-10 pb-8">
       <div className="flex flex-wrap sm:flex-nowrap justify-between items-start sm:items-center gap-4 bg-card p-5 md:p-6 rounded-2xl border border-gray-200/80 shadow-[0_1px_4px_rgba(15,23,42,0.06)]">
         <div>
           <h2 className="text-2xl font-bold text-[#191970]">Vision Horizon</h2>
