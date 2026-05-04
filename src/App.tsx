@@ -304,7 +304,7 @@ USER CONTEXT: Name: ${user?.name}, Tasks: ${tasks.length}, Habits: ${habits.leng
   };
 
   return (
-    <div className="h-screen bg-background text-[#191970] flex font-sans selection:bg-royal/20 overflow-hidden">
+    <div className="h-screen bg-background text-midnight flex font-sans selection:bg-royal/20 overflow-hidden">
       <Sidebar user={user} currentView={currentView} onViewChange={setCurrentView} onLogout={handleLogout} />
       
       <main className="flex-1 ml-0 md:ml-72 px-4 pt-24 pb-6 md:p-10 h-screen overflow-hidden max-w-full">
@@ -356,7 +356,7 @@ USER CONTEXT: Name: ${user?.name}, Tasks: ${tasks.length}, Habits: ${habits.leng
         </AnimatePresence>
         <button 
           onClick={() => setIsQuickActionOpen(!isQuickActionOpen)}
-          className={`h-14 w-14 md:h-16 md:w-16 rounded-full flex items-center justify-center shadow-2xl transition-all active:scale-95 ${isQuickActionOpen ? 'bg-[#191970] text-white rotate-45' : 'bg-royal text-white shadow-royal/30'}`}
+          className={`h-14 w-14 md:h-16 md:w-16 rounded-full flex items-center justify-center shadow-2xl transition-all active:scale-95 ${isQuickActionOpen ? 'bg-midnight text-white rotate-45' : 'bg-royal text-white shadow-royal/30'}`}
         >
           <Plus size={32} />
         </button>
@@ -366,7 +366,7 @@ USER CONTEXT: Name: ${user?.name}, Tasks: ${tasks.length}, Habits: ${habits.leng
       <AnimatePresence>
         {isTaskModalOpen && (
           <div className="fixed inset-0 z-100 flex items-center justify-center p-4">
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setIsTaskModalOpen(false)} className="absolute inset-0 bg-[#191970]/30 backdrop-blur-sm" />
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setIsTaskModalOpen(false)} className="absolute inset-0 bg-midnight/30 backdrop-blur-sm" />
             <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }} className="bg-card w-full max-w-lg p-8 rounded-3xl border border-gray-200 shadow-xl relative z-10 overflow-hidden">
               <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-royal via-purple-500 to-emerald-500"></div>
               <h3 className="text-xl font-bold mb-6 text-[#191970]">{editingTask ? 'Modify Objective' : 'Initialize Objective'}</h3>
