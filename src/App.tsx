@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import { Plus, Flame, Target } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { GoogleGenAI } from "@google/genai";
 import { format } from 'date-fns';
 
 // Types & Services
-import { User, Task, Habit, Goal, DashboardStats, ChatMessage, View, Notification } from './types';
+import { User, Task, Habit, Goal, DashboardStats, ChatMessage, Notification } from './types';
 import { api } from './services/api';
 
 // Components
@@ -26,7 +27,8 @@ const genAI = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 export default function App() {
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(localStorage.getItem('token'));
-  const [currentView, setCurrentView] = useState<View>('dashboard');
+  const location = useLocation();
+  const navigate = useNavigate();
   
   // Data State
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -270,58 +272,65 @@ USER CONTEXT: Name: ${user?.name}, Tasks: ${tasks.length}, Habits: ${habits.leng
     return <AuthView onLogin={handleLogin} onRegister={handleRegister} />;
   }
 
-  const renderView = () => {
-    switch (currentView) {
-      case 'dashboard':
-        return (
-          <DashboardView 
-            stats={stats} 
-            tasks={tasks} 
-            habits={habits} 
+  const renderView = () => (
+    <Routes>
+      <Route
+        path="/dashboard"
+        element={
+          <DashboardView
+            stats={stats}
+            tasks={tasks}
+            habits={habits}
             contextSummary={userContextSummary}
-            onViewChange={setCurrentView} 
+            onViewChange={(view) => navigate(view === 'ai' ? '/oracle' : `/${view}`)}
             onAddTask={() => {
-                setEditingTask(null);
-                setNewTaskTitle('');
-                setNewTaskDescription('');
-                setNewTaskPriority('medium');
-                setNewTaskDueDate(format(new Date(), 'yyyy-MM-dd'));
-                setIsTaskModalOpen(true);
-            }} 
-            onEditTask={handleEditTask}
-          />
-        );
-      case 'tasks':
-        return (
-          <TasksView 
-            tasks={tasks} 
-            onUpdateTask={(id, s) => api.tasks.update(token, id, { status: s }).then(refreshData)}
-            onDeleteTask={(id) => api.tasks.delete(token, id).then(refreshData)}
-            onAddTask={(s) => { 
-                setNewTaskStatus(s); 
-                setEditingTask(null);
-                setNewTaskTitle('');
-                setNewTaskDescription('');
-                setNewTaskPriority('medium');
-                setNewTaskDueDate(format(new Date(), 'yyyy-MM-dd'));
-                setIsTaskModalOpen(true); 
+              setEditingTask(null);
+              setNewTaskTitle('');
+              setNewTaskDescription('');
+              setNewTaskPriority('medium');
+              setNewTaskDueDate(format(new Date(), 'yyyy-MM-dd'));
+              setIsTaskModalOpen(true);
             }}
             onEditTask={handleEditTask}
           />
-        );
-      case 'habits':
-        return (
-          <HabitsView 
+        }
+      />
+      <Route
+        path="/tasks"
+        element={
+          <TasksView
+            tasks={tasks}
+            onUpdateTask={(id, s) => api.tasks.update(token, id, { status: s }).then(refreshData)}
+            onDeleteTask={(id) => api.tasks.delete(token, id).then(refreshData)}
+            onAddTask={(s) => {
+              setNewTaskStatus(s);
+              setEditingTask(null);
+              setNewTaskTitle('');
+              setNewTaskDescription('');
+              setNewTaskPriority('medium');
+              setNewTaskDueDate(format(new Date(), 'yyyy-MM-dd'));
+              setIsTaskModalOpen(true);
+            }}
+            onEditTask={handleEditTask}
+          />
+        }
+      />
+      <Route
+        path="/habits"
+        element={
+          <HabitsView
             habits={habits}
             onAdd={(n) => api.habits.create(token, { name: n }).then(refreshData)}
             onComplete={(id) => api.habits.complete(token, id).then(refreshData)}
             onDelete={(id) => api.habits.delete(token, id).then(refreshData)}
             onUpdate={(id, n) => api.habits.update(token, id, { name: n }).then(refreshData)}
           />
-        );
-      case 'goals':
-        return (
-          <GoalsView 
+        }
+      />
+      <Route
+        path="/goals"
+        element={
+          <GoalsView
             goals={goals}
             onAdd={(d) => api.goals.create(token, d).then(refreshData)}
             onDelete={(id) => api.goals.delete(token, id).then(refreshData)}
@@ -329,34 +338,45 @@ USER CONTEXT: Name: ${user?.name}, Tasks: ${tasks.length}, Habits: ${habits.leng
             onToggleMilestone={handleToggleMilestone}
             onDeleteMilestone={(id) => api.milestones.delete(token, id).then(refreshData)}
           />
-        );
-      case 'ai':
-        return (
-          <AIOracleView 
-            chat={aiChat} 
-            input={aiInput} 
+        }
+      />
+      <Route
+        path="/oracle"
+        element={
+          <AIOracleView
+            chat={aiChat}
+            input={aiInput}
             isLoading={isAiLoading}
             contextSummary={userContextSummary}
             onInputChange={setAiInput}
             onSubmit={askAI}
           />
-        );
-      case 'settings':
-        return <SettingsPanel user={user} onUpdateUser={(d) => api.auth.updateProfile(token, d).then(loadInitialData)} onClose={() => setCurrentView('dashboard')} />;
-      case 'admin':
-        return <AdminPanel token={token} />;
-      default:
-        return null;
-    }
-  };
+        }
+      />
+      <Route path="/settings" element={<SettingsPanel user={user} onUpdateUser={(d) => api.auth.updateProfile(token, d).then(loadInitialData)} onClose={() => navigate('/dashboard')} />} />
+      <Route path="/admin" element={<AdminPanel token={token} />} />
+      <Route path="/" element={<Navigate to="/dashboard" replace />} />
+      <Route path="*" element={<Navigate to="/dashboard" replace />} />
+    </Routes>
+  );
 
+
+const getViewTitle = (pathname: string) => ({
+  '/dashboard': 'Dashboard',
+  '/tasks': 'Tasks',
+  '/habits': 'Habits',
+  '/goals': 'Goals',
+  '/oracle': 'VitaMind',
+  '/settings': 'Settings',
+  '/admin': 'Admin Panel'
+}[pathname] || 'Dashboard');
   return (
     <div className="h-screen bg-background text-midnight flex font-sans selection:bg-royal/20 overflow-hidden">
-      <Sidebar user={user} currentView={currentView} onViewChange={setCurrentView} onLogout={handleLogout} />
+      <Sidebar user={user} onLogout={handleLogout} />
       
-      <main className="flex-1 ml-0 md:ml-72 px-4 pt-24 pb-6 md:p-10 h-screen overflow-hidden max-w-full">
+      <main className="flex-1 ml-0 md:ml-72 px-4 pt-24 md:pt-10 pb-6 md:px-10 h-screen overflow-hidden max-w-full">
         <Header 
-          viewTitle={currentView.charAt(0).toUpperCase() + currentView.slice(1)}
+          viewTitle={getViewTitle(location.pathname)}
           notifications={notifications}
           isNoteOpen={isNoteOpen}
           setIsNoteOpen={setIsNoteOpen}
@@ -369,7 +389,7 @@ USER CONTEXT: Name: ${user?.name}, Tasks: ${tasks.length}, Habits: ${habits.leng
         />
 
         <AnimatePresence mode="wait">
-          <div key={currentView} className="h-[calc(100vh-6rem)] overflow-y-auto pr-1 max-w-full overflow-x-hidden">{renderView()}</div>
+          <div key={location.pathname} className="h-[calc(100vh-7.5rem)] overflow-y-auto pr-1 max-w-full overflow-x-hidden">{renderView()}</div>
         </AnimatePresence>
       </main>
 
@@ -391,12 +411,12 @@ USER CONTEXT: Name: ${user?.name}, Tasks: ${tasks.length}, Habits: ${habits.leng
                 exit={{ opacity: 0, y: 20 }}
                 className="absolute bottom-20 right-0 space-y-4"
               >
-                <QuickActionBtn onClick={() => { setCurrentView('dashboard'); setIsQuickActionOpen(false); }} label="Dashboard" color="bg-royal" icon={<Plus size={18} />} />
-                <QuickActionBtn onClick={() => { setCurrentView('tasks'); setIsQuickActionOpen(false); }} label="Tasks" color="bg-indigo-500" icon={<Plus size={18} />} />
-                <QuickActionBtn onClick={() => { setCurrentView('habits'); setIsQuickActionOpen(false); }} label="Habits" color="bg-orange-500" icon={<Flame size={18} />} />
-                <QuickActionBtn onClick={() => { setCurrentView('goals'); setIsQuickActionOpen(false); }} label="Goals" color="bg-emerald-500" icon={<Target size={18} />} />
-                <QuickActionBtn onClick={() => { setCurrentView('ai'); setIsQuickActionOpen(false); }} label="AI Mind" color="bg-purple-500" icon={<Plus size={18} />} />
-                <QuickActionBtn onClick={() => { setCurrentView('settings'); setIsQuickActionOpen(false); }} label="Settings" color="bg-slate-500" icon={<Plus size={18} />} />
+                <QuickActionBtn onClick={() => { navigate('/dashboard'); setIsQuickActionOpen(false); }} label="Dashboard" color="bg-royal" icon={<Plus size={18} />} />
+                <QuickActionBtn onClick={() => { navigate('/tasks'); setIsQuickActionOpen(false); }} label="Tasks" color="bg-indigo-500" icon={<Plus size={18} />} />
+                <QuickActionBtn onClick={() => { navigate('/habits'); setIsQuickActionOpen(false); }} label="Habits" color="bg-orange-500" icon={<Flame size={18} />} />
+                <QuickActionBtn onClick={() => { navigate('/goals'); setIsQuickActionOpen(false); }} label="Goals" color="bg-emerald-500" icon={<Target size={18} />} />
+                <QuickActionBtn onClick={() => { navigate('/oracle'); setIsQuickActionOpen(false); }} label="AI Mind" color="bg-purple-500" icon={<Plus size={18} />} />
+                <QuickActionBtn onClick={() => { navigate('/settings'); setIsQuickActionOpen(false); }} label="Settings" color="bg-slate-500" icon={<Plus size={18} />} />
               </motion.div>
             </>
           )}
