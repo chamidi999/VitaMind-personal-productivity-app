@@ -26,6 +26,26 @@ export default function AdminPanel({ token }: AdminPanelProps) {
     }
   };
 
+  const handleDeleteAccount = async (userId: number, name: string) => {
+    const confirmed = window.confirm(`Delete account for ${name}? This cannot be undone.`);
+    if (!confirmed) return;
+
+    try {
+      const res = await fetch(`/api/admin/users/${userId}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        alert(data.error || 'Failed to delete account');
+        return;
+      }
+      await fetchAdminData();
+    } catch (e) {
+      alert('Failed to delete account');
+    }
+  };
+
   return (
     <div className="space-y-10">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -99,7 +119,11 @@ export default function AdminPanel({ token }: AdminPanelProps) {
                   </td>
                   <td className="px-8 py-5">
                     <div className="flex gap-2">
-                       <button className="p-2 hover:bg-white/5 rounded-xl text-gray-500 hover:text-white transition-colors">
+                       <button
+                          onClick={() => handleDeleteAccount(u.id, u.name)}
+                          className="p-2 hover:bg-white/5 rounded-xl text-gray-500 hover:text-white transition-colors"
+                          title="Delete account"
+                        >
                           <Ban size={16} />
                        </button>
                        <button className="p-2 hover:bg-white/5 rounded-xl text-gray-500 hover:text-white transition-colors">

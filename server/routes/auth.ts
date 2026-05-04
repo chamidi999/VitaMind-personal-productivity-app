@@ -28,11 +28,20 @@ router.post('/register', async (req, res) => {
   const { email, password, name, role, adminKey } = result.data;
   const requestedRole = role || 'user';
   const shouldCreateAdmin = requestedRole === 'admin';
-  const adminSignupKey = process.env.ADMIN_SIGNUP_KEY;
+  const adminSignupKeys = (process.env.ADMIN_SIGNUP_KEYS || process.env.ADMIN_SIGNUP_KEY || '')
+    .split(',')
+    .map((k) => k.trim())
+    .filter(Boolean);
+  const maxAdminAccounts = Number(process.env.ADMIN_MAX_ACCOUNTS || 2);
 
   if (shouldCreateAdmin) {
-    if (!adminSignupKey || adminKey !== adminSignupKey) {
+    if (!adminSignupKeys.length || !adminKey || !adminSignupKeys.includes(adminKey)) {
       return res.status(403).json({ error: 'Invalid admin signup key' });
+    }
+
+    const [adminRows]: any = await pool.query('SELECT COUNT(*) as count FROM users WHERE role = ?', ['admin']);
+    if ((adminRows[0]?.count || 0) >= maxAdminAccounts) {
+      return res.status(403).json({ error: `Maximum of ${maxAdminAccounts} admin accounts allowed` });
     }
   }
 
