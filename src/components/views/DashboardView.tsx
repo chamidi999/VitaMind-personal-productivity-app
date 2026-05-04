@@ -1,12 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { motion } from 'motion/react';
-import { 
-  Plus, Calendar, CheckSquare, Target, Activity, 
-  ChevronRight, Flame, Clock, BrainCircuit 
+import {
+  Plus, Calendar, CheckSquare, Target, Activity,
+  ChevronRight, Flame, Clock, BrainCircuit, Sparkles
 } from 'lucide-react';
-import { 
-  AreaChart, Area, XAxis, YAxis, CartesianGrid, 
-  Tooltip, ResponsiveContainer 
+import {
+  AreaChart, Area, XAxis, YAxis,
+  Tooltip, ResponsiveContainer
 } from 'recharts';
 import { DashboardStats, Task, Habit, View } from '../../types';
 
@@ -32,6 +32,12 @@ export default function DashboardView({ stats, tasks, habits, contextSummary, on
     { name: 'Sun', completion: 100 },
   ];
 
+  const activeTasks = tasks.filter((t) => t.status !== 'completed');
+  const habitCount = habits.length;
+  const goalCount = stats?.goals.total || 0;
+
+  const highestStreak = useMemo(() => Math.max(...habits.map((h) => h.streak), 0), [habits]);
+
   useEffect(() => {
     const loadInsight = async () => {
       try {
@@ -55,13 +61,19 @@ export default function DashboardView({ stats, tasks, habits, contextSummary, on
     loadInsight();
   }, [contextSummary]);
 
+  const priorityTone = (priority: string) => {
+    const tone = priority.toLowerCase();
+    if (tone === 'high') return 'bg-red-400 shadow-[0_0_14px_rgba(248,113,113,0.95)]';
+    if (tone === 'medium') return 'bg-yellow-300 shadow-[0_0_14px_rgba(253,224,71,0.95)]';
+    return 'bg-sky-300 shadow-[0_0_14px_rgba(125,211,252,0.9)]';
+  };
+
   return (
-    <motion.div 
+    <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       className="space-y-8 max-w-full overflow-x-hidden"
     >
-      {/* Welcome Section */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
           <h2 className="text-3xl font-bold tracking-tight text-[#191970] mb-2">Welcome back, Strategist.</h2>
@@ -75,13 +87,13 @@ export default function DashboardView({ stats, tasks, habits, contextSummary, on
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <button 
+          <button
             onClick={() => onViewChange('tasks')}
             className="h-11 bg-white text-royal hover:bg-royal/10 px-4 rounded-lg font-semibold text-sm sm:text-base transition-all border border-royal/30 flex items-center justify-center gap-2 whitespace-nowrap"
           >
             <Clock size={18} /> Focus Mode
           </button>
-          <button 
+          <button
             onClick={onAddTask}
             className="h-11 bg-royal text-white hover:bg-[#3559c7] px-4 rounded-lg font-semibold text-sm sm:text-base transition-all shadow-lg shadow-royal/20 flex items-center justify-center gap-2 whitespace-nowrap"
           >
@@ -90,7 +102,6 @@ export default function DashboardView({ stats, tasks, habits, contextSummary, on
         </div>
       </div>
 
-      {/* Stats Grid */}
       <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl p-4 md:p-5">
         <div className="flex items-center gap-3">
           <div className="h-10 w-10 rounded-2xl bg-card border border-white/10 text-royal flex items-center justify-center">
@@ -105,39 +116,40 @@ export default function DashboardView({ stats, tasks, habits, contextSummary, on
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {[
-          { id: 'tasks', label: 'Active Tasks', value: stats?.tasks.total || 0, sub: `${stats?.tasks.completed || 0} completed`, icon: <CheckSquare className="text-royal" />, color: 'from-royal/20' },
-          { id: 'habits', label: 'Habit Streak', value: Math.max(...habits.map(h => h.streak), 0), sub: 'Current highest', icon: <Flame className="text-orange-500" />, color: 'from-orange-500/20' },
-          { id: 'goals', label: 'Vision Goals', value: stats?.goals.total || 0, sub: 'Long-term tracks', icon: <Target className="text-emerald-500" />, color: 'from-emerald-500/20' },
-          { id: 'ai', label: 'Mind State', value: 'Flow', sub: 'Optimal performance', icon: <BrainCircuit className="text-purple-500" />, color: 'from-purple-500/20' },
+          { id: 'tasks', label: 'Active Tasks', value: stats?.tasks.total || 0, sub: `${stats?.tasks.completed || 0} completed`, icon: <CheckSquare className="text-royal" />, color: 'from-royal/25 via-indigo-500/15' },
+          { id: 'habits', label: 'Habit Streak', value: highestStreak, sub: habitCount ? 'Current highest' : 'No habits tracked yet', icon: <Flame className="text-orange-500" />, color: 'from-orange-500/25 via-amber-500/20' },
+          { id: 'goals', label: 'Vision Goals', value: goalCount, sub: goalCount ? 'Long-term tracks' : 'No goals added yet', icon: <Target className="text-emerald-500" />, color: 'from-emerald-500/25 via-cyan-500/15' },
+          { id: 'ai', label: 'Mind State', value: 'Flow', sub: 'Optimal performance', icon: <BrainCircuit className="text-purple-500" />, color: 'from-purple-500/25 via-fuchsia-500/20' },
         ].map((stat, i) => (
-          <div 
-            key={i} 
+          <motion.div
+            key={i}
+            whileHover={{ y: -6, scale: 1.015 }}
+            transition={{ type: 'spring', stiffness: 280, damping: 20 }}
             onClick={() => onViewChange(stat.id as View)}
-            className="bg-card p-6 rounded-3xl border border-gray-200 shadow-sm relative overflow-hidden group hover:border-white/10 transition-colors cursor-pointer active:scale-95"
+            className="bg-white/30 backdrop-blur-xl p-6 rounded-3xl border border-white/40 shadow-[0_10px_35px_-20px_rgba(15,23,42,0.6)] relative overflow-hidden group hover:border-white/60 transition-all duration-300 cursor-pointer active:scale-[0.985]"
           >
-            <div className={`absolute top-0 right-0 w-24 h-24 bg-linear-to-br ${stat.color} to-transparent opacity-30 -mr-8 -mt-8 rounded-full blur-2xl group-hover:opacity-50 transition-opacity`}></div>
+            <div className={`absolute top-0 right-0 w-24 h-24 bg-linear-to-br ${stat.color} to-transparent opacity-40 -mr-8 -mt-8 rounded-full blur-2xl group-hover:opacity-60 transition-opacity`}></div>
             <div className="flex justify-between items-start relative z-10">
               <div>
                 <p className="text-sm font-medium text-gray-500 mb-1">{stat.label}</p>
                 <h3 className="text-2xl font-bold text-[#191970] group-hover:text-royal transition-colors">{stat.value}</h3>
               </div>
-              <div className="bg-[#f3f5fb] p-3 rounded-2xl group-hover:bg-[#e9eefb] transition-colors">
+              <div className="bg-white/65 backdrop-blur-md p-3 rounded-2xl border border-white/50 group-hover:bg-white/80 transition-colors">
                 {stat.icon}
               </div>
             </div>
             <p className="text-xs text-gray-600 mt-4 flex items-center gap-1 group-hover:text-gray-700 transition-colors">
               <Activity size={12} className="text-royal" /> {stat.sub}
             </p>
-          </div>
+          </motion.div>
         ))}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Performance Chart */}
-        <div className="lg:col-span-2 bg-card p-8 rounded-3xl border border-gray-200 shadow-sm">
+        <div className="lg:col-span-2 bg-white/30 backdrop-blur-xl p-8 rounded-3xl border border-white/40 shadow-[0_10px_35px_-20px_rgba(15,23,42,0.6)]">
           <div className="flex items-center justify-between mb-8">
             <h3 className="text-lg font-bold text-[#191970]">System Performance</h3>
-            <select className="bg-white/5 border-none rounded-lg text-xs px-3 py-1 outline-none text-gray-600">
+            <select className="bg-white/35 border border-white/30 rounded-lg text-xs px-3 py-1 outline-none text-gray-600">
               <option>Last 7 Days</option>
               <option>Last 30 Days</option>
             </select>
@@ -147,13 +159,22 @@ export default function DashboardView({ stats, tasks, habits, contextSummary, on
               <AreaChart data={chartData}>
                 <defs>
                   <linearGradient id="performanceGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#4169e1" stopOpacity={0.38}/>
-                    <stop offset="95%" stopColor="#4169e1" stopOpacity={0}/>
+                    <stop offset="0%" stopColor="#3b82f6" stopOpacity={0.62} />
+                    <stop offset="42%" stopColor="#6366f1" stopOpacity={0.45} />
+                    <stop offset="72%" stopColor="#a855f7" stopOpacity={0.24} />
+                    <stop offset="100%" stopColor="#a855f7" stopOpacity={0} />
                   </linearGradient>
+                  <filter id="lineGlow" x="-50%" y="-50%" width="200%" height="200%">
+                    <feGaussianBlur stdDeviation="3.2" result="blur" />
+                    <feMerge>
+                      <feMergeNode in="blur" />
+                      <feMergeNode in="SourceGraphic" />
+                    </feMerge>
+                  </filter>
                 </defs>
-                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#666', fontSize: 12}} />
+                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#666', fontSize: 12 }} />
                 <YAxis hide />
-                <Tooltip 
+                <Tooltip
                   contentStyle={{
                     backgroundColor: '#111827',
                     border: '1px solid rgba(255, 255, 255, 0.12)',
@@ -163,28 +184,29 @@ export default function DashboardView({ stats, tasks, habits, contextSummary, on
                   }}
                   labelStyle={{ color: '#9ca3af', fontWeight: 600 }}
                   itemStyle={{ color: '#bfdbfe', fontSize: 12 }}
-                  cursor={{ stroke: '#4169e1', strokeOpacity: 0.25 }}
+                  cursor={{ stroke: '#5b7dff', strokeOpacity: 0.28 }}
                 />
-                <Area type="monotone" dataKey="completion" stroke="#4169e1" strokeWidth={3} fillOpacity={1} fill="url(#performanceGradient)" />
+                <Area type="monotone" dataKey="completion" stroke="#86a8ff" strokeWidth={7} fill="none" filter="url(#lineGlow)" dot={false} isAnimationActive={false} />
+                <Area type="monotone" dataKey="completion" stroke="#5b7dff" strokeWidth={3.4} fillOpacity={1} fill="url(#performanceGradient)" dot={false} />
               </AreaChart>
             </ResponsiveContainer>
           </div>
         </div>
 
-        {/* Up Next Section */}
-        <div className="bg-card p-8 rounded-3xl border border-gray-200 shadow-sm">
+        <div className="bg-white/30 backdrop-blur-xl p-8 rounded-3xl border border-white/40 shadow-[0_10px_35px_-20px_rgba(15,23,42,0.6)]">
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-lg font-bold text-[#191970]">Priority Objectives</h3>
             <button onClick={() => onViewChange('tasks')} className="text-royal text-xs font-bold hover:underline">View All</button>
           </div>
           <div className="space-y-4">
-            {tasks.filter(t => t.status !== 'completed').slice(0, 4).map(task => (
-              <div 
-                key={task.id} 
+            {activeTasks.slice(0, 4).map(task => (
+              <div
+                key={task.id}
                 onClick={() => onEditTask(task)}
-                className="flex items-center gap-4 group cursor-pointer"
+                className="flex items-center gap-4 group cursor-pointer rounded-2xl border border-transparent hover:border-white/40 hover:bg-white/40 transition-all px-2 py-1"
               >
-                <div className="h-10 w-10 bg-royal/10 rounded-xl flex items-center justify-center text-royal group-hover:bg-royal/20 transition-colors">
+                <div className="relative h-10 w-10 bg-royal/10 rounded-xl flex items-center justify-center text-royal group-hover:bg-royal/20 transition-colors">
+                  <span className={`absolute -right-1 -top-1 h-2.5 w-2.5 rounded-full ${priorityTone(task.priority)}`} />
                   <Calendar size={18} />
                 </div>
                 <div className="flex-1 overflow-hidden">
@@ -194,8 +216,12 @@ export default function DashboardView({ stats, tasks, habits, contextSummary, on
                 <ChevronRight size={16} className="text-gray-600 opacity-0 group-hover:opacity-100 transition-all -translate-x-2 group-hover:translate-x-0" />
               </div>
             ))}
-            {tasks.filter(t => t.status !== 'completed').length === 0 && (
-              <p className="text-gray-500 text-sm text-center py-8">All clear. Great job!</p>
+            {activeTasks.length === 0 && (
+              <div className="rounded-2xl border border-dashed border-white/60 bg-white/30 py-8 px-4 text-center">
+                <Sparkles className="mx-auto text-royal/70 mb-2" size={18} />
+                <p className="text-sm text-[#191970] font-medium">No active objectives</p>
+                <p className="text-xs text-gray-500 mt-1">A quiet board means your execution engine is in sync.</p>
+              </div>
             )}
           </div>
         </div>
