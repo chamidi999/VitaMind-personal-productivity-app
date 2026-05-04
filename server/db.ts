@@ -33,10 +33,20 @@ export const initDB = async () => {
       )
     `);
 
-    await connection.query(`
-      ALTER TABLE users
-      ADD COLUMN IF NOT EXISTS is_active BOOLEAN DEFAULT TRUE
-    `);
+    const [activeColRows]: any = await connection.query(
+      `SELECT COUNT(*) AS count
+       FROM INFORMATION_SCHEMA.COLUMNS
+       WHERE TABLE_SCHEMA = DATABASE()
+         AND TABLE_NAME = 'users'
+         AND COLUMN_NAME = 'is_active'`
+    );
+
+    if ((activeColRows?.[0]?.count || 0) === 0) {
+      await connection.query(`
+        ALTER TABLE users
+        ADD COLUMN is_active BOOLEAN DEFAULT TRUE
+      `);
+    }
 
     // Tasks Table
     await connection.query(`
