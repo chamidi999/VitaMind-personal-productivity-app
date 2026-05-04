@@ -1,115 +1,145 @@
-import Database from 'better-sqlite3';
+import mysql from 'mysql2/promise';
+import dotenv from 'dotenv';
 
-const db = new Database('zenith.db');
-db.pragma('journal_mode = WAL');
+dotenv.config();
+
+// Create a connection pool using your .env credentials
+const pool = mysql.createPool({
+  host: process.env.MYSQL_HOST,
+  user: process.env.MYSQL_USER,
+  password: process.env.MYSQL_PASSWORD,
+  database: process.env.MYSQL_DATABASE,
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0
+});
 
 export const initDB = async () => {
   try {
-    db.exec(`
+    const connection = await pool.getConnection();
+
+    // Users Table
+    await connection.query(`
       CREATE TABLE IF NOT EXISTS users (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        email TEXT UNIQUE NOT NULL,
-        password TEXT NOT NULL,
-        name TEXT NOT NULL,
-        role TEXT DEFAULT 'user',
+        id INT PRIMARY KEY AUTO_INCREMENT,
+        email VARCHAR(255) UNIQUE NOT NULL,
+        password VARCHAR(255) NOT NULL,
+        name VARCHAR(100) NOT NULL,
+        role VARCHAR(20) DEFAULT 'user',
         bio TEXT,
         avatar_url TEXT,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
       )
     `);
 
-    db.exec(`
+    // Tasks Table
+    await connection.query(`
       CREATE TABLE IF NOT EXISTS tasks (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        user_id INTEGER NOT NULL,
-        title TEXT NOT NULL,
+        id INT PRIMARY KEY AUTO_INCREMENT,
+        user_id INT NOT NULL,
+        title VARCHAR(255) NOT NULL,
         description TEXT,
-        due_date TEXT,
-        status TEXT DEFAULT 'todo',
-        priority TEXT DEFAULT 'medium',
-        category TEXT DEFAULT 'Personal',
+        due_date VARCHAR(100),
+        status VARCHAR(50) DEFAULT 'todo',
+        priority VARCHAR(50) DEFAULT 'medium',
+        category VARCHAR(100) DEFAULT 'Personal',
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+        CONSTRAINT fk_tasks_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
       )
     `);
 
-    db.exec(`
+    // Habits Table
+    await connection.query(`
       CREATE TABLE IF NOT EXISTS habits (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        user_id INTEGER NOT NULL,
-        name TEXT NOT NULL,
-        category TEXT DEFAULT 'Health',
-        streak INTEGER DEFAULT 0,
-        last_completed TEXT,
+        id INT PRIMARY KEY AUTO_INCREMENT,
+        user_id INT NOT NULL,
+        name VARCHAR(255) NOT NULL,
+        category VARCHAR(100) DEFAULT 'Health',
+        streak INT DEFAULT 0,
+        last_completed VARCHAR(100),
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+        CONSTRAINT fk_habits_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
       )
     `);
 
-    db.exec(`
+    // Goals Table
+    await connection.query(`
       CREATE TABLE IF NOT EXISTS goals (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        user_id INTEGER NOT NULL,
-        title TEXT NOT NULL,
+        id INT PRIMARY KEY AUTO_INCREMENT,
+        user_id INT NOT NULL,
+        title VARCHAR(255) NOT NULL,
         description TEXT,
-        category TEXT,
-        target_date TEXT,
-        progress INTEGER DEFAULT 0,
-        status TEXT DEFAULT 'active',
+        category VARCHAR(100),
+        target_date VARCHAR(100),
+        progress INT DEFAULT 0,
+        status VARCHAR(50) DEFAULT 'active',
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+        CONSTRAINT fk_goals_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
       )
     `);
 
-    db.exec(`
+    // Milestones Table
+    await connection.query(`
       CREATE TABLE IF NOT EXISTS milestones (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        goal_id INTEGER NOT NULL,
-        title TEXT NOT NULL,
+        id INT PRIMARY KEY AUTO_INCREMENT,
+        goal_id INT NOT NULL,
+        title VARCHAR(255) NOT NULL,
         is_completed BOOLEAN DEFAULT FALSE,
-        FOREIGN KEY (goal_id) REFERENCES goals(id) ON DELETE CASCADE
+        CONSTRAINT fk_milestones_goal FOREIGN KEY (goal_id) REFERENCES goals(id) ON DELETE CASCADE
       )
     `);
 
-    db.exec(`
+    // Notifications Table (including your SQLite migration logic converted to MySQL)[cite: 1]
+    await connection.query(`
       CREATE TABLE IF NOT EXISTS notifications (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        user_id INTEGER NOT NULL,
-        title TEXT,
+        id INT PRIMARY KEY AUTO_INCREMENT,
+        user_id INT NOT NULL,
+        title VARCHAR(255),
         message TEXT NOT NULL,
-        type TEXT NOT NULL CHECK(type IN ('task', 'habit')),
+        type ENUM('task', 'habit') NOT NULL DEFAULT 'task',
         is_read BOOLEAN DEFAULT FALSE,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+        CONSTRAINT fk_notifications_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
       )
     `);
 
-    console.log('SQLite Database (better-sqlite3) initialized successfully');
+    connection.release();
+    console.log('MySQL Database initialized successfully[cite: 1]');
   } catch (error) {
-    console.error('Error initializing database:', error);
+    console.error('Error initializing MySQL database:', error);
     throw error;
   }
 };
 
-const pool = {
-  query: (sql: string, params: any[] = []) => {
+/**
+ * Custom query wrapper to maintain compatibility with your previous code
+ * while using the native MySQL promise pool.
+ */
+export const dbWrapper = {
+  query: async (sql: string, params: any[] = []) => {
     try {
-      const stmt = db.prepare(sql.replace(/\?/g, (val, i) => `?`));
+      // MySQL uses '?' as placeholders naturally, no need for manual replace[cite: 1]
+      const [rows, fields] = await pool.query(sql, params);
+      
+      // Mimicking your previous SQLite return format[cite: 1]
       if (sql.trim().toUpperCase().startsWith('SELECT')) {
-        return Promise.resolve([stmt.all(...params)]);
+        return [rows];
       } else {
-        const result = stmt.run(...params);
-        return Promise.resolve([{ insertId: result.lastInsertRowid, affectedRows: result.changes }]);
+        const result = rows as any;
+        return [{ insertId: result.insertId, affectedRows: result.affectedRows }];
       }
     } catch (e) {
       console.error('Query error:', e, 'SQL:', sql);
-      return Promise.reject(e);
+      throw e;
     }
   },
-  getConnection: () => Promise.resolve({
-    query: (sql: string, params: any[] = []) => pool.query(sql, params),
-    release: () => {}
-  })
+  getConnection: async () => {
+    const connection = await pool.getConnection();
+    return {
+      query: (sql: string, params: any[] = []) => connection.query(sql, params),
+      release: () => connection.release()
+    };
+  }
 };
 
-export default pool;
+export default dbWrapper;
