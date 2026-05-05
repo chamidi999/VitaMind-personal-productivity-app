@@ -1,4 +1,4 @@
-import { User, Task, Goal } from '../types';
+import { User, Task, Goal, Habit, DashboardStats, ContextSummary } from '../types';
 
 const getHeaders = (token: string) => ({
   'Content-Type': 'application/json',
@@ -27,12 +27,12 @@ const fetchWithTimeout = async <T>(url: string, options: RequestInit = {}, timeo
 
 export const api = {
   auth: {
-    me: (token: string) => fetchWithTimeout('/api/auth/me', { headers: getHeaders(token) }),
+    me: (token: string) => fetchWithTimeout<User>('/api/auth/me', { headers: getHeaders(token) }),
     updateProfile: (token: string, data: Partial<User>) =>
       fetchWithTimeout('/api/auth/profile', { method: 'PATCH', headers: getHeaders(token), body: JSON.stringify(data) })
   },
   tasks: {
-    list: (token: string) => fetchWithTimeout('/api/tasks', { headers: getHeaders(token) }),
+    list: (token: string) => fetchWithTimeout<Task[]>('/api/tasks', { headers: getHeaders(token) }),
     create: (token: string, data: Partial<Task>) =>
       fetchWithTimeout('/api/tasks', { method: 'POST', headers: getHeaders(token), body: JSON.stringify(data) }),
     update: (token: string, id: number, data: Partial<Task>) =>
@@ -40,7 +40,7 @@ export const api = {
     delete: (token: string, id: number) => fetchWithTimeout(`/api/tasks/${id}`, { method: 'DELETE', headers: getHeaders(token) })
   },
   habits: {
-    list: (token: string) => fetchWithTimeout('/api/habits', { headers: getHeaders(token) }),
+    list: (token: string) => fetchWithTimeout<Habit[]>('/api/habits', { headers: getHeaders(token) }),
     create: (token: string, data: { name: string; category?: string }) =>
       fetchWithTimeout('/api/habits', { method: 'POST', headers: getHeaders(token), body: JSON.stringify(data) }),
     update: (token: string, id: number, data: { name: string }) =>
@@ -49,7 +49,7 @@ export const api = {
     delete: (token: string, id: number) => fetchWithTimeout(`/api/habits/${id}`, { method: 'DELETE', headers: getHeaders(token) })
   },
   goals: {
-    list: (token: string) => fetchWithTimeout('/api/goals', { headers: getHeaders(token) }),
+    list: (token: string) => fetchWithTimeout<Goal[]>('/api/goals', { headers: getHeaders(token) }),
     create: (token: string, data: Partial<Goal>) =>
       fetchWithTimeout('/api/goals', { method: 'POST', headers: getHeaders(token), body: JSON.stringify(data) }),
     delete: (token: string, id: number) => fetchWithTimeout(`/api/goals/${id}`, { method: 'DELETE', headers: getHeaders(token) }),
@@ -62,9 +62,9 @@ export const api = {
     delete: (token: string, id: number) => fetchWithTimeout(`/api/milestones/${id}`, { method: 'DELETE', headers: getHeaders(token) })
   },
   stats: {
-    get: (token: string) => fetchWithTimeout('/api/user-stats', { headers: getHeaders(token) })
+    get: (token: string) => fetchWithTimeout<DashboardStats>('/api/user-stats', { headers: getHeaders(token) })
   },
   user: {
-    contextSummary: (token: string) => fetchWithTimeout('/api/context-summary', { headers: getHeaders(token) })
+    contextSummary: (token: string) => fetchWithTimeout<ContextSummary>('/api/context-summary', { headers: getHeaders(token) })
   }
 };

@@ -77,6 +77,7 @@ export default function App() {
   }, [token]);
 
   useEffect(() => {
+    console.log('DEBUG [App]: token effect triggered', { hasToken: Boolean(token) });
     if (token) {
       loadInitialData();
     }
@@ -99,6 +100,7 @@ export default function App() {
 
 
   const handleLogin = async (email: string, pass: string) => {
+    console.log('DEBUG [App]: handleLogin invoked', { email });
     try {
       const res = await fetch('/api/auth/login', {
         method: 'POST',
@@ -119,6 +121,7 @@ export default function App() {
   };
 
   const handleRegister = async (name: string, email: string, pass: string) => {
+    console.log('DEBUG [App]: handleRegister invoked', { name, email });
     try {
       const res = await fetch('/api/auth/register', {
         method: 'POST',
@@ -186,6 +189,7 @@ export default function App() {
   };
 
   const askAI = async (e: React.FormEvent) => {
+    console.log('DEBUG [App]: askAI submit', { aiInput });
     e.preventDefault();
     if (!aiInput.trim() || !token) return;
 
