@@ -79,11 +79,11 @@
 
 @layer components {
   .task-card {
-    @apply bg-card p-4 rounded-2xl border border-border shadow-sm group hover:border-royal/30 transition-all cursor-pointer relative;
+    @apply bg-card p-4 rounded-2xl border border-border shadow-sm hover:border-royal/30 transition-all cursor-pointer relative;
   }
 
   .stat-card {
-    @apply bg-card backdrop-blur-xl p-6 rounded-3xl border border-border shadow-[0_10px_35px_-20px_rgba(15,23,42,0.6)] relative overflow-hidden group hover:border-royal/40 transition-all duration-300 cursor-pointer active:scale-[0.985];
+    @apply bg-card backdrop-blur-xl p-6 rounded-3xl border border-border shadow-[0_10px_35px_-20px_rgba(15,23,42,0.6)] relative overflow-hidden hover:border-royal/40 transition-all duration-300 cursor-pointer active:scale-[0.985];
   }
 
   .page-title {
