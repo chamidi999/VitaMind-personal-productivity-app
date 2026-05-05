@@ -28,9 +28,9 @@ export default function KanbanBoard({ tasks, onUpdateTask, onDeleteTask, onAddTa
   };
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 h-full items-start content-start justify-items-start">
+    <div className="flex flex-wrap justify-start gap-8 h-full items-start content-start">
       {columns.map(column => (
-        <div key={column.id} className="bg-card/50 border border-border rounded-3xl flex flex-col max-h-[80vh]">
+        <div key={column.id} className="kanban-column flex flex-col max-h-[80vh]">
           <div className="p-5 border-b border-border flex justify-between items-center bg-card/30 rounded-t-3xl">
             <div className="flex items-center gap-3">
               <div className={`w-2 h-2 rounded-full ${column.color}`}></div>
