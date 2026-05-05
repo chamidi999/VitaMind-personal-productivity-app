@@ -23,6 +23,19 @@
   --accent: #3b82f6;           /* Bright blue for active elements */
 }
 
+/* Dark mode readability: prevent blue text and keep copy legible */
+.dark .text-royal,
+.dark [class*="text-[#191970]"],
+.dark [class*="text-[#4169E1]"],
+.dark [class*="text-blue-"] {
+  color: var(--foreground) !important;
+}
+
+.dark [class*="text-gray-"],
+.dark [class*="text-slate-"] {
+  color: var(--muted-foreground) !important;
+}
+
 @theme {
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-display: "Playfair Display", serif;

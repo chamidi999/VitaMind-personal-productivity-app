@@ -57,7 +57,7 @@ export default function NotificationCenter({ notifications, setNotifications, on
                     <span className="bg-royal px-2 py-0.5 rounded-full text-xs font-black">{unreadCount} NEW</span>
                   )}
                 </div>
-                <button className="text-xs text-royal font-bold hover:underline">Mark all read</button>
+                <button className="text-xs text-muted-foreground font-bold hover:text-foreground hover:underline">Mark all read</button>
               </div>
 
               <div className="max-h-125 overflow-y-auto p-4 space-y-3 custom-scrollbar">
@@ -80,7 +80,7 @@ export default function NotificationCenter({ notifications, setNotifications, on
                        {!n.is_read && (
                          <button 
                           onClick={() => onRead(n.id)}
-                          className="flex items-center gap-1.5 text-[11px] font-black text-royal hover:text-blue-400"
+                          className="flex items-center gap-1.5 text-[11px] font-black text-muted-foreground hover:text-foreground"
                          >
                            <Check size={12} /> MARK AS READ
                          </button>

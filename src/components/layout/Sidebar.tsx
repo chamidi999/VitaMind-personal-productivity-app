@@ -47,7 +47,7 @@ export default function Sidebar({ user, onLogout }: SidebarProps) {
         </div>
         <button 
           onClick={onLogout}
-          className="w-full flex items-center gap-3 p-3 rounded-xl text-blue-100 hover:bg-white/10 hover:text-white transition-all group font-bold"
+          className="w-full flex items-center gap-3 p-3 rounded-xl text-sidebar-foreground/90 hover:bg-white/10 hover:text-white transition-all group font-bold"
         >
           <LogOut size={20} className="group-hover:translate-x-1 transition-transform" />
           <span className="text-sm">Logout / Sign Out</span>
@@ -64,7 +64,7 @@ function NavItem({ to, icon, label }: { to: string, icon: React.ReactNode, label
       className={({ isActive }) => `w-full flex items-center gap-3 p-3 rounded-xl transition-all relative group ${
         isActive
           ? 'text-white bg-royal/25' 
-          : 'text-blue-100 hover:text-white hover:bg-white/10'
+          : 'text-sidebar-foreground/90 hover:text-white hover:bg-white/10'
       }`}
     >
       {({ isActive }) => (
