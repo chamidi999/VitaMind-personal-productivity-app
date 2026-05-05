@@ -13,6 +13,13 @@ interface SidebarProps {
 }
 
 export default function Sidebar({ user, onLogout }: SidebarProps) {
+  console.log('DEBUG [Sidebar]: Rendering for user', user?.id);
+
+  const handleLogout = () => {
+    console.log('DEBUG [Sidebar]: Logout triggered');
+    onLogout();
+  };
+
   return (
     <aside className="hidden md:flex w-72 border-r border-border flex-col p-6 fixed h-screen bg-sidebar text-sidebar-foreground z-20">
       <div className="flex items-center gap-3 mb-12">
@@ -46,7 +53,7 @@ export default function Sidebar({ user, onLogout }: SidebarProps) {
           </div>
         </div>
         <button 
-          onClick={onLogout}
+          onClick={handleLogout}
           className="w-full flex items-center gap-3 p-3 rounded-xl text-blue-100 hover:bg-white/10 hover:text-white transition-all group font-bold"
         >
           <LogOut size={20} className="group-hover:translate-x-1 transition-transform" />
@@ -61,13 +68,13 @@ function NavItem({ to, icon, label }: { to: string, icon: React.ReactNode, label
   return (
     <NavLink
       to={to}
-      className={({ isActive }) => `w-full flex items-center gap-3 p-3 rounded-xl transition-all relative group ${
+      className={({ isActive }: { isActive: boolean }) => `w-full flex items-center gap-3 p-3 rounded-xl transition-all relative group ${
         isActive
           ? 'text-white bg-royal/25' 
           : 'text-blue-100 hover:text-white hover:bg-white/10'
       }`}
     >
-      {({ isActive }) => (
+      {({ isActive }: { isActive: boolean }) => (
         <>
           <div className={`${isActive ? 'text-royal' : 'group-hover:text-white'} transition-colors`}>
             {icon}

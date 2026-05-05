@@ -13,7 +13,6 @@
   --midnight: #191970; 
 }
 
-
 .dark {
   --background: #0b0e14;       
   --foreground: #ffffff;       
@@ -43,18 +42,13 @@
     @apply bg-background text-foreground antialiased;
   }
 
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6 {
+  h1, h2, h3, h4, h5, h6 {
     @apply text-foreground;
   }
 }
 
 .gradient-text {
-  @apply bg-clip-text text-transparent bg-gradient-to-r from-royal to-[#a2b5ff];
+  @apply bg-clip-text text-transparent bg-linear-to-r from-royal to-[#a2b5ff];
 }
 
 ::-webkit-scrollbar {
@@ -62,7 +56,7 @@
 }
 
 ::-webkit-scrollbar-track {
-  @apply bg-transparent;
+  background-color: transparent;
 }
 
 .custom-scrollbar::-webkit-scrollbar {
@@ -70,31 +64,42 @@
 }
 
 .custom-scrollbar::-webkit-scrollbar-track {
-  @apply bg-transparent;
+  background-color: transparent;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  @apply bg-[#cfd6ea] rounded-full hover:bg-[#b7c3e3] transition-colors;
+  @apply bg-[#cfd6ea] rounded-full transition-colors;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  @apply bg-[#b7c3e3];
 }
 
 @layer components {
   .task-card {
-    @apply bg-card p-4 rounded-2xl border border-border shadow-sm hover:border-royal/30 transition-all cursor-pointer relative;
+    @apply bg-card p-4 rounded-2xl border border-border shadow-sm transition-all cursor-pointer relative;
+  }
+
+  .task-card:hover {
+    @apply border-royal/30;
   }
 
   .stat-card {
-    @apply bg-card backdrop-blur-xl p-6 rounded-3xl border border-border shadow-[0_10px_35px_-20px_rgba(15,23,42,0.6)] relative overflow-hidden hover:border-royal/40 transition-all duration-300 cursor-pointer active:scale-[0.985];
+    @apply bg-card backdrop-blur-xl p-6 rounded-3xl border border-border shadow-[0_10px_35px_-20px_rgba(15,23,42,0.6)] relative overflow-hidden transition-all duration-300 cursor-pointer active:scale-[0.985];
+  }
+
+  .stat-card:hover {
+    @apply border-royal/40;
   }
 
   .page-title {
     @apply text-3xl font-bold tracking-tight text-foreground;
   }
 
-
-
   .kanban-column {
-    @apply flex-1 min-w-[350px] max-w-[420px] bg-card/50 rounded-3xl p-0 border border-border transition-all duration-300;
+    @apply flex-1 min-w-87.5 max-w-105 bg-card/50 rounded-3xl p-0 border border-border transition-all duration-300;
   }
+
   .btn-primary {
     @apply h-11 bg-royal text-white px-4 rounded-lg font-semibold transition-all shadow-lg shadow-royal/20 flex items-center justify-center gap-2 whitespace-nowrap;
   }

@@ -25,7 +25,7 @@ export default function TasksView({ tasks, onUpdateTask, onDeleteTask, onAddTask
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="max-w-[1200px] w-full ml-0 mr-auto flex flex-col items-start space-y-10 overflow-x-hidden px-0"
+      className="max-w-300 w-full ml-0 mr-auto flex flex-col items-start space-y-10 overflow-x-hidden px-0"
     >
       <div className="w-full flex flex-col md:flex-row justify-between items-start md:items-center gap-6 bg-card p-6 rounded-3xl border border-border">
         <div>
@@ -55,7 +55,7 @@ export default function TasksView({ tasks, onUpdateTask, onDeleteTask, onAddTask
         </div>
       </div>
 
-      <div className="w-full max-w-[1200px] ml-0">
+      <div className="w-full max-w-300 ml-0">
         <KanbanBoard
           tasks={filteredTasks}
           onUpdateTask={onUpdateTask}

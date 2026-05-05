@@ -101,7 +101,7 @@ export default function ReportsView() {
         scale: 2,
         useCORS: true,
         backgroundColor: '#ffffff',
-        ignoreElements: (element) => element.classList.contains('no-pdf')
+        ignoreElements: (element: { classList: { contains: (arg0: string) => any; }; }) => element.classList.contains('no-pdf')
       });
 
       const imageData = canvas.toDataURL('image/png');
@@ -147,7 +147,7 @@ export default function ReportsView() {
       id="reports-content"
       initial={{ opacity: 0, y: 14 }}
       animate={{ opacity: 1, y: 0 }}
-      className="space-y-6 max-w-[1200px] ml-0"
+      className="space-y-6 max-w-300 ml-0"
     >
 
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -196,12 +196,13 @@ export default function ReportsView() {
               <YAxis yAxisId="left" tick={{ fill: '#6b7280', fontSize: 12 }} />
               <YAxis yAxisId="right" orientation="right" tick={{ fill: '#6b7280', fontSize: 12 }} domain={[0, 100]} />
               <Tooltip
-                formatter={(value: number, name: string) => {
+                formatter={(value: any, name: any) => {
+                  const displayValue = value ?? '';
                   if (name === 'Habit Completion %') {
-                    return [`${value}%`, name];
+                    return [`${displayValue}%`, name];
                   }
 
-                  return [value, name];
+                  return [displayValue, name];
                 }}
                 contentStyle={{
                   borderRadius: '12px',
