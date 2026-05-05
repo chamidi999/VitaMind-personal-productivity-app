@@ -83,7 +83,6 @@ export default function DashboardView({ stats, tasks, habits, contextSummary, on
           setChartData(formatted);
         }
       } catch (error) {
-        // Keep baseline chart data on fetch error.
       }
     };
 

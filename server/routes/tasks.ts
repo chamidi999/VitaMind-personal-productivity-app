@@ -78,6 +78,7 @@ router.get('/', authenticateToken, async (req: AuthRequest, res) => {
       'SELECT * FROM tasks WHERE user_id = ? ORDER BY created_at DESC',
       [req.user?.id]
     );
+    console.log('DEBUG [TasksRoute]: list query result count', Array.isArray(rows) ? rows.length : 0);
     res.json(rows);
   } catch (error) {
     res.status(500).json({ error: 'Internal server error' });
@@ -85,6 +86,7 @@ router.get('/', authenticateToken, async (req: AuthRequest, res) => {
 });
 
 router.post('/', authenticateToken, async (req: AuthRequest, res) => {
+  console.log('DEBUG [TasksRoute]: create req.body', req.body);
   const result = taskCreateSchema.safeParse(req.body);
   if (!result.success) return res.status(400).json({ error: result.error.issues[0].message });
 
@@ -97,6 +99,7 @@ router.post('/', authenticateToken, async (req: AuthRequest, res) => {
       'INSERT INTO tasks (user_id, title, description, due_date, priority, category, status) VALUES (?, ?, ?, ?, ?, ?, ?)',
       [req.user?.id, title, description, due_date, priority, category, status]
     );
+    console.log('DEBUG [TasksRoute]: create db result', dbResult);
     res.json({ id: dbResult.insertId, title, description, due_date, priority, category, status });
   } catch (error) {
     res.status(500).json({ error: 'Internal server error' });
@@ -104,6 +107,7 @@ router.post('/', authenticateToken, async (req: AuthRequest, res) => {
 });
 
 router.patch('/:id', authenticateToken, async (req: AuthRequest, res) => {
+  console.log('DEBUG [TasksRoute]: patch req.body', req.body);
   const { status, priority, title, description, due_date, category } = req.body;
   const fields = [];
   const values = [];
@@ -118,7 +122,8 @@ router.patch('/:id', authenticateToken, async (req: AuthRequest, res) => {
   
   values.push(req.params.id, req.user?.id);
   try {
-    await pool.query(`UPDATE tasks SET ${fields.join(', ')} WHERE id = ? AND user_id = ?`, values);
+    const [dbResult]: any = await pool.query(`UPDATE tasks SET ${fields.join(', ')} WHERE id = ? AND user_id = ?`, values);
+    console.log('DEBUG [TasksRoute]: patch db result', dbResult);
     res.json({ success: true });
   } catch (error) {
     res.status(500).json({ error: 'Internal server error' });

@@ -65,3 +65,14 @@ export interface Notification {
 }
 
 export type View = 'dashboard' | 'tasks' | 'habits' | 'goals' | 'ai' | 'settings' | 'admin';
+
+export interface ContextSummary {
+  todoCount: number;
+  completedCount: number;
+  habitStreak: number;
+  overdueTasks: Array<{ id: number; title: string; due_date: string; priority: string }>;
+  highPriorityTodoCount: number;
+  pendingTasks: Array<{ title: string; priority: string; due_date: string | null }>;
+  topHabits: Array<{ name: string; streak: number }>;
+  activeGoals: Array<{ title: string; progress: number }>;
+}

@@ -5,11 +5,9 @@ import { motion, AnimatePresence } from 'motion/react';
 import { GoogleGenAI } from "@google/genai";
 import { format } from 'date-fns';
 
-// Types & Services
 import { User, Task, Habit, Goal, DashboardStats, ChatMessage, Notification } from './types';
 import { api } from './services/api';
 
-// Components
 import Sidebar from './components/layout/Sidebar';
 import Header from './components/layout/Header';
 import AuthView from './components/views/AuthView';
@@ -22,7 +20,6 @@ import ReportsView from './components/views/ReportsView';
 import SettingsPanel from './components/SettingsPanel';
 import AdminPanel from './components/AdminPanel';
 
-// AI Config
 const genAI = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 export default function App() {
@@ -31,7 +28,6 @@ export default function App() {
   const location = useLocation();
   const navigate = useNavigate();
   
-  // Data State
   const [tasks, setTasks] = useState<Task[]>([]);
   const [habits, setHabits] = useState<Habit[]>([]);
   const [goals, setGoals] = useState<Goal[]>([]);
@@ -39,7 +35,6 @@ export default function App() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [userContextSummary, setUserContextSummary] = useState<any>(null);
   
-  // UI States
   const [isNoteOpen, setIsNoteOpen] = useState(false);
   const [isQuickActionOpen, setIsQuickActionOpen] = useState(false);
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
@@ -50,7 +45,6 @@ export default function App() {
   const [newTaskDueDate, setNewTaskDueDate] = useState(format(new Date(), 'yyyy-MM-dd'));
   const [newTaskStatus, setNewTaskStatus] = useState<Task['status']>('todo');
 
-  // AI State
   const [aiInput, setAiInput] = useState('');
   const [aiChat, setAiChat] = useState<ChatMessage[]>([]);
   const [isAiLoading, setIsAiLoading] = useState(false);
@@ -58,7 +52,6 @@ export default function App() {
   const refreshData = useCallback(async () => {
     if (!token) return;
     try {
-      // Fetch core data
       const t = await api.tasks.list(token).catch(() => []);
       const h = await api.habits.list(token).catch(() => []);
       const g = await api.goals.list(token).catch(() => []);
@@ -398,7 +391,6 @@ const getViewTitle = (pathname: string) => ({
         </div>
       </main>
 
-      {/* Floating Action Button */}
       <div className="fixed bottom-6 right-4 md:bottom-10 md:right-10 z-60">
         <AnimatePresence>
           {isQuickActionOpen && (
@@ -435,7 +427,6 @@ const getViewTitle = (pathname: string) => ({
         </button>
       </div>
 
-      {/* New/Edit Task Modal */}
       <AnimatePresence>
         {isTaskModalOpen && (
           <div className="fixed inset-0 z-100 flex items-center justify-center p-4">

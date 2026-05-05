@@ -2,13 +2,13 @@ import React, { useRef, useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Send, Zap, BrainCircuit, User, Sparkles } from 'lucide-react';
 import Markdown from 'react-markdown';
-import { ChatMessage } from '../../types';
+import { ChatMessage, ContextSummary } from '../../types';
 
 interface AIOracleViewProps {
   chat: ChatMessage[];
   input: string;
   isLoading: boolean;
-  contextSummary: any;
+  contextSummary: ContextSummary | null;
   onInputChange: (value: string) => void;
   onSubmit: (e: React.FormEvent) => void;
 }
@@ -55,8 +55,8 @@ export default function AIOracleView({ chat, input, isLoading, contextSummary, o
             <Sparkles size={18} />
           </div>
           <div>
-            <p className="text-[10px] text-[#191970]/55 uppercase tracking-[0.2em] mb-1">Proactive Insight</p>
-            <p className="text-sm md:text-base text-[#191970] font-medium">{insight}</p>
+            <p className="text-[10px] text-midnight/55 uppercase tracking-[0.2em] mb-1">Proactive Insight</p>
+            <p className="text-sm md:text-base text-midnight font-medium">{insight}</p>
           </div>
         </div>
       </div>
@@ -77,8 +77,8 @@ export default function AIOracleView({ chat, input, isLoading, contextSummary, o
                 </div>
                 <div className={`p-4 md:p-5 rounded-3xl shadow-sm ${
                   msg.role === 'user' 
-                    ? 'bg-[#dbe7ff] text-[#191970] border border-[#b8ccff] rounded-tr-none shadow-[#4169E1]/10' 
-                    : 'bg-[#F8FAFF] text-[#191970] border border-[#E3EBFF] rounded-tl-none shadow-[#191970]/5'
+                    ? 'bg-blue-100 text-midnight border border-blue-200 rounded-tr-none shadow-royal/10' 
+                    : 'bg-background text-midnight border border-border rounded-tl-none shadow-midnight/5'
                 }`}>
                   <div className="markdown-body">
                     <Markdown>{msg.content}</Markdown>
@@ -93,7 +93,7 @@ export default function AIOracleView({ chat, input, isLoading, contextSummary, o
                 <div className="h-10 w-10 rounded-2xl bg-card border border-white/5 flex items-center justify-center text-royal animate-pulse">
                   <BrainCircuit size={20} />
                 </div>
-                <div className="bg-[#F8FAFF] p-4 rounded-3xl rounded-tl-none border border-[#E3EBFF] shadow-sm shadow-[#191970]/5">
+                <div className="bg-background p-4 rounded-3xl rounded-tl-none border border-border shadow-sm shadow-midnight/5">
                   <div className="flex gap-1">
                     <div className="h-2 w-2 bg-royal rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
                     <div className="h-2 w-2 bg-royal rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
@@ -115,7 +115,7 @@ export default function AIOracleView({ chat, input, isLoading, contextSummary, o
             value={input}
             onChange={e => onInputChange(e.target.value)}
             disabled={isLoading}
-            className="flex-1 bg-white border border-[#4169E1] rounded-2xl px-4 md:px-6 py-3 md:py-4 text-sm md:text-base outline-none focus:border-[#4169E1] focus:ring-2 focus:ring-[#4169E1]/20 transition-all text-[#191970] placeholder:text-[#9CA3AF] shadow-lg"
+            className="flex-1 bg-white border border-royal rounded-2xl px-4 md:px-6 py-3 md:py-4 text-sm md:text-base outline-none focus:border-royal focus:ring-2 focus:ring-royal/20 transition-all text-midnight placeholder:text-muted-foreground shadow-lg"
           />
           <button 
             type="submit" 
@@ -125,7 +125,7 @@ export default function AIOracleView({ chat, input, isLoading, contextSummary, o
             <Send size={20} />
           </button>
         </form>
-        <p className="text-[10px] text-[#191970]/55 mt-3 text-left uppercase tracking-[0.2em]">
+        <p className="text-[10px] text-midnight/55 mt-3 text-left uppercase tracking-[0.2em]">
           <Zap size={10} className="inline mr-1" /> Powered by VitaMind Neural Infrastructure
         </p>
       </div>

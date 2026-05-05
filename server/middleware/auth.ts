@@ -15,11 +15,18 @@ export const authenticateToken = (req: AuthRequest, res: Response, next: NextFun
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
 
-  if (!token) return res.sendStatus(401);
+  if (!token) {
+    console.log('DEBUG [AuthMiddleware]: Missing token');
+    return res.sendStatus(401);
+  }
 
   jwt.verify(token, JWT_SECRET, (err: any, user: any) => {
-    if (err) return res.status(403).json({ error: 'Forbidden' });
+    if (err) {
+      console.log('DEBUG [AuthMiddleware]: Invalid token');
+      return res.status(403).json({ error: 'Forbidden' });
+    }
     req.user = user;
+    console.log('DEBUG [AuthMiddleware]: Authenticated user', req.user?.id);
     next();
   });
 };

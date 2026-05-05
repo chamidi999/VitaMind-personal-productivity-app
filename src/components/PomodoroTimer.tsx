@@ -18,13 +18,11 @@ export default function PomodoroTimer() {
           setMinutes(minutes - 1);
           setSeconds(59);
         } else {
-          // Timer finished
           setIsActive(false);
           const nextMode = mode === 'work' ? 'break' : 'work';
           setMode(nextMode);
           setMinutes(nextMode === 'work' ? 25 : 5);
           setSeconds(0);
-          // Auto-trigger sound or notification here
         }
       }, 1000);
     } else {
