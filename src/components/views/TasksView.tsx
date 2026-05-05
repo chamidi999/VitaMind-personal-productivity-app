@@ -48,7 +48,7 @@ export default function TasksView({ tasks, onUpdateTask, onDeleteTask, onAddTask
           </button>
           <button 
             onClick={() => onAddTask('todo')}
-            className="h-11 bg-royal text-white px-5 rounded-lg font-bold hover:bg-royal-light transition-all flex items-center justify-center gap-2 shadow-lg shadow-royal/20 whitespace-nowrap"
+            className="btn-primary px-5 font-bold hover:bg-royal-light"
           >
             <Plus size={18} /> New Task
           </button>
