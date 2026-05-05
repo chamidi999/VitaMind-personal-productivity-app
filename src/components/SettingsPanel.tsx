@@ -12,13 +12,30 @@ interface SettingsPanelProps {
 export default function SettingsPanel({ user, onUpdateUser, onClose }: SettingsPanelProps) {
   const [name, setName] = useState(user.name);
   const [bio, setBio] = useState(user.bio || '');
+  const [avatarUrl, setAvatarUrl] = useState(user.avatar_url || '');
   const [isSaving, setIsSaving] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+
+  const handleAvatarUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 800 * 1024) {
+      alert('Please select an image under 800KB.');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result === 'string') {
+        setAvatarUrl(reader.result);
+      }
+    };
+    reader.readAsDataURL(file);
+  };
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSaving(true);
-    await onUpdateUser({ name, bio });
+    await onUpdateUser({ name, bio, avatar_url: avatarUrl });
     setIsSaving(false);
     setShowSuccess(true);
     setTimeout(() => {
@@ -72,13 +89,27 @@ export default function SettingsPanel({ user, onUpdateUser, onClose }: SettingsP
               <h3 className="text-xl font-bold mb-8">Public Profile</h3>
               <form onSubmit={handleSave} className="space-y-6">
                 <div className="flex items-center gap-6 mb-8">
-                  <div className="h-20 w-20 bg-royal/10 rounded-full flex items-center justify-center text-royal font-black text-2xl border-2 border-royal/30">
-                    {user.name?.[0]?.toUpperCase()}
-                  </div>
+                  {avatarUrl ? (
+                    <img
+                      src={avatarUrl}
+                      alt="Profile avatar"
+                      className="h-20 w-20 rounded-full object-cover border-2 border-royal/30"
+                    />
+                  ) : (
+                    <div className="h-20 w-20 bg-royal/10 rounded-full flex items-center justify-center text-royal font-black text-2xl border-2 border-royal/30">
+                      {user.name?.[0]?.toUpperCase()}
+                    </div>
+                  )}
                   <div>
-                    <button type="button" className="text-royal text-sm font-bold hover:underline mb-1 flex items-center gap-2">
+                    <label className="text-royal text-sm font-bold hover:underline mb-1 flex items-center gap-2 cursor-pointer">
                       <Image size={14} /> Change Avatar
-                    </button>
+                      <input
+                        type="file"
+                        accept="image/png,image/jpeg,image/gif"
+                        className="hidden"
+                        onChange={handleAvatarUpload}
+                      />
+                    </label>
                     <p className="text-gray-500 text-xs">JPG, GIF or PNG. Max size of 800K</p>
                   </div>
                 </div>

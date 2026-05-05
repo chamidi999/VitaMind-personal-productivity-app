@@ -102,9 +102,9 @@ router.get('/me', authenticateToken, async (req: AuthRequest, res) => {
 });
 
 router.patch('/profile', authenticateToken, async (req: AuthRequest, res) => {
-  const { name, bio } = req.body;
+  const { name, bio, avatar_url } = req.body;
   try {
-    await pool.query('UPDATE users SET name = ?, bio = ? WHERE id = ?', [name, bio, req.user?.id]);
+    await pool.query('UPDATE users SET name = ?, bio = ?, avatar_url = ? WHERE id = ?', [name, bio, avatar_url || null, req.user?.id]);
     res.json({ success: true });
   } catch (error) {
     console.error('Profile update error:', error);
