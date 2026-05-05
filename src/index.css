@@ -16,8 +16,9 @@
 
 .dark {
   --background: #020617;
-  --foreground: #f8fafc;
-  --card: #0f172a;
+  --foreground: #ffffff;
+  --card: #111827;
+  --muted-foreground: #94a3b8;
   --border: #1e293b;
 }
 
