@@ -6,12 +6,24 @@
   --font-display: "Playfair Display", serif;
   --color-midnight: #191970;
   --color-royal: #4169e1;
+  --color-background: #f6f8ff;
+  --color-foreground: #191970;
   --color-card: #ffffff;
+  --color-border: #dbe1f0;
+  --color-muted-foreground: #64748b;
+}
+
+.dark {
+  --color-background: #0f172a;
+  --color-foreground: #e2e8f0;
+  --color-card: #1e293b;
+  --color-border: #334155;
+  --color-muted-foreground: #94a3b8;
 }
 
 @layer base {
   body {
-    @apply bg-white text-[#191970] antialiased;
+    @apply bg-background text-foreground antialiased;
   }
 }
 

@@ -237,8 +237,8 @@ export default function ReportsView() {
 
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-[#191970]">Reports &amp; Insights</h2>
-          <p className="text-sm text-gray-600">Track your weekly performance and behavior trends.</p>
+          <h2 className="text-2xl font-bold text-foreground">Reports &amp; Insights</h2>
+          <p className="text-sm text-muted-foreground">Track your weekly performance and behavior trends.</p>
         </div>
         <button
           onClick={handleDownloadPDF}
@@ -250,7 +250,7 @@ export default function ReportsView() {
       </div>
 
       {isLoading ? (
-        <div className="bg-white/40 backdrop-blur-xl border border-white/50 rounded-2xl p-6 text-sm font-medium text-gray-600">Loading...</div>
+        <div className="bg-white/40 backdrop-blur-xl border border-white/50 rounded-2xl p-6 text-sm font-medium text-muted-foreground">Loading...</div>
       ) : null}
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -264,7 +264,7 @@ export default function ReportsView() {
               <p className="text-xs font-semibold uppercase tracking-widest text-gray-500" style={isPdfCaptureMode ? { color: PDF_CAPTURE_SAFE_COLORS.mutedText } : undefined}>{card.label}</p>
               <card.Icon size={18} style={isPdfCaptureMode ? { color: card.iconColor } : undefined} className={isPdfCaptureMode ? undefined : card.iconColor === '#4169e1' ? 'text-royal' : card.iconColor === '#f97316' ? 'text-orange-500' : 'text-emerald-500'} />
             </div>
-            <p className="text-3xl font-bold text-[#191970]" style={isPdfCaptureMode ? { color: PDF_CAPTURE_SAFE_COLORS.pageText } : undefined}>{isLoading ? '--' : card.value}</p>
+            <p className="text-3xl font-bold text-foreground" style={isPdfCaptureMode ? { color: PDF_CAPTURE_SAFE_COLORS.pageText } : undefined}>{isLoading ? '--' : card.value}</p>
           </div>
         ))}
       </div>
@@ -273,7 +273,7 @@ export default function ReportsView() {
         className="bg-white/40 backdrop-blur-xl border border-white/50 rounded-2xl p-5"
         style={isPdfCaptureMode ? { backgroundColor: PDF_CAPTURE_SAFE_COLORS.panelBg, borderColor: PDF_CAPTURE_SAFE_COLORS.panelBorder, backdropFilter: 'none' } : undefined}
       >
-        <h3 className="text-base font-bold text-[#191970] mb-4">Performance Overview</h3>
+        <h3 className="text-base font-bold text-foreground mb-4">Performance Overview</h3>
         <div style={{ width: '100%', height: isPdfCaptureMode ? 350 : 320, minHeight: 300 }}>
           <ResponsiveContainer width={isPdfCaptureMode ? 1000 : '100%'} height={isPdfCaptureMode ? 350 : '100%'} minHeight={300}>
             <ComposedChart data={chartData} margin={{ top: 10, right: 12, left: 0, bottom: 0 }}>
@@ -310,7 +310,7 @@ export default function ReportsView() {
         <p className="text-xs uppercase tracking-[0.2em] text-royal font-semibold mb-2" style={isPdfCaptureMode ? { color: PDF_CAPTURE_SAFE_COLORS.insightAccent } : undefined}>
           Proactive Insight
         </p>
-        <p className="text-sm md:text-base text-[#191970] font-medium" style={isPdfCaptureMode ? { color: PDF_CAPTURE_SAFE_COLORS.pageText } : undefined}>{summary.aiInsight}</p>
+        <p className="text-sm md:text-base text-foreground font-medium" style={isPdfCaptureMode ? { color: PDF_CAPTURE_SAFE_COLORS.pageText } : undefined}>{summary.aiInsight}</p>
       </div>
       {isPdfCaptureMode ? (
         <div className="pt-6 mt-2 border-t border-slate-200 flex items-center justify-between text-xs" style={{ color: PDF_CAPTURE_SAFE_COLORS.mutedText }}>
