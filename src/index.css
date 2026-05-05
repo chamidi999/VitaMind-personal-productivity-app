@@ -90,6 +90,11 @@
     @apply text-3xl font-bold tracking-tight text-foreground;
   }
 
+
+
+  .kanban-column {
+    @apply flex-1 min-w-[350px] max-w-[420px] bg-card/50 rounded-3xl p-0 border border-border transition-all duration-300;
+  }
   .btn-primary {
     @apply h-11 bg-royal text-white px-4 rounded-lg font-semibold transition-all shadow-lg shadow-royal/20 flex items-center justify-center gap-2 whitespace-nowrap;
   }
