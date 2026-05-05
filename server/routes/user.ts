@@ -5,18 +5,43 @@ import { getUserContextSummary } from './tasks';
 
 const router = Router();
 
-const buildOracleTip = (summary: {
+interface Task {
+  id: number;
+  title: string;
+  due_date: string;
+  priority: string;
+}
+
+interface PendingTask {
+  title: string;
+  priority: string;
+  due_date: string | null;
+}
+
+interface Habit {
+  name: string;
+  streak: number;
+}
+
+interface Goal {
+  title: string;
+  progress: number;
+}
+
+interface Summary {
   todoCount: number;
   completedCount: number;
   habitStreak: number;
-  overdueTasks: Array<{ id: number; title: string; due_date: string; priority: string }>;
+  overdueTasks: Task[];
   highPriorityTodoCount: number;
-  pendingTasks: Array<{ title: string; priority: string; due_date: string | null }>;
-  topHabits: Array<{ name: string; streak: number }>;
-  activeGoals: Array<{ title: string; progress: number }>;
-}) => {
+  pendingTasks: PendingTask[];
+  topHabits: Habit[];
+  activeGoals: Goal[];
+}
+
+const buildOracleTip = (summary: Summary) => {
   if ((summary.overdueTasks ?? []).length > 0) {
-    const highest = (summary.overdueTasks ?? []).find(t => t.priority === 'high') || (summary.overdueTasks ?? [])[0];
+    const highest = (summary.overdueTasks ?? []).find((t: Task) => t.priority === 'high') || (summary.overdueTasks ?? [])[0];
     return `Strategist, you have ${summary.overdueTasks.length} overdue objective(s). Start with "${highest.title}" to rapidly stabilize your momentum.`;
   }
   if (summary.highPriorityTodoCount > 0) {
@@ -40,12 +65,14 @@ const buildOracleTip = (summary: {
 router.get('/user-stats', authenticateToken, async (req: AuthRequest, res) => {
   try {
     const userId = req.user?.id;
-    console.log('DEBUG [UserRoute]: /user-stats userId', userId);
+    console.log('DEBUG [UserRoute]: Fetching /user-stats for userId:', userId);
+    
     const [totalTasks]: any = await pool.query('SELECT COUNT(*) as count FROM tasks WHERE user_id = ?', [userId]);
-    console.log('DEBUG [UserRoute]: user-stats totalTasks', totalTasks);
     const [completedTasks]: any = await pool.query("SELECT COUNT(*) as count FROM tasks WHERE user_id = ? AND status = 'completed'", [userId]);
     const [activeHabits]: any = await pool.query('SELECT COUNT(*) as count FROM habits WHERE user_id = ?', [userId]);
     const [totalGoals]: any = await pool.query('SELECT COUNT(*) as count FROM goals WHERE user_id = ?', [userId]);
+
+    console.log('DEBUG [UserRoute]: Stats retrieved successfully');
 
     res.json({
       tasks: { total: totalTasks[0].count, completed: completedTasks[0].count },
@@ -53,19 +80,21 @@ router.get('/user-stats', authenticateToken, async (req: AuthRequest, res) => {
       goals: { total: totalGoals[0].count }
     });
   } catch (error) {
+    console.error('DEBUG [UserRoute]: Error in /user-stats', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
 
 router.get('/notifications', authenticateToken, async (req: AuthRequest, res) => {
   try {
-    console.log('DEBUG [UserRoute]: /notifications userId', req.user?.id);
+    console.log('DEBUG [UserRoute]: Fetching /notifications for userId:', req.user?.id);
     const [notes] = await pool.query(
       'SELECT id, user_id, title, message, type, is_read, created_at FROM notifications WHERE user_id = ? ORDER BY created_at DESC LIMIT 50',
       [req.user?.id]
     );
     res.json(notes);
   } catch (error) {
+    console.error('DEBUG [UserRoute]: Error in /notifications', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
@@ -73,13 +102,13 @@ router.get('/notifications', authenticateToken, async (req: AuthRequest, res) =>
 router.get('/context-summary', authenticateToken, async (req: AuthRequest, res) => {
   try {
     const userId = req.user?.id;
-    console.log('DEBUG [UserRoute]: /user-stats userId', userId);
     if (!userId) return res.status(401).json({ error: 'Unauthorized' });
+    
+    console.log('DEBUG [UserRoute]: Fetching /context-summary');
     const summary = await getUserContextSummary(userId);
-    console.log('DEBUG [UserRoute]: oracle summary', summary);
-    console.log('DEBUG [UserRoute]: context summary', summary);
     res.json(summary);
   } catch (error) {
+    console.error('DEBUG [UserRoute]: Error in /context-summary', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
@@ -87,20 +116,21 @@ router.get('/context-summary', authenticateToken, async (req: AuthRequest, res) 
 router.get('/oracle-daily-insight', authenticateToken, async (req: AuthRequest, res) => {
   try {
     const userId = req.user?.id;
-    console.log('DEBUG [UserRoute]: /user-stats userId', userId);
     if (!userId) return res.status(401).json({ error: 'Unauthorized' });
+
+    console.log('DEBUG [UserRoute]: Generating /oracle-daily-insight');
     const summary = await getUserContextSummary(userId);
-    console.log('DEBUG [UserRoute]: context summary', summary);
+    
     const contextPrompt = [
       `Tasks To Do: ${summary.todoCount}`,
       `Tasks Completed: ${summary.completedCount}`,
       `Habit Streak: ${summary.habitStreak}`,
       `Overdue Tasks: ${summary.overdueTasks.length}`,
       `High Priority Pending: ${summary.highPriorityTodoCount}`,
-      `Overdue Task Titles: ${summary.overdueTasks.map(task => task.title).join(', ') || 'None'}`,
-      `Top Pending Tasks: ${(summary.pendingTasks ?? []).map(task => `${task.title} (${task.priority}, due ${task.due_date || 'no due date'})`).join('; ') || 'None'}`,
-      `Top Habits: ${(summary.topHabits ?? []).map(habit => `${habit.name} (${habit.streak}-day streak)`).join('; ') || 'None'}`,
-      `Active Vision Goals: ${(summary.activeGoals ?? []).map(goal => `${goal.title} (${goal.progress}% complete)`).join('; ') || 'None'}`
+      `Overdue Task Titles: ${summary.overdueTasks.map((t: Task) => t.title).join(', ') || 'None'}`,
+      `Top Pending Tasks: ${(summary.pendingTasks ?? []).map((t: PendingTask) => `${t.title} (${t.priority})`).join('; ') || 'None'}`,
+      `Top Habits: ${(summary.topHabits ?? []).map((h: Habit) => `${h.name} (${h.streak}-day streak)`).join('; ') || 'None'}`,
+      `Active Vision Goals: ${(summary.activeGoals ?? []).map((g: Goal) => `${g.title} (${g.progress}% complete)`).join('; ') || 'None'}`
     ].join(' | ');
 
     res.json({
@@ -108,12 +138,14 @@ router.get('/oracle-daily-insight', authenticateToken, async (req: AuthRequest, 
       contextPrompt
     });
   } catch (error) {
+    console.error('DEBUG [UserRoute]: Error in /oracle-daily-insight', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
 
 router.patch('/notifications/:id/read', authenticateToken, async (req: AuthRequest, res) => {
   try {
+    console.log(`DEBUG [UserRoute]: Marking notification ${req.params.id} as read`);
     await pool.query('UPDATE notifications SET is_read = 1 WHERE id = ? AND user_id = ?', 
       [req.params.id, req.user?.id]);
     res.json({ success: true });
