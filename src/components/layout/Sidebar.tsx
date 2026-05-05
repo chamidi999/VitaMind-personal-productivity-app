@@ -14,12 +14,12 @@ interface SidebarProps {
 
 export default function Sidebar({ user, onLogout }: SidebarProps) {
   return (
-    <aside className="hidden md:flex w-72 border-r border-border flex-col p-6 fixed h-screen bg-card z-20">
+    <aside className="hidden md:flex w-72 border-r border-border flex-col p-6 fixed h-screen bg-[#191970] text-white z-20">
       <div className="flex items-center gap-3 mb-12">
         <div className="h-10 w-10 bg-white rounded-xl flex items-center justify-center">
           <Zap className="text-royal h-6 w-6" />
         </div>
-        <span className="text-xl font-bold tracking-tight text-foreground">VitaMind</span>
+        <span className="text-xl font-bold tracking-tight text-white">VitaMind</span>
       </div>
 
       <nav className="flex-1 space-y-2">
@@ -41,8 +41,8 @@ export default function Sidebar({ user, onLogout }: SidebarProps) {
             {user?.name?.[0]?.toUpperCase()}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-semibold truncate text-foreground">{user?.name}</p>
-            <p className="text-xs text-muted-foreground truncate">{user?.email}</p>
+            <p className="text-sm font-semibold truncate text-white">{user?.name}</p>
+            <p className="text-xs text-white/80 truncate">{user?.email}</p>
           </div>
         </div>
         <button 
