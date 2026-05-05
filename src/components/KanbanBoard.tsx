@@ -53,7 +53,7 @@ export default function KanbanBoard({ tasks, onUpdateTask, onDeleteTask, onAddTa
                 layoutId={`task-${task.id}`}
                 key={task.id}
                 onClick={() => onEditTask(task)}
-                className="task-card"
+                className="task-card group"
               >
                 <div className="flex justify-between items-start mb-3">
                   <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-tighter ${getTaskPriorityColor(task.priority)}`}>
