@@ -10,17 +10,17 @@
   --border: #dbe1f0;
   --muted-foreground: #64748b;
   --royal: #4169e1;
-  --midnight: #191970; /* This is our Sidebar color */
+  --midnight: #191970; 
 }
 
 
 .dark {
-  --background: #0b0e14;       /* Deep matte black background */
-  --foreground: #ffffff;       /* Pure white text for headings */
-  --card: #151921;             /* Slightly lighter card for depth */
-  --muted-foreground: #94a3b8; /* Soft blue-gray for secondary text */
-  --border: #1e293b;           /* Thin subtle borders */
-  --accent: #3b82f6;           /* Bright blue for active elements */
+  --background: #0b0e14;       
+  --foreground: #ffffff;       
+  --card: #151921;             
+  --muted-foreground: #94a3b8; 
+  --border: #1e293b;           
+  --accent: #3b82f6;           
 }
 
 @theme {

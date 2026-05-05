@@ -7,7 +7,6 @@ import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import cors from 'cors';
 
-// Modular Imports
 import { initDB } from './server/db';
 import authRoutes from './server/routes/auth';
 import taskRoutes from './server/routes/tasks';
@@ -27,7 +26,6 @@ const PORT = 3000;
 const app = express();
 app.set('trust proxy', 1);
 
-// Security Middlewares
 app.use(helmet({
   contentSecurityPolicy: false,
 }));
@@ -40,7 +38,6 @@ const limiter = rateLimit({
 });
 app.use('/api/', limiter);
 
-// --- API Routes ---
 app.use('/api/auth', authRoutes);
 app.use('/api/tasks', taskRoutes);
 app.use('/api/habits', habitRoutes);
@@ -53,7 +50,6 @@ app.use('/api', userRoutes);
 async function startServer() {
   let dbInitialized = false;
   try {
-    // Initialize MySQL Database
     await initDB();
     dbInitialized = true;
     await runNotificationChecks();
@@ -62,7 +58,6 @@ async function startServer() {
     }, 5 * 60 * 1000);
   } catch (error) {
     console.error('Database initialization failed:', error);
-    // We continue so the Express server can still serve the frontend/Vite
   }
 
   app.get('/api/health', (req, res) => {
