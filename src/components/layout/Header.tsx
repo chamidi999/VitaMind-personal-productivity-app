@@ -1,6 +1,7 @@
 import React from 'react';
 import { Notification } from '../../types';
 import { Search, Bell } from 'lucide-react';
+import ThemeToggle from '../ThemeToggle';
 import NotificationCenter from '../NotificationCenter';
 import PageHeader from './PageHeader';
 
@@ -22,20 +23,21 @@ export default function Header({ viewTitle, notifications, isNoteOpen, setIsNote
       </div>
       <div className="flex items-center gap-4">
         <div className="relative hidden md:block">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
           <input 
             type="text" 
             placeholder="Search files..." 
-            className="bg-card border border-gray-200 rounded-2xl py-2.5 pl-10 pr-4 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-royal/50 w-64 transition-all"
+            className="bg-card border border-border rounded-2xl py-2.5 pl-10 pr-4 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-royal/50 w-64 transition-all"
           />
         </div>
+        <ThemeToggle />
         <button 
           onClick={() => setIsNoteOpen(!isNoteOpen)}
-          className="h-11 w-11 bg-card border border-gray-200 rounded-2xl flex items-center justify-center text-gray-500 hover:text-[#191970] transition-colors relative group"
+          className="h-11 w-11 bg-card border border-border rounded-2xl flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors relative group"
         >
            <Bell size={20} className="group-hover:rotate-12 transition-transform" />
            {notifications.some(n => !n.is_read) && (
-             <span className="absolute -top-1 -right-1 min-w-5 h-5 px-1 bg-royal rounded-full border-2 border-white shadow-[0_0_8px_#4169e1] text-[10px] font-black text-white flex items-center justify-center">
+             <span className="absolute -top-1 -right-1 min-w-5 h-5 px-1 bg-royal rounded-full border-2 border-card shadow-[0_0_8px_#4169e1] text-[10px] font-black text-white flex items-center justify-center">
                {notifications.filter(n => !n.is_read).length}
              </span>
            )}
