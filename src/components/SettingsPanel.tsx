@@ -23,7 +23,7 @@ export default function SettingsPanel({ user, onUpdateUser, onClose }: SettingsP
     setShowSuccess(true);
     setTimeout(() => {
       setShowSuccess(false);
-      onClose(); // Close back to dashboard after save
+      onClose();
     }, 1500);
   };
 

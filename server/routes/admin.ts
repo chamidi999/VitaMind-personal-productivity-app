@@ -4,7 +4,6 @@ import { authenticateToken, isAdmin, AuthRequest } from '../middleware/auth';
 
 const router = Router();
 
-// --- Admin ---
 router.get('/users', authenticateToken, isAdmin, async (req, res) => {
   try {
     const [users] = await pool.query('SELECT id, email, name, role, created_at FROM users');
