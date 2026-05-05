@@ -1,8 +1,9 @@
 import React from 'react';
 import { Notification } from '../../types';
-import { Search, Bell } from 'lucide-react';
+import { Search, Bell, Sun, Moon } from 'lucide-react';
 import NotificationCenter from '../NotificationCenter';
 import PageHeader from './PageHeader';
+import { useTheme } from '../../context/ThemeContext';
 
 interface HeaderProps {
   viewTitle: string;
@@ -15,6 +16,8 @@ interface HeaderProps {
 }
 
 export default function Header({ viewTitle, notifications, isNoteOpen, setIsNoteOpen, setNotifications, onReadNotification, token }: HeaderProps) {
+  const { theme, toggleTheme } = useTheme();
+
   return (
     <header className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 mb-8 px-1">
       <div>
@@ -29,6 +32,13 @@ export default function Header({ viewTitle, notifications, isNoteOpen, setIsNote
             className="bg-card border border-border rounded-2xl py-2.5 pl-10 pr-4 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-royal/50 w-64 transition-all"
           />
         </div>
+        <button
+          onClick={toggleTheme}
+          aria-label="Toggle dark mode"
+          className="h-11 w-11 bg-card border border-border rounded-2xl flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
+        >
+          {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
+        </button>
         <button 
           onClick={() => setIsNoteOpen(!isNoteOpen)}
           className="h-11 w-11 bg-card border border-border rounded-2xl flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors relative group"

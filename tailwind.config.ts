@@ -1,6 +1,7 @@
 import type { Config } from 'tailwindcss';
 
 export default {
+  darkMode: 'class',
   theme: {
     extend: {
       colors: {
@@ -8,6 +9,8 @@ export default {
         foreground: 'var(--foreground)',
         card: 'var(--card)',
         border: 'var(--border)',
+        sidebar: 'var(--sidebar)',
+        'sidebar-foreground': 'var(--sidebar-foreground)',
         'muted-foreground': 'var(--muted-foreground)'
       }
     }
