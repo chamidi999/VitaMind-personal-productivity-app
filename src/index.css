@@ -15,11 +15,12 @@
 
 
 .dark {
-  --background: #020617;
-  --foreground: #ffffff;
-  --card: #111827;
-  --muted-foreground: #94a3b8;
-  --border: #1e293b;
+  --background: #0b0e14;       /* Deep matte black background */
+  --foreground: #ffffff;       /* Pure white text for headings */
+  --card: #151921;             /* Slightly lighter card for depth */
+  --muted-foreground: #94a3b8; /* Soft blue-gray for secondary text */
+  --border: #1e293b;           /* Thin subtle borders */
+  --accent: #3b82f6;           /* Bright blue for active elements */
 }
 
 @theme {
@@ -34,11 +35,18 @@
   --color-sidebar: var(--sidebar);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
 }
 
 @layer base {
   body {
     @apply bg-background text-foreground antialiased;
+  }
+
+  .dark h1,
+  .dark h2,
+  .dark h3 {
+    color: #ffffff;
   }
 }
 
