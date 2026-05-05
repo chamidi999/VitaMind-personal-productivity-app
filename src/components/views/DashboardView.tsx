@@ -108,7 +108,7 @@ export default function DashboardView({ stats, tasks, habits, contextSummary, on
     >
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight text-foreground mb-2">Welcome back, Strategist.</h2>
+          <h2 className="page-title mb-2">Welcome back, Strategist.</h2>
           <p className="text-muted-foreground flex items-center gap-2">
             Your systems are performing at
             <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-2 py-0.5 text-emerald-600">
@@ -127,7 +127,7 @@ export default function DashboardView({ stats, tasks, habits, contextSummary, on
           </button>
           <button
             onClick={onAddTask}
-            className="h-11 bg-royal text-white hover:bg-[#3559c7] px-4 rounded-lg font-semibold text-sm sm:text-base transition-all shadow-lg shadow-royal/20 flex items-center justify-center gap-2 whitespace-nowrap"
+            className="btn-primary hover:bg-[#3559c7] text-sm sm:text-base"
           >
             <Plus size={18} /> New Objective
           </button>
@@ -158,7 +158,7 @@ export default function DashboardView({ stats, tasks, habits, contextSummary, on
             whileHover={{ y: -6, scale: 1.015 }}
             transition={{ type: 'spring', stiffness: 280, damping: 20 }}
             onClick={() => onViewChange(stat.id as View)}
-            className="bg-card backdrop-blur-xl p-6 rounded-3xl border border-border shadow-[0_10px_35px_-20px_rgba(15,23,42,0.6)] relative overflow-hidden group hover:border-royal/40 transition-all duration-300 cursor-pointer active:scale-[0.985]"
+            className="stat-card"
           >
             <div className={`absolute top-0 right-0 w-24 h-24 bg-linear-to-br ${stat.color} to-transparent opacity-40 -mr-8 -mt-8 rounded-full blur-2xl group-hover:opacity-60 transition-opacity`}></div>
             <div className="flex justify-between items-start relative z-10">

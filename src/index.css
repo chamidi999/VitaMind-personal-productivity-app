@@ -76,3 +76,21 @@
 .custom-scrollbar::-webkit-scrollbar-thumb {
   @apply bg-[#cfd6ea] rounded-full hover:bg-[#b7c3e3] transition-colors;
 }
+
+@layer components {
+  .task-card {
+    @apply bg-card p-4 rounded-2xl border border-border shadow-sm group hover:border-royal/30 transition-all cursor-pointer relative;
+  }
+
+  .stat-card {
+    @apply bg-card backdrop-blur-xl p-6 rounded-3xl border border-border shadow-[0_10px_35px_-20px_rgba(15,23,42,0.6)] relative overflow-hidden group hover:border-royal/40 transition-all duration-300 cursor-pointer active:scale-[0.985];
+  }
+
+  .page-title {
+    @apply text-3xl font-bold tracking-tight text-foreground;
+  }
+
+  .btn-primary {
+    @apply h-11 bg-royal text-white px-4 rounded-lg font-semibold transition-all shadow-lg shadow-royal/20 flex items-center justify-center gap-2 whitespace-nowrap;
+  }
+}
