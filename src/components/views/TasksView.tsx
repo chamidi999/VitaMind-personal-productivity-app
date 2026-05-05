@@ -27,23 +27,23 @@ export default function TasksView({ tasks, onUpdateTask, onDeleteTask, onAddTask
       animate={{ opacity: 1 }}
       className="max-w-[1200px] w-full ml-0 mr-auto flex flex-col items-start space-y-10 overflow-x-hidden px-0"
     >
-      <div className="w-full flex flex-col md:flex-row justify-between items-start md:items-center gap-6 bg-card p-6 rounded-3xl border border-white/5">
+      <div className="w-full flex flex-col md:flex-row justify-between items-start md:items-center gap-6 bg-card p-6 rounded-3xl border border-border">
         <div>
-          <h2 className="text-2xl font-bold text-[#191970] mb-1">Strategic Operations</h2>
-          <p className="text-sm text-gray-700">Manage your active mission parameters.</p>
+          <h2 className="text-2xl font-bold text-foreground mb-1">Strategic Operations</h2>
+          <p className="text-sm text-muted-foreground">Manage your active mission parameters.</p>
         </div>
         <div className="flex items-center gap-3 w-full md:w-auto">
           <div className="relative flex-1 md:w-64">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-700" size={16} />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
             <input 
               type="text" 
               placeholder="Search objectives..." 
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full bg-white/5 border border-white/10 rounded-xl py-2 pl-10 pr-4 text-sm focus:ring-2 focus:ring-royal/50 outline-none transition-all"
+              className="w-full bg-card border border-border rounded-xl py-2 pl-10 pr-4 text-sm text-foreground focus:ring-2 focus:ring-royal/50 outline-none transition-all"
             />
           </div>
-          <button className="p-2 bg-white/5 border border-white/10 rounded-xl text-gray-700 hover:text-[#191970] transition-colors">
+          <button className="p-2 bg-card border border-border rounded-xl text-muted-foreground hover:text-foreground transition-colors">
             <Filter size={20} />
           </button>
           <button 

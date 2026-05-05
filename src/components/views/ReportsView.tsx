@@ -165,18 +165,18 @@ export default function ReportsView() {
       </div>
 
       {isLoading ? (
-        <div className="bg-white/40 backdrop-blur-xl border border-white/50 rounded-2xl p-6 text-sm font-medium text-muted-foreground">Loading...</div>
+        <div className="bg-card backdrop-blur-xl border border-border rounded-2xl p-6 text-sm font-medium text-muted-foreground">Loading...</div>
       ) : null}
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {statCards.map((card) => (
           <div
             key={card.label}
-            className="bg-white/40 backdrop-blur-xl border border-white/50 rounded-2xl p-5"
+            className="bg-card backdrop-blur-xl border border-border rounded-2xl p-5"
 
           >
             <div className="flex items-center justify-between mb-2">
-              <p className="text-xs font-semibold uppercase tracking-widest text-gray-500">{card.label}</p>
+              <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">{card.label}</p>
               <card.Icon size={18} className={card.iconColor === '#4169e1' ? 'text-royal' : card.iconColor === '#f97316' ? 'text-orange-500' : 'text-emerald-500'} />
             </div>
             <p className="text-3xl font-bold text-foreground">{isLoading ? '--' : card.value}</p>
@@ -185,7 +185,7 @@ export default function ReportsView() {
       </div>
 
       <div
-        className="bg-white/40 backdrop-blur-xl border border-white/50 rounded-2xl p-5"
+        className="bg-card backdrop-blur-xl border border-border rounded-2xl p-5"
       >
         <h3 className="text-base font-bold text-foreground mb-4">Performance Overview</h3>
         <div style={{ width: '100%', height: 320, minHeight: 300 }}>

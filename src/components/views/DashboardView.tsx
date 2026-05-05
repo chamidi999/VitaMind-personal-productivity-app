@@ -108,8 +108,8 @@ export default function DashboardView({ stats, tasks, habits, contextSummary, on
     >
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight text-[#191970] mb-2">Welcome back, Strategist.</h2>
-          <p className="text-gray-600 flex items-center gap-2">
+          <h2 className="text-3xl font-bold tracking-tight text-foreground mb-2">Welcome back, Strategist.</h2>
+          <p className="text-muted-foreground flex items-center gap-2">
             Your systems are performing at
             <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-2 py-0.5 text-emerald-600">
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
@@ -121,7 +121,7 @@ export default function DashboardView({ stats, tasks, habits, contextSummary, on
         <div className="flex items-center gap-3">
           <button
             onClick={() => onViewChange('tasks')}
-            className="h-11 bg-white text-royal hover:bg-royal/10 px-4 rounded-lg font-semibold text-sm sm:text-base transition-all border border-royal/30 flex items-center justify-center gap-2 whitespace-nowrap"
+            className="h-11 bg-card text-royal hover:bg-royal/10 px-4 rounded-lg font-semibold text-sm sm:text-base transition-all border border-border flex items-center justify-center gap-2 whitespace-nowrap"
           >
             <Clock size={18} /> Focus Mode
           </button>
@@ -134,14 +134,14 @@ export default function DashboardView({ stats, tasks, habits, contextSummary, on
         </div>
       </div>
 
-      <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl p-4 md:p-5">
+      <div className="bg-card backdrop-blur-md border border-border rounded-3xl p-4 md:p-5">
         <div className="flex items-center gap-3">
-          <div className="h-10 w-10 rounded-2xl bg-card border border-white/10 text-royal flex items-center justify-center">
+          <div className="h-10 w-10 rounded-2xl bg-card border border-border text-royal flex items-center justify-center">
             <BrainCircuit size={18} />
           </div>
           <div>
-            <p className="text-[10px] text-[#191970]/55 uppercase tracking-[0.2em] mb-1">Oracle&apos;s Daily Insight</p>
-            <p className="text-sm md:text-base text-[#191970] font-medium">{dailyInsight}</p>
+            <p className="text-[10px] text-muted-foreground uppercase tracking-[0.2em] mb-1">Oracle&apos;s Daily Insight</p>
+            <p className="text-sm md:text-base text-foreground font-medium">{dailyInsight}</p>
           </div>
         </div>
       </div>
@@ -158,19 +158,19 @@ export default function DashboardView({ stats, tasks, habits, contextSummary, on
             whileHover={{ y: -6, scale: 1.015 }}
             transition={{ type: 'spring', stiffness: 280, damping: 20 }}
             onClick={() => onViewChange(stat.id as View)}
-            className="bg-white/30 backdrop-blur-xl p-6 rounded-3xl border border-white/40 shadow-[0_10px_35px_-20px_rgba(15,23,42,0.6)] relative overflow-hidden group hover:border-white/60 transition-all duration-300 cursor-pointer active:scale-[0.985]"
+            className="bg-card backdrop-blur-xl p-6 rounded-3xl border border-border shadow-[0_10px_35px_-20px_rgba(15,23,42,0.6)] relative overflow-hidden group hover:border-royal/40 transition-all duration-300 cursor-pointer active:scale-[0.985]"
           >
             <div className={`absolute top-0 right-0 w-24 h-24 bg-linear-to-br ${stat.color} to-transparent opacity-40 -mr-8 -mt-8 rounded-full blur-2xl group-hover:opacity-60 transition-opacity`}></div>
             <div className="flex justify-between items-start relative z-10">
               <div>
-                <p className="text-sm font-medium text-gray-500 mb-1">{stat.label}</p>
-                <h3 className="text-2xl font-bold text-[#191970] group-hover:text-royal transition-colors">{stat.value}</h3>
+                <p className="text-sm font-medium text-muted-foreground mb-1">{stat.label}</p>
+                <h3 className="text-2xl font-bold text-foreground group-hover:text-royal transition-colors">{stat.value}</h3>
               </div>
               <div className="bg-white/65 backdrop-blur-md p-3 rounded-2xl border border-white/50 group-hover:bg-white/80 transition-colors">
                 {stat.icon}
               </div>
             </div>
-            <p className="text-xs text-gray-600 mt-4 flex items-center gap-1 group-hover:text-gray-700 transition-colors">
+            <p className="text-xs text-muted-foreground mt-4 flex items-center gap-1 transition-colors">
               <Activity size={12} className="text-royal" /> {stat.sub}
             </p>
           </motion.div>
@@ -178,10 +178,10 @@ export default function DashboardView({ stats, tasks, habits, contextSummary, on
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2 bg-white/30 backdrop-blur-xl p-8 rounded-3xl border border-white/40 shadow-[0_10px_35px_-20px_rgba(15,23,42,0.6)]">
+        <div className="lg:col-span-2 bg-card backdrop-blur-xl p-8 rounded-3xl border border-border shadow-[0_10px_35px_-20px_rgba(15,23,42,0.6)]">
           <div className="flex items-center justify-between mb-8">
-            <h3 className="text-lg font-bold text-[#191970]">System Performance</h3>
-            <select className="bg-white/35 border border-white/30 rounded-lg text-xs px-3 py-1 outline-none text-gray-600">
+            <h3 className="text-lg font-bold text-foreground">System Performance</h3>
+            <select className="bg-card border border-border rounded-lg text-xs px-3 py-1 outline-none text-muted-foreground">
               <option>Last 7 Days</option>
               <option>Last 30 Days</option>
             </select>
@@ -225,9 +225,9 @@ export default function DashboardView({ stats, tasks, habits, contextSummary, on
           </div>
         </div>
 
-        <div className="bg-white/30 backdrop-blur-xl p-8 rounded-3xl border border-white/40 shadow-[0_10px_35px_-20px_rgba(15,23,42,0.6)]">
+        <div className="bg-card backdrop-blur-xl p-8 rounded-3xl border border-border shadow-[0_10px_35px_-20px_rgba(15,23,42,0.6)]">
           <div className="flex items-center justify-between mb-6">
-            <h3 className="text-lg font-bold text-[#191970]">Priority Objectives</h3>
+            <h3 className="text-lg font-bold text-foreground">Priority Objectives</h3>
             <button onClick={() => onViewChange('tasks')} className="text-royal text-xs font-bold hover:underline">View All</button>
           </div>
           <div className="space-y-4">
@@ -242,17 +242,17 @@ export default function DashboardView({ stats, tasks, habits, contextSummary, on
                   <Calendar size={18} />
                 </div>
                 <div className="flex-1 overflow-hidden">
-                  <h4 className="font-semibold text-sm text-[#191970] truncate group-hover:text-royal transition-colors">{task.title}</h4>
-                  <p className="text-[10px] text-gray-500 uppercase tracking-widest mt-0.5">{task.priority} Priority</p>
+                  <h4 className="font-semibold text-sm text-foreground truncate group-hover:text-royal transition-colors">{task.title}</h4>
+                  <p className="text-[10px] text-muted-foreground uppercase tracking-widest mt-0.5">{task.priority} Priority</p>
                 </div>
-                <ChevronRight size={16} className="text-gray-600 opacity-0 group-hover:opacity-100 transition-all -translate-x-2 group-hover:translate-x-0" />
+                <ChevronRight size={16} className="text-muted-foreground opacity-0 group-hover:opacity-100 transition-all -translate-x-2 group-hover:translate-x-0" />
               </div>
             ))}
             {activeTasks.length === 0 && (
-              <div className="rounded-2xl border border-dashed border-white/60 bg-white/30 py-8 px-4 text-center">
+              <div className="rounded-2xl border border-dashed border-border bg-card py-8 px-4 text-center">
                 <Sparkles className="mx-auto text-royal/70 mb-2" size={18} />
-                <p className="text-sm text-[#191970] font-medium">No active objectives</p>
-                <p className="text-xs text-gray-500 mt-1">A quiet board means your execution engine is in sync.</p>
+                <p className="text-sm text-foreground font-medium">No active objectives</p>
+                <p className="text-xs text-muted-foreground mt-1">A quiet board means your execution engine is in sync.</p>
               </div>
             )}
           </div>
