@@ -8,8 +8,8 @@ interface PageHeaderProps {
 export default function PageHeader({ title }: PageHeaderProps) {
   return (
     <div>
-      <h2 className="text-3xl font-bold tracking-tight text-[#191970]">{title}</h2>
-      <p className="text-gray-600 mt-1">{format(new Date(), 'EEEE, MMMM do')}</p>
+      <h2 className="text-3xl font-bold tracking-tight text-foreground">{title}</h2>
+      <p className="text-muted-foreground mt-1">{format(new Date(), 'EEEE, MMMM do')}</p>
     </div>
   );
 }
