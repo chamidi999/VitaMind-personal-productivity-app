@@ -1,7 +1,6 @@
 import React from 'react';
 import { Notification } from '../../types';
 import { Search, Bell } from 'lucide-react';
-import ThemeToggle from '../ThemeToggle';
 import NotificationCenter from '../NotificationCenter';
 import PageHeader from './PageHeader';
 
@@ -30,7 +29,6 @@ export default function Header({ viewTitle, notifications, isNoteOpen, setIsNote
             className="bg-card border border-border rounded-2xl py-2.5 pl-10 pr-4 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-royal/50 w-64 transition-all"
           />
         </div>
-        <ThemeToggle />
         <button 
           onClick={() => setIsNoteOpen(!isNoteOpen)}
           className="h-11 w-11 bg-card border border-border rounded-2xl flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors relative group"
