@@ -374,7 +374,7 @@ const getViewTitle = (pathname: string) => ({
   '/admin': 'Admin Panel'
 }[pathname] || 'Dashboard');
   return (
-    <div className="h-screen bg-background text-midnight flex font-sans selection:bg-royal/20 overflow-hidden">
+    <div className="h-screen bg-background text-foreground flex font-sans selection:bg-royal/20 overflow-hidden">
       <Sidebar user={user} onLogout={handleLogout} />
       
       <main className="flex-1 ml-0 md:ml-72 pt-24 md:pt-8 pb-6 h-screen overflow-hidden max-w-full">
