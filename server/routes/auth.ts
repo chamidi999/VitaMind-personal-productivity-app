@@ -4,6 +4,8 @@ import jwt from 'jsonwebtoken';
 import { z } from 'zod';
 import pool from '../db';
 import { authenticateToken, AuthRequest } from '../middleware/auth';
+import fs from 'fs';
+import path from 'path';
 
 const router = Router();
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret';
@@ -104,6 +106,7 @@ router.get('/me', authenticateToken, async (req: AuthRequest, res) => {
 router.patch('/profile', authenticateToken, async (req: AuthRequest, res) => {
   const { name, bio, avatar_url } = req.body;
   try {
+    let avatarPath: string | null | undefined = undefined;
     if (avatar_url) {
       const dataUrlMatch = String(avatar_url).match(/^data:(image\/(jpeg|png|gif));base64,(.+)$/);
       if (!dataUrlMatch) {
@@ -115,9 +118,25 @@ router.patch('/profile', authenticateToken, async (req: AuthRequest, res) => {
       if (sizeInBytes > 800 * 1024) {
         return res.status(400).json({ error: 'Avatar must be under 800KB.' });
       }
+
+      const ext = dataUrlMatch[2] === 'jpeg' ? 'jpg' : dataUrlMatch[2];
+      const uploadsDir = path.join(process.cwd(), 'uploads', 'avatars');
+      if (!fs.existsSync(uploadsDir)) {
+        fs.mkdirSync(uploadsDir, { recursive: true });
+      }
+      const filename = `user-${req.user?.id}-${Date.now()}.${ext}`;
+      const filePath = path.join(uploadsDir, filename);
+      fs.writeFileSync(filePath, Buffer.from(base64Data, 'base64'));
+      avatarPath = `/uploads/avatars/${filename}`;
+    } else if (avatar_url === null) {
+      avatarPath = null;
     }
 
-    await pool.query('UPDATE users SET name = ?, bio = ?, avatar_url = ? WHERE id = ?', [name, bio, avatar_url || null, req.user?.id]);
+    if (avatarPath === undefined) {
+      await pool.query('UPDATE users SET name = ?, bio = ? WHERE id = ?', [name, bio, req.user?.id]);
+    } else {
+      await pool.query('UPDATE users SET name = ?, bio = ?, avatar_url = ? WHERE id = ?', [name, bio, avatarPath, req.user?.id]);
+    }
     res.json({ success: true });
   } catch (error) {
     console.error('Profile update error:', error);

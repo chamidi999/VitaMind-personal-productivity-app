@@ -40,7 +40,11 @@ export default function SettingsPanel({ user, onUpdateUser, onClose }: SettingsP
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSaving(true);
-    await onUpdateUser({ name, bio, avatar_url: avatarUrl });
+    await onUpdateUser({
+      name,
+      bio,
+      ...(avatarUrl.startsWith('data:image/') ? { avatar_url: avatarUrl } : {})
+    });
     setIsSaving(false);
     setShowSuccess(true);
     setTimeout(() => {
