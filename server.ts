@@ -22,7 +22,7 @@ import { runNotificationChecks } from './server/services/notificationService';
 dotenv.config();
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const PORT = 3000;
+const PORT = Number(process.env.PORT) || 3000;
 
 const app = express();
 app.set('trust proxy', 1);
@@ -67,15 +67,19 @@ async function startServer() {
   }
 
   app.get('/api/health', (req, res) => {
-    res.json({ 
+    res.json({
       status: dbInitialized ? 'ok' : 'db_error',
       database: dbInitialized ? 'connected' : 'disconnected'
     });
   });
 
   if (process.env.NODE_ENV !== 'production') {
+    const hmrPort = Number(process.env.HMR_PORT);
     const vite = await createViteServer({
-      server: { middlewareMode: true },
+      server: {
+        middlewareMode: true,
+        hmr: process.env.DISABLE_HMR === 'true' ? false : (Number.isFinite(hmrPort) && hmrPort > 0 ? { port: hmrPort } : undefined),
+      },
       appType: 'spa',
     });
     app.use(vite.middlewares);
@@ -87,11 +91,20 @@ async function startServer() {
     });
   }
 
-  app.listen(PORT, '0.0.0.0', () => {
+  const server = app.listen(PORT, '0.0.0.0', () => {
     console.log(`Server running on http://localhost:${PORT}`);
     if (!dbInitialized) {
       console.warn('WARNING: Server started without database connection.');
     }
+  });
+
+  server.on('error', (error: NodeJS.ErrnoException) => {
+    if (error.code === 'EADDRINUSE') {
+      console.error(`Port ${PORT} is already in use.`);
+      console.error('Either stop the other process or run with a different port, e.g. PORT=3001 npm run dev');
+      process.exit(1);
+    }
+    throw error;
   });
 }
 

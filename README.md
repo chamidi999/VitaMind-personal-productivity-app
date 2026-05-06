@@ -18,3 +18,17 @@ View your app in AI Studio: https://ai.studio/apps/4d0cf6ff-6670-471b-8d7f-9e117
 2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
 3. Run the app:
    `npm run dev`
+
+## Port configuration (dev)
+
+If you already have another process running, you can customize the ports:
+
+- App server port (default `3000`):
+  - PowerShell: `$env:PORT=3001; npm run dev`
+  - macOS/Linux: `PORT=3001 npm run dev`
+- Vite HMR websocket port (default Vite behavior):
+  - PowerShell: `$env:HMR_PORT=24679; npm run dev`
+  - macOS/Linux: `HMR_PORT=24679 npm run dev`
+- Disable HMR entirely (if websocket port conflicts):
+  - PowerShell: `$env:DISABLE_HMR='true'; npm run dev`
+  - macOS/Linux: `DISABLE_HMR=true npm run dev`
