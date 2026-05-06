@@ -59,10 +59,10 @@ const getPeriodSummary = async (userId: number, rangeDays: number): Promise<Anal
   const endDate = dates[dates.length - 1];
 
   const [taskCompletionRows]: any = await pool.query(
-    `SELECT date(created_at) as day, COUNT(*) as count
+    `SELECT date(COALESCE(completed_at, created_at)) as day, COUNT(*) as count
      FROM tasks
-     WHERE user_id = ? AND status = 'completed' AND date(created_at) BETWEEN date(?) AND date(?)
-     GROUP BY date(created_at)`,
+     WHERE user_id = ? AND status = 'completed' AND date(COALESCE(completed_at, created_at)) BETWEEN date(?) AND date(?)
+     GROUP BY date(COALESCE(completed_at, created_at))`,
     [userId, startDate, endDate]
   );
 
@@ -97,15 +97,37 @@ const getPeriodSummary = async (userId: number, rangeDays: number): Promise<Anal
     [userId, startDate, endDate]
   );
 
-  const [achievedGoalRows]: any = await pool.query(
-    `SELECT COUNT(*) as count FROM goals
-     WHERE user_id = ? AND status = 'completed' AND date(created_at) BETWEEN date(?) AND date(?)`,
+  const [goalCompletionRows]: any = await pool.query(
+    `SELECT date(created_at) as day, COUNT(*) as count
+     FROM goals
+     WHERE user_id = ? AND status = 'completed' AND date(created_at) BETWEEN date(?) AND date(?)
+     GROUP BY date(created_at)`,
     [userId, startDate, endDate]
+  );
+
+  const [milestoneCompletedRows]: any = await pool.query(
+    `SELECT COUNT(*) as count
+     FROM milestones m
+     JOIN goals g ON g.id = m.goal_id
+     WHERE g.user_id = ? AND m.is_completed = 1`,
+    [userId]
+  );
+
+  const [totalMilestonesRows]: any = await pool.query(
+    `SELECT COUNT(*) as count
+     FROM milestones m
+     JOIN goals g ON g.id = m.goal_id
+     WHERE g.user_id = ?`,
+    [userId]
   );
 
   const taskMap = new Map<string, number>((taskCompletionRows as DailyRow[]).map((row) => [row.day, Number(row.count)]));
   const habitMap = new Map<string, number>((habitCompletionRows as DailyRow[]).map((row) => [row.day, Number(row.count)]));
+  const goalMap = new Map<string, number>((goalCompletionRows as DailyRow[]).map((row) => [row.day, Number(row.count)]));
   const totalHabits = Number(habitCountRows[0]?.count || 0);
+  const totalMilestones = Number(totalMilestonesRows[0]?.count || 0);
+  const completedMilestones = Number(milestoneCompletedRows[0]?.count || 0);
+  const milestoneRate = totalMilestones > 0 ? Number(((completedMilestones / totalMilestones) * 100).toFixed(2)) : 0;
 
   const labels = dates.map(formatLabel);
   const taskData = dates.map((date) => taskMap.get(date) || 0);
@@ -113,6 +135,8 @@ const getPeriodSummary = async (userId: number, rangeDays: number): Promise<Anal
     if (totalHabits === 0) return 0;
     return Math.round(((habitMap.get(date) || 0) / totalHabits) * 100);
   });
+  const goalData = dates.map((date) => goalMap.get(date) || 0);
+  const milestoneData = dates.map(() => milestoneRate);
 
   const completedTasks = Number(completedTaskRows[0]?.count || 0);
   const totalTasks = Number(totalTaskRows[0]?.count || 0);
@@ -126,18 +150,25 @@ const getPeriodSummary = async (userId: number, rangeDays: number): Promise<Anal
     labels,
     taskData,
     habitData,
+    goalData,
+    milestoneData,
     efficiencyRate,
     habitConsistency,
     completedTasks,
     totalTasks,
     successfulHabitStreaks: Number(successfulStreakRows[0]?.count || 0),
     achievedGoals: Number(achievedGoalRows[0]?.count || 0),
+    milestoneCompletionRate: milestoneRate,
+    completedMilestones,
+    totalMilestones,
     aiInsight: '',
     raw: {
       startDate,
       endDate,
       dailyTaskCompletions: dates.map((date, idx) => ({ date, completed: taskData[idx] })),
-      dailyHabitCompletionRate: dates.map((date, idx) => ({ date, percentage: habitData[idx] }))
+      dailyHabitCompletionRate: dates.map((date, idx) => ({ date, percentage: habitData[idx] })),
+      dailyGoalCompletions: dates.map((date, idx) => ({ date, completed: goalData[idx] })),
+      milestoneCompletionRate: milestoneRate
     }
   };
 };

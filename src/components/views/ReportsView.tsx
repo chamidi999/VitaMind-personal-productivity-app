@@ -19,12 +19,15 @@ interface AnalyticsPoint {
   label: string;
   taskData: number;
   habitData: number;
+  goalData: number;
+  milestoneData: number;
 }
 
 interface AnalyticsSummary {
   taskEfficiency: number;
   habitConsistency: number;
   goalAchievementRate: number;
+  milestoneCompletionRate: number;
   aiInsight: string;
   chartData: AnalyticsPoint[];
 }
@@ -38,14 +41,18 @@ interface AnalyticsSummaryPayload extends Partial<AnalyticsSummary> {
   labels?: string[];
   taskData?: number[];
   habitData?: number[];
+  goalData?: number[];
+  milestoneData?: number[];
   efficiencyRate?: number;
   achievedGoals?: number;
+  milestoneCompletionRate?: number;
 }
 
 const defaultSummary: AnalyticsSummary = {
   taskEfficiency: 0,
   habitConsistency: 0,
   goalAchievementRate: 0,
+  milestoneCompletionRate: 0,
   aiInsight: 'No proactive insight available yet. Complete more actions to unlock trends.',
   chartData: []
 };
@@ -82,12 +89,15 @@ export default function ReportsView() {
             ...normalizedData,
             taskEfficiency: Number(normalizedData?.taskEfficiency ?? normalizedData?.efficiencyRate) || 0,
             goalAchievementRate: Number(normalizedData?.goalAchievementRate ?? normalizedData?.achievedGoals) || 0,
+            milestoneCompletionRate: Number(normalizedData?.milestoneCompletionRate) || 0,
             chartData:
               normalizedData?.chartData ||
               normalizedData?.labels?.map((label, index) => ({
                 label,
                 taskData: Number(normalizedData?.taskData?.[index]) || 0,
-                habitData: Number(normalizedData?.habitData?.[index]) || 0
+                habitData: Number(normalizedData?.habitData?.[index]) || 0,
+                goalData: Number(normalizedData?.goalData?.[index]) || 0,
+                milestoneData: Number(normalizedData?.milestoneData?.[index]) || 0
               })) ||
               []
           });
@@ -113,7 +123,9 @@ export default function ReportsView() {
       summary.chartData.map((point) => ({
         label: point.label,
         taskData: Number(point.taskData) || 0,
-        habitData: Number(point.habitData) || 0
+        habitData: Number(point.habitData) || 0,
+        goalData: Number(point.goalData) || 0,
+        milestoneData: Number(point.milestoneData) || 0
       })),
     [summary.chartData]
   );
@@ -168,7 +180,8 @@ export default function ReportsView() {
   const statCards = [
     { label: 'Task Efficiency', value: `${summary.taskEfficiency}%`, iconColor: '#4169e1', Icon: TrendingUp },
     { label: 'Habit Consistency', value: `${summary.habitConsistency}%`, iconColor: '#f97316', Icon: Flame },
-    { label: 'Goal Achievement Rate', value: `${summary.goalAchievementRate}%`, iconColor: '#10b981', Icon: Target }
+    { label: 'Goal Achievement Rate', value: `${summary.goalAchievementRate}%`, iconColor: '#10b981', Icon: Target },
+    { label: 'Milestone Progress', value: `${summary.milestoneCompletionRate}%`, iconColor: '#8b5cf6', Icon: Target }
   ];
 
   return (
@@ -227,7 +240,7 @@ export default function ReportsView() {
               <Tooltip
                 formatter={(value: any, name: any) => {
                   const displayValue = value ?? '';
-                  if (name === 'Habit Completion %') {
+                  if (name.includes('%')) {
                     return [`${displayValue}%`, name];
                   }
 
@@ -241,7 +254,9 @@ export default function ReportsView() {
               />
               <Legend />
               <Bar yAxisId="left" dataKey="taskData" name="Completed Tasks" fill="#4169e1" radius={[8, 8, 0, 0]} />
+              <Bar yAxisId="left" dataKey="goalData" name="Completed Goals" fill="#10b981" radius={[8, 8, 0, 0]} />
               <Line yAxisId="right" type="monotone" dataKey="habitData" name="Habit Completion %" stroke="#f97316" strokeWidth={3} dot={{ r: 3 }} />
+              <Line yAxisId="right" type="monotone" dataKey="milestoneData" name="Milestone Progress %" stroke="#8b5cf6" strokeWidth={3} dot={{ r: 3 }} strokeDasharray="5 5" />
             </ComposedChart>
           </ResponsiveContainer>
         </div>
