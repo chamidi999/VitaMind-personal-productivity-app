@@ -2,6 +2,7 @@ import express from 'express';
 import { createServer as createViteServer } from 'vite';
 import path from 'path';
 import fs from 'fs';
+import net from 'net';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 import helmet from 'helmet';
@@ -22,7 +23,29 @@ import { runNotificationChecks } from './server/services/notificationService';
 dotenv.config();
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const PORT = 3000;
+const DEFAULT_PORT = Number(process.env.PORT ?? 3000);
+
+const findAvailablePort = async (preferredPort: number): Promise<number> => {
+  let candidatePort = preferredPort;
+
+  while (true) {
+    const isAvailable = await new Promise<boolean>((resolve) => {
+      const tester = net
+        .createServer()
+        .once('error', () => resolve(false))
+        .once('listening', () => {
+          tester.close(() => resolve(true));
+        })
+        .listen(candidatePort, '0.0.0.0');
+    });
+
+    if (isAvailable) {
+      return candidatePort;
+    }
+
+    candidatePort += 1;
+  }
+};
 
 const app = express();
 app.set('trust proxy', 1);
@@ -75,7 +98,10 @@ async function startServer() {
 
   if (process.env.NODE_ENV !== 'production') {
     const vite = await createViteServer({
-      server: { middlewareMode: true },
+      server: {
+        middlewareMode: true,
+        hmr: false,
+      },
       appType: 'spa',
     });
     app.use(vite.middlewares);
@@ -87,8 +113,14 @@ async function startServer() {
     });
   }
 
-  app.listen(PORT, '0.0.0.0', () => {
-    console.log(`Server running on http://localhost:${PORT}`);
+  const port = await findAvailablePort(DEFAULT_PORT);
+
+  if (port !== DEFAULT_PORT) {
+    console.warn(`Port ${DEFAULT_PORT} is already in use. Using port ${port} instead.`);
+  }
+
+  app.listen(port, '0.0.0.0', () => {
+    console.log(`Server running on http://localhost:${port}`);
     if (!dbInitialized) {
       console.warn('WARNING: Server started without database connection.');
     }
