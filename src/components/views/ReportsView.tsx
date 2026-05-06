@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { motion } from 'motion/react';
 import { Download, TrendingUp, Flame, Target } from 'lucide-react';
 import html2canvas from 'html2canvas';
@@ -48,6 +48,110 @@ interface AnalyticsSummaryPayload extends Partial<AnalyticsSummary> {
   milestoneCompletionRate?: number;
 }
 
+
+const COLOR_PROPERTIES = [
+  'color',
+  'backgroundColor',
+  'borderTopColor',
+  'borderRightColor',
+  'borderBottomColor',
+  'borderLeftColor',
+  'outlineColor',
+  'textDecorationColor',
+  'fill',
+  'stroke',
+  'caretColor',
+  'columnRuleColor'
+];
+
+const clampColorChannel = (value: number) => Math.min(255, Math.max(0, Math.round(value * 255)));
+
+const parseOklchComponent = (component: string, isLightness = false) => {
+  if (component === 'none') {
+    return 0;
+  }
+
+  if (component.endsWith('%')) {
+    const percentage = Number.parseFloat(component);
+    return Number.isFinite(percentage) ? percentage / 100 : 0;
+  }
+
+  const parsedValue = Number.parseFloat(component);
+  if (!Number.isFinite(parsedValue)) {
+    return 0;
+  }
+
+  return isLightness && parsedValue > 1 ? parsedValue / 100 : parsedValue;
+};
+
+const parseOklchHue = (hue: string) => {
+  if (hue === 'none') {
+    return 0;
+  }
+
+  const parsedHue = Number.parseFloat(hue);
+  if (!Number.isFinite(parsedHue)) {
+    return 0;
+  }
+
+  if (hue.endsWith('rad')) {
+    return parsedHue * (180 / Math.PI);
+  }
+
+  if (hue.endsWith('turn')) {
+    return parsedHue * 360;
+  }
+
+  return parsedHue;
+};
+
+const convertOklchToRgb = (oklchColor: string) => {
+  const match = oklchColor.match(/oklch\(([^)]+)\)/i);
+  if (!match) {
+    return oklchColor;
+  }
+
+  const [colorComponents, alphaComponent] = match[1].split('/').map((part) => part.trim());
+  const [lightness = '0', chroma = '0', hue = '0'] = colorComponents.split(/\s+/);
+  const l = parseOklchComponent(lightness, true);
+  const c = parseOklchComponent(chroma);
+  const h = parseOklchHue(hue) * (Math.PI / 180);
+  const alpha = alphaComponent ? parseOklchComponent(alphaComponent) : 1;
+
+  const a = c * Math.cos(h);
+  const b = c * Math.sin(h);
+
+  const long = l + 0.3963377774 * a + 0.2158037573 * b;
+  const medium = l - 0.1055613458 * a - 0.0638541728 * b;
+  const short = l - 0.0894841775 * a - 1.291485548 * b;
+
+  const longCubed = long ** 3;
+  const mediumCubed = medium ** 3;
+  const shortCubed = short ** 3;
+
+  const linearRed = 4.0767416621 * longCubed - 3.3077115913 * mediumCubed + 0.2309699292 * shortCubed;
+  const linearGreen = -1.2684380046 * longCubed + 2.6097574011 * mediumCubed - 0.3413193965 * shortCubed;
+  const linearBlue = -0.0041960863 * longCubed - 0.7034186147 * mediumCubed + 1.707614701 * shortCubed;
+
+  const toSrgb = (channel: number) => (
+    channel <= 0.0031308
+      ? 12.92 * channel
+      : 1.055 * (channel ** (1 / 2.4)) - 0.055
+  );
+
+  const red = clampColorChannel(toSrgb(linearRed));
+  const green = clampColorChannel(toSrgb(linearGreen));
+  const blue = clampColorChannel(toSrgb(linearBlue));
+
+  if (alpha < 1) {
+    return `rgba(${red}, ${green}, ${blue}, ${Math.max(0, Math.min(1, alpha))})`;
+  }
+
+  return `rgb(${red}, ${green}, ${blue})`;
+};
+
+const replaceOklchColors = (colorValue: string) => colorValue.replace(/oklch\([^)]+\)/gi, convertOklchToRgb);
+
 const defaultSummary: AnalyticsSummary = {
   taskEfficiency: 0,
   habitConsistency: 0,
@@ -61,6 +165,7 @@ export default function ReportsView() {
   const [summary, setSummary] = useState<AnalyticsSummary>(defaultSummary);
   const [isLoading, setIsLoading] = useState(true);
   const [isDownloadingPdf, setIsDownloadingPdf] = useState(false);
+  const reportRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     let isCancelled = false;
@@ -131,8 +236,9 @@ export default function ReportsView() {
   );
 
   const handleDownloadPDF = async () => {
-    const reportsContent = document.getElementById('reports-content');
+    const reportsContent = reportRef.current;
     if (!reportsContent) {
+      console.error('Reports content is not available for PDF export');
       return;
     }
 
@@ -142,7 +248,31 @@ export default function ReportsView() {
         scale: 2,
         useCORS: true,
         backgroundColor: '#ffffff',
-        ignoreElements: (element: { classList: { contains: (arg0: string) => any; }; }) => element.classList.contains('no-pdf')
+        ignoreElements: (element: { classList: { contains: (arg0: string) => any; }; }) => element.classList.contains('no-pdf'),
+        onclone: (clonedDocument: Document) => {
+          const clonedReportsContent = clonedDocument.getElementById('reports-content');
+          if (!clonedReportsContent) {
+            return;
+          }
+
+          const clonedWindow = clonedDocument.defaultView;
+          if (!clonedWindow) {
+            return;
+          }
+
+          const clonedElements = [clonedReportsContent, ...Array.from(clonedReportsContent.querySelectorAll('*'))] as HTMLElement[];
+
+          clonedElements.forEach((element) => {
+            const computedStyle = clonedWindow.getComputedStyle(element);
+
+            COLOR_PROPERTIES.forEach((property) => {
+              const propertyValue = computedStyle[property as any];
+              if (typeof propertyValue === 'string' && propertyValue.includes('oklch(')) {
+                element.style[property as any] = replaceOklchColors(propertyValue);
+              }
+            });
+          });
+        }
       });
 
       const imageData = canvas.toDataURL('image/png');
@@ -186,6 +316,7 @@ export default function ReportsView() {
 
   return (
     <motion.div
+      ref={reportRef}
       id="reports-content"
       initial={{ opacity: 0, y: 14 }}
       animate={{ opacity: 1, y: 0 }}
