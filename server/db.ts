@@ -136,10 +136,26 @@ export const initDB = async () => {
         target_date VARCHAR(100),
         progress INT DEFAULT 0,
         status VARCHAR(50) DEFAULT 'active',
+        completed_at DATETIME NULL,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         CONSTRAINT fk_goals_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
       )
     `);
+
+    const [goalCompletedAtRows]: any = await connection.query(
+      `SELECT COUNT(*) AS count
+       FROM INFORMATION_SCHEMA.COLUMNS
+       WHERE TABLE_SCHEMA = DATABASE()
+         AND TABLE_NAME = 'goals'
+         AND COLUMN_NAME = 'completed_at'`
+    );
+
+    if ((goalCompletedAtRows?.[0]?.count || 0) === 0) {
+      await connection.query(`
+        ALTER TABLE goals
+        ADD COLUMN completed_at DATETIME NULL
+      `);
+    }
 
     // Milestones Table
     await connection.query(`

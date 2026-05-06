@@ -25,6 +25,8 @@ type AnalyticsRangeSummary = {
   labels: string[];
   taskData: number[];
   habitData: number[];
+  goalData: number[];
+  milestoneData: number[];
   efficiencyRate: number;
   habitConsistency: number;
   completedTasks: number;
@@ -118,16 +120,18 @@ const getPeriodSummary = async (userId: number, rangeDays: number): Promise<Anal
   );
 
   const [goalCompletionRows]: any = await pool.query(
-    `SELECT date(created_at) as day, COUNT(*) as count
+    `SELECT date(COALESCE(completed_at, created_at)) as day, COUNT(*) as count
      FROM goals
-     WHERE user_id = ? AND status = 'completed' AND date(created_at) BETWEEN date(?) AND date(?)
-     GROUP BY date(created_at)`,
+     WHERE user_id = ? AND status = 'completed'
+       AND date(COALESCE(completed_at, created_at)) BETWEEN date(?) AND date(?)
+     GROUP BY date(COALESCE(completed_at, created_at))`,
     [userId, startDate, endDate]
   );
 
   const [achievedGoalRows]: any = await pool.query(
     `SELECT COUNT(*) as count FROM goals
-     WHERE user_id = ? AND status = 'completed' AND date(created_at) BETWEEN date(?) AND date(?)`,
+     WHERE user_id = ? AND status = 'completed'
+       AND date(COALESCE(completed_at, created_at)) BETWEEN date(?) AND date(?)`,
     [userId, startDate, endDate]
   );
 
