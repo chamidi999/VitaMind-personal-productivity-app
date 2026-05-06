@@ -10,12 +10,22 @@ const loginSchema = z.object({
 const registerSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
   email: z.string().email('Invalid email address'),
-  password: z.string().min(6, 'Password must be at least 6 characters')
+  password: z.string().min(6, 'Password must be at least 6 characters'),
+  role: z.enum(['user', 'admin']),
+  adminKey: z.string().optional()
+}).superRefine((data, ctx) => {
+  if (data.role === 'admin' && !data.adminKey?.trim()) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['adminKey'],
+      message: 'Admin key is required for admin signup'
+    });
+  }
 });
 
 interface AuthViewProps {
   onLogin: (email: string, password: string) => Promise<string | null>;
-  onRegister: (name: string, email: string, password: string) => Promise<string | null>;
+  onRegister: (name: string, email: string, password: string, role: 'user' | 'admin', adminKey?: string) => Promise<string | null>;
 }
 
 export default function AuthView({ onLogin, onRegister }: AuthViewProps) {
@@ -23,6 +33,8 @@ export default function AuthView({ onLogin, onRegister }: AuthViewProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
+  const [role, setRole] = useState<'user' | 'admin'>('user');
+  const [adminKey, setAdminKey] = useState('');
   const [error, setError] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -30,7 +42,7 @@ export default function AuthView({ onLogin, onRegister }: AuthViewProps) {
     setError('');
 
     const schema = authMode === 'login' ? loginSchema : registerSchema;
-    const result = schema.safeParse(authMode === 'login' ? { email, password } : { name, email, password });
+    const result = schema.safeParse(authMode === 'login' ? { email, password } : { name, email, password, role, adminKey });
 
     if (!result.success) {
       setError(result.error.issues[0].message);
@@ -41,7 +53,7 @@ export default function AuthView({ onLogin, onRegister }: AuthViewProps) {
     if (authMode === 'login') {
       err = await onLogin(email, password);
     } else {
-      err = await onRegister(name, email, password);
+      err = await onRegister(name, email, password, role, adminKey);
     }
 
     if (err) setError(err);
@@ -76,17 +88,43 @@ export default function AuthView({ onLogin, onRegister }: AuthViewProps) {
           
           <form onSubmit={handleSubmit} className="space-y-4">
             {authMode === 'register' && (
-              <div>
-                <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-1.5 ml-1">Full Name</label>
-                <input 
-                  type="text" 
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className="w-full bg-white border border-[#D1D5DB] rounded-2xl px-5 py-3.5 text-[#191970] placeholder:text-[#9CA3AF] focus:outline-none focus:border-[#4169E1] transition-all"
-                  placeholder="John Doe"
-                  required
-                />
-              </div>
+              <>
+                <div>
+                  <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-1.5 ml-1">Full Name</label>
+                  <input 
+                    type="text" 
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    className="w-full bg-white border border-[#D1D5DB] rounded-2xl px-5 py-3.5 text-[#191970] placeholder:text-[#9CA3AF] focus:outline-none focus:border-[#4169E1] transition-all"
+                    placeholder="John Doe"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-1.5 ml-1">Account Type</label>
+                  <select
+                    value={role}
+                    onChange={(e) => setRole(e.target.value as 'user' | 'admin')}
+                    className="w-full bg-white border border-[#D1D5DB] rounded-2xl px-5 py-3.5 text-[#191970] focus:outline-none focus:border-[#4169E1] transition-all"
+                  >
+                    <option value="user">User</option>
+                    <option value="admin">Admin</option>
+                  </select>
+                </div>
+                {role === 'admin' && (
+                  <div>
+                    <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-1.5 ml-1">Admin Signup Key</label>
+                    <input
+                      type="password"
+                      value={adminKey}
+                      onChange={(e) => setAdminKey(e.target.value)}
+                      className="w-full bg-white border border-[#D1D5DB] rounded-2xl px-5 py-3.5 text-[#191970] placeholder:text-[#9CA3AF] focus:outline-none focus:border-[#4169E1] transition-all"
+                      placeholder="Enter admin key"
+                      required={role === 'admin'}
+                    />
+                  </div>
+                )}
+              </>
             )}
             <div>
               <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-1.5 ml-1">Email Address</label>

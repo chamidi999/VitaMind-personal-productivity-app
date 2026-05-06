@@ -116,17 +116,20 @@ export default function App() {
       }
       return data.error || 'Login failed';
     } catch (e) {
-      return 'Connection timed out. Please try again.';
+      const message = e instanceof Error ? e.message : '';
+      if (message.toLowerCase().includes('failed to fetch')) {
+        return 'Unable to connect to server. Please check your network and try again.';
+      }
+      return 'Login request failed. Please try again.';
     }
   };
 
-  const handleRegister = async (name: string, email: string, pass: string) => {
-    console.log('DEBUG [App]: handleRegister invoked', { name, email });
+  const handleRegister = async (name: string, email: string, pass: string, role: 'user' | 'admin', adminKey?: string) => {
     try {
       const res = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, password: pass })
+        body: JSON.stringify({ name, email, password: pass, role, adminKey })
       });
       const data = await res.json();
       if (res.ok) {
@@ -137,7 +140,11 @@ export default function App() {
       }
       return data.error || 'Registration failed';
     } catch (e) {
-      return 'Connection timed out. Please try again.';
+      const message = e instanceof Error ? e.message : '';
+      if (message.toLowerCase().includes('failed to fetch')) {
+        return 'Unable to connect to server. Please check your network and try again.';
+      }
+      return 'Registration request failed. Please try again.';
     }
   };
 
@@ -352,8 +359,10 @@ USER CONTEXT: Name: ${user?.name}, Tasks: ${tasks.length}, Habits: ${habits.leng
         }
       />
       <Route path="/reports" element={<ReportsView />} />
-      <Route path="/settings" element={<SettingsPanel user={user} onUpdateUser={(d) => api.auth.updateProfile(token, d).then(loadInitialData)} onClose={() => navigate('/dashboard')} />} />
-      <Route path="/admin" element={<AdminPanel token={token} />} />
+      <Route path="/settings" element={<SettingsPanel user={user} token={token} onUpdateUser={(d) => api.auth.updateProfile(token, d).then(loadInitialData)} onClose={() => navigate('/dashboard')} />} />
+      <Route path="/admin" element={
+        user?.role === 'admin' ? <AdminPanel token={token} /> : <Navigate to="/dashboard" replace />
+      } />
       <Route path="/" element={<Navigate to="/dashboard" replace />} />
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>

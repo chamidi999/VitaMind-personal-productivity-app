@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Users, Activity, ShieldAlert, MoreHorizontal, Ban } from 'lucide-react';
+import { Users, Activity, ShieldAlert, Trash2 } from 'lucide-react';
 import { User } from '../types';
 
 interface AdminPanelProps {
@@ -23,6 +23,47 @@ export default function AdminPanel({ token }: AdminPanelProps) {
       if (sRes.ok) setStats(await sRes.json());
     } catch (e) {
       console.error('Admin fetch error', e);
+    }
+  };
+
+  const handleDeleteAccount = async (userId: number, name: string) => {
+    const confirmed = window.confirm(`Delete account for ${name}? This cannot be undone.`);
+    if (!confirmed) return;
+
+    try {
+      const res = await fetch(`/api/admin/users/${userId}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        alert(data.error || 'Failed to delete account');
+        return;
+      }
+      await fetchAdminData();
+    } catch (e) {
+      alert('Failed to delete account');
+    }
+  };
+
+  const handleToggleActive = async (userId: number, nextActive: boolean) => {
+    try {
+      const res = await fetch(`/api/admin/users/${userId}/status`, {
+        method: 'PATCH',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ is_active: nextActive })
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        alert(data.error || 'Failed to update account status');
+        return;
+      }
+      await fetchAdminData();
+    } catch (e) {
+      alert('Failed to update account status');
     }
   };
 
@@ -88,8 +129,9 @@ export default function AdminPanel({ token }: AdminPanelProps) {
                     </div>
                   </td>
                   <td className="px-8 py-5">
-                    <span className="flex items-center gap-1.5 text-xs font-bold text-emerald-500">
-                      <div className="h-1.5 w-1.5 rounded-full bg-emerald-500"></div> Active
+                    <span className={`flex items-center gap-1.5 text-xs font-bold ${u.is_active ? 'text-emerald-500' : 'text-amber-500'}`}>
+                      <div className={`h-1.5 w-1.5 rounded-full ${u.is_active ? 'bg-emerald-500' : 'bg-amber-500'}`}></div>
+                      {u.is_active ? 'Active' : 'Deactivated'}
                     </span>
                   </td>
                   <td className="px-8 py-5">
@@ -99,11 +141,19 @@ export default function AdminPanel({ token }: AdminPanelProps) {
                   </td>
                   <td className="px-8 py-5">
                     <div className="flex gap-2">
-                       <button className="p-2 hover:bg-white/5 rounded-xl text-gray-500 hover:text-white transition-colors">
-                          <Ban size={16} />
+                       <button
+                          onClick={() => handleToggleActive(u.id, !u.is_active)}
+                          className={`px-2 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider ${u.is_active ? 'bg-amber-500/10 text-amber-500 hover:bg-amber-500/20' : 'bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20'} transition-colors`}
+                          title={u.is_active ? 'Deactivate account' : 'Activate account'}
+                        >
+                          {u.is_active ? 'Deactivate' : 'Activate'}
                        </button>
-                       <button className="p-2 hover:bg-white/5 rounded-xl text-gray-500 hover:text-white transition-colors">
-                          <MoreHorizontal size={16} />
+                       <button
+                          onClick={() => handleDeleteAccount(u.id, u.name)}
+                          className="p-2 hover:bg-white/5 rounded-xl text-gray-500 hover:text-white transition-colors"
+                          title="Delete account"
+                        >
+                          <Trash2 size={16} />
                        </button>
                     </div>
                   </td>

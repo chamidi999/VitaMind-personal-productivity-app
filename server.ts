@@ -1,6 +1,7 @@
 import express from 'express';
 import { createServer as createViteServer } from 'vite';
 import path from 'path';
+import fs from 'fs';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 import helmet from 'helmet';
@@ -25,6 +26,11 @@ const PORT = 3000;
 
 const app = express();
 app.set('trust proxy', 1);
+const uploadsDir = path.join(process.cwd(), 'uploads');
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+}
+app.use('/uploads', express.static(uploadsDir));
 
 app.use(helmet({
   contentSecurityPolicy: false,
