@@ -28,7 +28,7 @@ export const initDB = async () => {
         role VARCHAR(20) DEFAULT 'user',
         is_active BOOLEAN DEFAULT TRUE,
         bio TEXT,
-        avatar_url TEXT,
+        avatar_url MEDIUMTEXT,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
       )
     `);
@@ -45,6 +45,23 @@ export const initDB = async () => {
       await connection.query(`
         ALTER TABLE users
         ADD COLUMN is_active BOOLEAN DEFAULT TRUE
+      `);
+    }
+
+    const [avatarColRows]: any = await connection.query(
+      `SELECT DATA_TYPE AS dataType
+       FROM INFORMATION_SCHEMA.COLUMNS
+       WHERE TABLE_SCHEMA = DATABASE()
+         AND TABLE_NAME = 'users'
+         AND COLUMN_NAME = 'avatar_url'
+       LIMIT 1`
+    );
+
+    const avatarDataType = String(avatarColRows?.[0]?.dataType || '').toLowerCase();
+    if (avatarDataType && avatarDataType !== 'mediumtext' && avatarDataType !== 'longtext') {
+      await connection.query(`
+        ALTER TABLE users
+        MODIFY COLUMN avatar_url MEDIUMTEXT
       `);
     }
 
