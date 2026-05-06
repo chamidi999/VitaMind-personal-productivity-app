@@ -32,7 +32,7 @@ export const getUserContextSummary = async (userId: number) => {
       [userId]
     );
     const [overdueRows]: any = await pool.query(
-      "SELECT id, title, due_date, priority FROM tasks WHERE user_id = ? AND status != 'completed' AND due_date < date('now') ORDER BY due_date ASC",
+      "SELECT id, title, due_date, priority FROM tasks WHERE user_id = ? AND status != 'completed' AND due_date < CURDATE() ORDER BY due_date ASC",
       [userId]
     );
     const [highPriorityRows]: any = await pool.query(

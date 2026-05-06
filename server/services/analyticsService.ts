@@ -149,7 +149,7 @@ export const getAnalyticsSummary = async (userId: number) => {
     pool.query(
       `SELECT COUNT(*) as count FROM tasks
        WHERE user_id = ? AND status = 'completed'
-       AND date(created_at) BETWEEN date('now', '-13 days') AND date('now', '-7 days')`,
+       AND DATE(created_at) BETWEEN DATE_SUB(CURDATE(), INTERVAL 13 DAY) AND DATE_SUB(CURDATE(), INTERVAL 7 DAY)`,
       [userId]
     )
   ]);

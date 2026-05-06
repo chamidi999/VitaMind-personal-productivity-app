@@ -77,7 +77,7 @@ router.get('/history', authenticateToken, async (req: AuthRequest, res) => {
     const [completionRows]: any = await pool.query(
       `SELECT completed_on, COUNT(DISTINCT habit_id) as completed
        FROM habit_completions
-       WHERE user_id = ? AND date(completed_on) >= date('now', '-6 days')
+       WHERE user_id = ? AND DATE(completed_on) >= DATE_SUB(CURDATE(), INTERVAL 6 DAY)
        GROUP BY completed_on`,
       [req.user?.id]
     );
