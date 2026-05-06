@@ -7,14 +7,16 @@ interface SettingsPanelProps {
   user: UserType;
   onUpdateUser: (data: Partial<UserType>) => Promise<void>;
   onClose: () => void;
+  token: string;
 }
 
-export default function SettingsPanel({ user, onUpdateUser, onClose }: SettingsPanelProps) {
+export default function SettingsPanel({ user, onUpdateUser, onClose, token }: SettingsPanelProps) {
   const [name, setName] = useState(user.name);
   const [bio, setBio] = useState(user.bio || '');
   const [avatarUrl, setAvatarUrl] = useState(user.avatar_url || '');
   const [isSaving, setIsSaving] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [reminders, setReminders] = useState<Array<{ id: number; title: string; message: string; is_read: boolean; created_at: string }>>([]);
 
   const handleAvatarUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -61,6 +63,20 @@ export default function SettingsPanel({ user, onUpdateUser, onClose }: SettingsP
   ];
 
   const [activeTab, setActiveTab] = useState('profile');
+
+  React.useEffect(() => {
+    if (activeTab !== 'notifications') return;
+    const loadReminders = async () => {
+      const res = await fetch('/api/notifications', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setReminders(data.filter((n: any) => n.type === 'task'));
+      }
+    };
+    loadReminders().catch((e) => console.error('Failed to load reminders', e));
+  }, [activeTab, token]);
 
   return (
     <div className="max-w-4xl mx-auto relative">
@@ -223,6 +239,29 @@ export default function SettingsPanel({ user, onUpdateUser, onClose }: SettingsP
                     {isSaving ? 'Updating...' : 'Save Security Settings'}
                   </button>
                 </div>
+              </div>
+            </motion.div>
+          )}
+
+          {activeTab === 'notifications' && (
+            <motion.div
+              key="notifications"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="bg-card border border-white/5 rounded-3xl p-8"
+            >
+              <h3 className="text-xl font-bold mb-2">Task Deadline Reminders</h3>
+              <p className="text-sm text-gray-500 mb-6">Automatic reminders are generated for 2 days before, 1 day before, and on due date.</p>
+              <div className="space-y-3 max-h-[420px] overflow-y-auto pr-1">
+                {reminders.length === 0 && (
+                  <div className="text-sm text-gray-500 italic py-8 text-center">No reminder messages yet.</div>
+                )}
+                {reminders.map(reminder => (
+                  <div key={reminder.id} className={`p-4 rounded-2xl border ${reminder.is_read ? 'border-white/5 bg-white/2' : 'border-royal/20 bg-royal/5'}`}>
+                    <p className="font-bold text-sm mb-1">{reminder.title}</p>
+                    <p className="text-xs text-gray-400">{reminder.message}</p>
+                  </div>
+                ))}
               </div>
             </motion.div>
           )}

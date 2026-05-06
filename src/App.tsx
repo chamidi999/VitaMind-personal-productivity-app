@@ -303,7 +303,7 @@ USER CONTEXT: Name: ${user?.name}, Tasks: ${tasks.length}, Habits: ${habits.leng
           />
         );
       case 'settings':
-        return <SettingsPanel user={user} onUpdateUser={(d) => api.auth.updateProfile(token, d).then(loadInitialData)} onClose={() => setCurrentView('dashboard')} />;
+        return <SettingsPanel user={user} token={token} onUpdateUser={(d) => api.auth.updateProfile(token, d).then(loadInitialData)} onClose={() => setCurrentView('dashboard')} />;
       case 'admin':
         if (user.role !== 'admin') return <DashboardView 
             stats={stats} 
