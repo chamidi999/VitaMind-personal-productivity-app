@@ -93,14 +93,15 @@ router.post('/', authenticateToken, async (req: AuthRequest, res) => {
   const { title, status, priority, due_date } = result.data;
   const description = req.body.description || '';
   const category = req.body.category || 'Personal';
+  const completedAt = status === 'completed' ? new Date() : null;
 
   try {
     const [dbResult]: any = await pool.query(
-      'INSERT INTO tasks (user_id, title, description, due_date, priority, category, status) VALUES (?, ?, ?, ?, ?, ?, ?)',
-      [req.user?.id, title, description, due_date, priority, category, status]
+      'INSERT INTO tasks (user_id, title, description, due_date, priority, category, status, completed_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+      [req.user?.id, title, description, due_date, priority, category, status, completedAt]
     );
     console.log('DEBUG [TasksRoute]: create db result', dbResult);
-    res.json({ id: dbResult.insertId, title, description, due_date, priority, category, status });
+    res.json({ id: dbResult.insertId, title, description, due_date, priority, category, status, completed_at: completedAt });
   } catch (error) {
     res.status(500).json({ error: 'Internal server error' });
   }
@@ -111,7 +112,16 @@ router.patch('/:id', authenticateToken, async (req: AuthRequest, res) => {
   const { status, priority, title, description, due_date, category } = req.body;
   const fields = [];
   const values = [];
-  if (status) { fields.push('status = ?'); values.push(status); }
+  if (status) {
+    fields.push('status = ?');
+    values.push(status);
+    if (status === 'completed') {
+      fields.push('completed_at = ?');
+      values.push(new Date());
+    } else {
+      fields.push('completed_at = NULL');
+    }
+  }
   if (priority) { fields.push('priority = ?'); values.push(priority); }
   if (title) { fields.push('title = ?'); values.push(title); }
   if (description !== undefined) { fields.push('description = ?'); values.push(description); }

@@ -77,6 +77,7 @@ export const initDB = async () => {
         priority VARCHAR(50) DEFAULT 'medium',
         category VARCHAR(100) DEFAULT 'Personal',
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        completed_at DATETIME NULL,
         CONSTRAINT fk_tasks_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
       )
     `);
@@ -94,6 +95,21 @@ export const initDB = async () => {
         CONSTRAINT fk_habits_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
       )
     `);
+
+    const [taskCompletedAtRows]: any = await connection.query(
+      `SELECT COUNT(*) AS count
+       FROM INFORMATION_SCHEMA.COLUMNS
+       WHERE TABLE_SCHEMA = DATABASE()
+         AND TABLE_NAME = 'tasks'
+         AND COLUMN_NAME = 'completed_at'`
+    );
+
+    if ((taskCompletedAtRows?.[0]?.count || 0) === 0) {
+      await connection.query(`
+        ALTER TABLE tasks
+        ADD COLUMN completed_at DATETIME NULL
+      `);
+    }
 
     // Habit Completions Table
     await connection.query(`
