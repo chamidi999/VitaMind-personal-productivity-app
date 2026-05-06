@@ -63,6 +63,7 @@ function HabitItem({ habit, onComplete, onDelete, onUpdate }: {
   onUpdate: (id: number, name: string) => Promise<void>
 }) {
   const [isEditing, setIsEditing] = useState(false);
+  const [isCompleting, setIsCompleting] = useState(false);
   const [name, setName] = useState(habit.name);
 
   const save = async () => {
@@ -73,6 +74,18 @@ function HabitItem({ habit, onComplete, onDelete, onUpdate }: {
   };
 
   const isDoneToday = habit.last_completed && (typeof habit.last_completed === 'string' ? habit.last_completed : (habit.last_completed as any).toISOString()).split('T')[0] === new Date().toISOString().split('T')[0];
+
+  const handleExecute = async () => {
+    if (isDoneToday || isCompleting) return;
+    setIsCompleting(true);
+    try {
+      await onComplete(habit.id);
+    } catch (error) {
+      console.error('Failed to complete habit:', error);
+    } finally {
+      setIsCompleting(false);
+    }
+  };
 
   return (
     <div className="bg-card p-6 rounded-3xl border border-white/5 flex items-center justify-between group relative">
@@ -101,15 +114,17 @@ function HabitItem({ habit, onComplete, onDelete, onUpdate }: {
       </div>
       <div className="flex items-center gap-2">
         <button 
-          onClick={() => !isDoneToday && onComplete(habit.id)}
-          disabled={!!isDoneToday}
+          onClick={handleExecute}
+          disabled={!!isDoneToday || isCompleting}
           className={`px-6 py-2 rounded-xl font-bold transition-all ${
             isDoneToday
               ? 'bg-emerald-500/10 text-emerald-500 cursor-default'
+              : isCompleting
+              ? 'bg-royal/50 text-white cursor-wait'
               : 'bg-royal text-white hover:bg-royal-light'
           }`}
         >
-          {isDoneToday ? 'Locked' : 'Execute'}
+          {isDoneToday ? '✓ Done' : isCompleting ? 'Executing...' : 'Execute'}
         </button>
         <button 
           onClick={() => onDelete(habit.id)}

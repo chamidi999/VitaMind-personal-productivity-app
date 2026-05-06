@@ -98,6 +98,27 @@ export default function App() {
     }
   };
 
+  const handleCompleteHabit = async (id: number) => {
+    if (!token) return;
+    const today = format(new Date(), 'yyyy-MM-dd');
+    const previousHabits = habits;
+
+    setHabits((current) =>
+      current.map((habit) =>
+        habit.id === id
+          ? { ...habit, streak: habit.streak + 1, last_completed: today }
+          : habit
+      )
+    );
+
+    try {
+      await api.habits.complete(token, id);
+      await refreshData();
+    } catch (error) {
+      console.error('Habit completion failed:', error);
+      setHabits(previousHabits);
+    }
+  };
 
   const handleLogin = async (email: string, pass: string) => {
     console.log('DEBUG [App]: handleLogin invoked', { email });
@@ -326,7 +347,7 @@ USER CONTEXT: Name: ${user?.name}, Tasks: ${tasks.length}, Habits: ${habits.leng
           <HabitsView
             habits={habits}
             onAdd={(n) => api.habits.create(token, { name: n }).then(refreshData)}
-            onComplete={(id) => api.habits.complete(token, id).then(refreshData)}
+            onComplete={handleCompleteHabit}
             onDelete={(id) => api.habits.delete(token, id).then(refreshData)}
             onUpdate={(id, n) => api.habits.update(token, id, { name: n }).then(refreshData)}
           />

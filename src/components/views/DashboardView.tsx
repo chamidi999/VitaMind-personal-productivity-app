@@ -8,13 +8,13 @@ import {
   AreaChart, Area, XAxis, YAxis,
   Tooltip, ResponsiveContainer
 } from 'recharts';
-import { DashboardStats, Task, Habit, View } from '../../types';
+import { DashboardStats, Task, Habit, View, ContextSummary } from '../../types';
 
 interface DashboardProps {
   stats: DashboardStats | null;
   tasks: Task[];
   habits: Habit[];
-  contextSummary: any;
+  contextSummary: ContextSummary | null;
   onViewChange: (view: View) => void;
   onAddTask: () => void;
   onEditTask: (task: Task) => void;
@@ -32,11 +32,24 @@ export default function DashboardView({ stats, tasks, habits, contextSummary, on
     { name: 'Sun', completion: 0 },
   ]);
 
-  const activeTasks = tasks.filter((t) => t.status !== 'completed');
-  const habitCount = habits.length;
-  const goalCount = stats?.goals.total || 0;
+  const safeTasks = Array.isArray(tasks) ? tasks : [];
+  const safeHabits = Array.isArray(habits) ? habits : [];
+  const safeStats = stats ?? { tasks: { total: 0, completed: 0 }, habits: { active: 0 }, goals: { total: 0 } };
 
-  const highestStreak = useMemo(() => Math.max(...habits.map((h) => h.streak), 0), [habits]);
+  const activeTasks = safeTasks.filter((t) => t.status !== 'completed');
+  const habitCount = safeHabits.length;
+  const goalCount = safeStats.goals.total;
+  const executedTodayCount = safeHabits.filter((habit) => {
+    const completed = habit.last_completed;
+    const completedDate = typeof completed === 'string'
+      ? completed
+      : completed instanceof Date
+        ? completed.toISOString().slice(0, 10)
+        : '';
+    return completedDate === new Date().toISOString().slice(0, 10);
+  }).length;
+
+  const highestStreak = useMemo(() => Math.max(0, ...safeHabits.map((h) => h.streak)), [safeHabits]);
 
   useEffect(() => {
     const loadInsight = async () => {
@@ -48,9 +61,9 @@ export default function DashboardView({ stats, tasks, habits, contextSummary, on
         });
         if (!response.ok) return;
         const data = await response.json();
-        const topHabit = contextSummary?.topHabits?.[0];
+        const topHabit = contextSummary?.topHabits?.[0] ?? null;
         const daysToRecord = topHabit ? (7 - (topHabit.streak % 7 || 7)) : null;
-        const enhancedInsight = (daysToRecord && daysToRecord <= 3)
+        const enhancedInsight = (daysToRecord && daysToRecord <= 3 && topHabit?.name)
           ? `You're ${daysToRecord} day(s) away from a Habit record on "${topHabit.name}". Keep it up.`
           : data.insight;
         setDailyInsight(enhancedInsight || 'Complete one priority objective before noon.');
@@ -147,8 +160,8 @@ export default function DashboardView({ stats, tasks, habits, contextSummary, on
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {[
-          { id: 'tasks', label: 'Active Tasks', value: stats?.tasks.total || 0, sub: `${stats?.tasks.completed || 0} completed`, icon: <CheckSquare className="text-royal" />, color: 'from-royal/25 via-indigo-500/15' },
-          { id: 'habits', label: 'Habit Streak', value: highestStreak, sub: habitCount ? 'Current highest' : 'No habits tracked yet', icon: <Flame className="text-orange-500" />, color: 'from-orange-500/25 via-amber-500/20' },
+          { id: 'tasks', label: 'Active Tasks', value: activeTasks.length, sub: `${stats?.tasks.completed || 0} completed`, icon: <CheckSquare className="text-royal" />, color: 'from-royal/25 via-indigo-500/15' },
+          { id: 'habits', label: 'Total Habits', value: habitCount, sub: executedTodayCount ? `${executedTodayCount} executed today` : 'No habits executed today', icon: <Flame className="text-orange-500" />, color: 'from-orange-500/25 via-amber-500/20' },
           { id: 'goals', label: 'Vision Goals', value: goalCount, sub: goalCount ? 'Long-term tracks' : 'No goals added yet', icon: <Target className="text-emerald-500" />, color: 'from-emerald-500/25 via-cyan-500/15' },
           { id: 'ai', label: 'Mind State', value: 'Flow', sub: 'Optimal performance', icon: <BrainCircuit className="text-purple-500" />, color: 'from-purple-500/25 via-fuchsia-500/20' },
         ].map((stat, i) => (

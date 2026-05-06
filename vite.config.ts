@@ -5,6 +5,8 @@ import {defineConfig, loadEnv} from 'vite';
 
 export default defineConfig(({mode}) => {
   const env = loadEnv(mode, '.', '');
+  const hmrPort = process.env.HMR_PORT ? parseInt(process.env.HMR_PORT, 10) : 24678;
+  
   return {
     plugins: [react(), tailwindcss()],
     define: {
@@ -16,7 +18,11 @@ export default defineConfig(({mode}) => {
       },
     },
     server: {
-      hmr: process.env.DISABLE_HMR !== 'true',
+      hmr: {
+        host: 'localhost',
+        port: hmrPort,
+        protocol: 'ws',
+      },
     },
   };
 });

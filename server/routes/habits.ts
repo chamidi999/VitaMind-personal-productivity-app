@@ -58,9 +58,9 @@ router.post('/:id/complete', authenticateToken, async (req: AuthRequest, res) =>
     }
 
     const newStreak = habit.streak + 1;
-    await pool.query('UPDATE habits SET streak = ?, last_completed = ? WHERE id = ?', [newStreak, today, req.params.id]);
+    await pool.query('UPDATE habits SET streak = ?, last_completed = ? WHERE id = ? AND user_id = ?', [newStreak, today, req.params.id, req.user?.id]);
     await pool.query(
-      'INSERT OR IGNORE INTO habit_completions (habit_id, user_id, completed_on) VALUES (?, ?, ?)',
+      'INSERT IGNORE INTO habit_completions (habit_id, user_id, completed_on) VALUES (?, ?, ?)',
       [req.params.id, req.user?.id, today]
     );
     res.json({ ...habit, streak: newStreak, last_completed: today });

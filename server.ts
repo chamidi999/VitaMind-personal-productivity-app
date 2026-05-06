@@ -22,7 +22,7 @@ import { runNotificationChecks } from './server/services/notificationService';
 dotenv.config();
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const PORT = Number(process.env.PORT) || 3000;
+const PORT = Number(process.env.PORT) || 3001;
 
 const app = express();
 app.set('trust proxy', 1);
@@ -74,11 +74,11 @@ async function startServer() {
   });
 
   if (process.env.NODE_ENV !== 'production') {
-    const hmrPort = Number(process.env.HMR_PORT);
+    const hmrPort = process.env.HMR_PORT ? Number(process.env.HMR_PORT) : 24678;
     const vite = await createViteServer({
       server: {
         middlewareMode: true,
-        hmr: process.env.DISABLE_HMR === 'true' ? false : (Number.isFinite(hmrPort) && hmrPort > 0 ? { port: hmrPort } : undefined),
+        hmr: process.env.DISABLE_HMR === 'true' ? false : { port: hmrPort, host: 'localhost' },
       },
       appType: 'spa',
     });
