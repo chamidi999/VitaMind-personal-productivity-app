@@ -29,6 +29,18 @@ interface AnalyticsSummary {
   chartData: AnalyticsPoint[];
 }
 
+interface AnalyticsApiResponse {
+  weekly?: AnalyticsSummaryPayload;
+  monthly?: AnalyticsSummaryPayload;
+}
+
+interface AnalyticsSummaryPayload extends Partial<AnalyticsSummary> {
+  labels?: string[];
+  taskData?: number[];
+  habitData?: number[];
+  efficiencyRate?: number;
+  achievedGoals?: number;
+}
 
 const defaultSummary: AnalyticsSummary = {
   taskEfficiency: 0,
@@ -59,9 +71,26 @@ export default function ReportsView() {
           return;
         }
 
-        const data: AnalyticsSummary = await response.json();
+        const data: AnalyticsSummaryPayload | AnalyticsApiResponse = await response.json();
+        const normalizedData = 'weekly' in data
+          ? data.weekly || defaultSummary
+          : data;
+
         if (!isCancelled) {
-          setSummary({ ...defaultSummary, ...data, chartData: data.chartData || [] });
+          setSummary({
+            ...defaultSummary,
+            ...normalizedData,
+            taskEfficiency: Number(normalizedData?.taskEfficiency ?? normalizedData?.efficiencyRate) || 0,
+            goalAchievementRate: Number(normalizedData?.goalAchievementRate ?? normalizedData?.achievedGoals) || 0,
+            chartData:
+              normalizedData?.chartData ||
+              normalizedData?.labels?.map((label, index) => ({
+                label,
+                taskData: Number(normalizedData?.taskData?.[index]) || 0,
+                habitData: Number(normalizedData?.habitData?.[index]) || 0
+              })) ||
+              []
+          });
         }
       } catch (error) {
         console.error('Failed to load analytics summary', error);
