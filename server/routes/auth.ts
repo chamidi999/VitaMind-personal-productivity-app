@@ -104,6 +104,19 @@ router.get('/me', authenticateToken, async (req: AuthRequest, res) => {
 router.patch('/profile', authenticateToken, async (req: AuthRequest, res) => {
   const { name, bio, avatar_url } = req.body;
   try {
+    if (avatar_url) {
+      const dataUrlMatch = String(avatar_url).match(/^data:(image\/(jpeg|png|gif));base64,(.+)$/);
+      if (!dataUrlMatch) {
+        return res.status(400).json({ error: 'Invalid avatar format. Use JPG, PNG, or GIF.' });
+      }
+
+      const base64Data = dataUrlMatch[3];
+      const sizeInBytes = Buffer.from(base64Data, 'base64').length;
+      if (sizeInBytes > 800 * 1024) {
+        return res.status(400).json({ error: 'Avatar must be under 800KB.' });
+      }
+    }
+
     await pool.query('UPDATE users SET name = ?, bio = ?, avatar_url = ? WHERE id = ?', [name, bio, avatar_url || null, req.user?.id]);
     res.json({ success: true });
   } catch (error) {

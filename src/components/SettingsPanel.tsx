@@ -19,6 +19,11 @@ export default function SettingsPanel({ user, onUpdateUser, onClose }: SettingsP
   const handleAvatarUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+    if (!allowedTypes.includes(file.type)) {
+      alert('Invalid file type. Please select JPG, PNG, or GIF image.');
+      return;
+    }
     if (file.size > 800 * 1024) {
       alert('Please select an image under 800KB.');
       return;
