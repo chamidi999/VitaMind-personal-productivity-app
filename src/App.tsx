@@ -115,16 +115,20 @@ export default function App() {
       }
       return data.error || 'Login failed';
     } catch (e) {
-      return 'Connection timed out. Please try again.';
+      const message = e instanceof Error ? e.message : '';
+      if (message.toLowerCase().includes('failed to fetch')) {
+        return 'Unable to connect to server. Please check your network and try again.';
+      }
+      return 'Login request failed. Please try again.';
     }
   };
 
-  const handleRegister = async (name: string, email: string, pass: string) => {
+  const handleRegister = async (name: string, email: string, pass: string, role: 'user' | 'admin', adminKey?: string) => {
     try {
       const res = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, password: pass })
+        body: JSON.stringify({ name, email, password: pass, role, adminKey })
       });
       const data = await res.json();
       if (res.ok) {
@@ -135,7 +139,11 @@ export default function App() {
       }
       return data.error || 'Registration failed';
     } catch (e) {
-      return 'Connection timed out. Please try again.';
+      const message = e instanceof Error ? e.message : '';
+      if (message.toLowerCase().includes('failed to fetch')) {
+        return 'Unable to connect to server. Please check your network and try again.';
+      }
+      return 'Registration request failed. Please try again.';
     }
   };
 
@@ -295,8 +303,23 @@ USER CONTEXT: Name: ${user?.name}, Tasks: ${tasks.length}, Habits: ${habits.leng
           />
         );
       case 'settings':
-        return <SettingsPanel user={user} onUpdateUser={(d) => api.auth.updateProfile(token, d).then(loadInitialData)} onClose={() => setCurrentView('dashboard')} />;
+        return <SettingsPanel user={user} token={token} onUpdateUser={(d) => api.auth.updateProfile(token, d).then(loadInitialData)} onClose={() => setCurrentView('dashboard')} />;
       case 'admin':
+        if (user.role !== 'admin') return <DashboardView 
+            stats={stats} 
+            tasks={tasks} 
+            habits={habits} 
+            onViewChange={setCurrentView} 
+            onAddTask={() => {
+                setEditingTask(null);
+                setNewTaskTitle('');
+                setNewTaskDescription('');
+                setNewTaskPriority('medium');
+                setNewTaskDueDate(format(new Date(), 'yyyy-MM-dd'));
+                setIsTaskModalOpen(true);
+            }} 
+            onEditTask={handleEditTask}
+          />;
         return <AdminPanel token={token} />;
       default:
         return null;

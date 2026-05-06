@@ -26,11 +26,44 @@ export const initDB = async () => {
         password VARCHAR(255) NOT NULL,
         name VARCHAR(100) NOT NULL,
         role VARCHAR(20) DEFAULT 'user',
+        is_active BOOLEAN DEFAULT TRUE,
         bio TEXT,
-        avatar_url TEXT,
+        avatar_url MEDIUMTEXT,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
       )
     `);
+
+    const [activeColRows]: any = await connection.query(
+      `SELECT COUNT(*) AS count
+       FROM INFORMATION_SCHEMA.COLUMNS
+       WHERE TABLE_SCHEMA = DATABASE()
+         AND TABLE_NAME = 'users'
+         AND COLUMN_NAME = 'is_active'`
+    );
+
+    if ((activeColRows?.[0]?.count || 0) === 0) {
+      await connection.query(`
+        ALTER TABLE users
+        ADD COLUMN is_active BOOLEAN DEFAULT TRUE
+      `);
+    }
+
+    const [avatarColRows]: any = await connection.query(
+      `SELECT DATA_TYPE AS dataType
+       FROM INFORMATION_SCHEMA.COLUMNS
+       WHERE TABLE_SCHEMA = DATABASE()
+         AND TABLE_NAME = 'users'
+         AND COLUMN_NAME = 'avatar_url'
+       LIMIT 1`
+    );
+
+    const avatarDataType = String(avatarColRows?.[0]?.dataType || '').toLowerCase();
+    if (avatarDataType && avatarDataType !== 'mediumtext' && avatarDataType !== 'longtext') {
+      await connection.query(`
+        ALTER TABLE users
+        MODIFY COLUMN avatar_url MEDIUMTEXT
+      `);
+    }
 
     // Tasks Table
     await connection.query(`
