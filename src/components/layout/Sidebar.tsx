@@ -58,7 +58,7 @@ export default function Sidebar({ user, currentView, onViewChange, onLogout }: S
           className="w-full flex items-center gap-3 p-3 rounded-xl text-blue-100 hover:bg-white/10 hover:text-white transition-all group font-bold"
         >
           <LogOut size={20} className="group-hover:translate-x-1 transition-transform" />
-          <span className="text-sm">Logout / Sign Out</span>
+          <span className="text-sm">Sign Out</span>
         </button>
       </div>
     </aside>
