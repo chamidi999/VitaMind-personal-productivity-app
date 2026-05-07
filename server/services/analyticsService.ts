@@ -1,12 +1,32 @@
 import pool from '../db';
 
-type DailyRow = { day: string; count: number };
+type DailyRow = { day: string | Date; count: number };
+
+const toIsoDateKey = (value: string | Date) => {
+  if (value instanceof Date) {
+    return value.toISOString().split('T')[0];
+  }
+
+  const raw = String(value);
+  if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) {
+    return raw;
+  }
+
+  const parsed = new Date(raw);
+  if (!Number.isNaN(parsed.getTime())) {
+    return parsed.toISOString().split('T')[0];
+  }
+
+  return raw;
+};
 
 type AnalyticsRangeSummary = {
   rangeDays: number;
   labels: string[];
   taskData: number[];
   habitData: number[];
+  goalData: number[];
+  milestoneData: number[];
   efficiencyRate: number;
   habitConsistency: number;
   completedTasks: number;
@@ -19,6 +39,8 @@ type AnalyticsRangeSummary = {
     endDate: string;
     dailyTaskCompletions: Array<{ date: string; completed: number }>;
     dailyHabitCompletionRate: Array<{ date: string; percentage: number }>;
+    dailyGoalCompletions: Array<{ date: string; completed: number }>;
+    milestoneCompletionRate: number;
   };
 };
 
@@ -98,10 +120,18 @@ const getPeriodSummary = async (userId: number, rangeDays: number): Promise<Anal
   );
 
   const [goalCompletionRows]: any = await pool.query(
-    `SELECT date(created_at) as day, COUNT(*) as count
+    `SELECT date(COALESCE(completed_at, created_at)) as day, COUNT(*) as count
      FROM goals
-     WHERE user_id = ? AND status = 'completed' AND date(created_at) BETWEEN date(?) AND date(?)
-     GROUP BY date(created_at)`,
+     WHERE user_id = ? AND status = 'completed'
+       AND date(COALESCE(completed_at, created_at)) BETWEEN date(?) AND date(?)
+     GROUP BY date(COALESCE(completed_at, created_at))`,
+    [userId, startDate, endDate]
+  );
+
+  const [achievedGoalRows]: any = await pool.query(
+    `SELECT COUNT(*) as count FROM goals
+     WHERE user_id = ? AND status = 'completed'
+       AND date(COALESCE(completed_at, created_at)) BETWEEN date(?) AND date(?)`,
     [userId, startDate, endDate]
   );
 
@@ -121,9 +151,9 @@ const getPeriodSummary = async (userId: number, rangeDays: number): Promise<Anal
     [userId]
   );
 
-  const taskMap = new Map<string, number>((taskCompletionRows as DailyRow[]).map((row) => [row.day, Number(row.count)]));
-  const habitMap = new Map<string, number>((habitCompletionRows as DailyRow[]).map((row) => [row.day, Number(row.count)]));
-  const goalMap = new Map<string, number>((goalCompletionRows as DailyRow[]).map((row) => [row.day, Number(row.count)]));
+  const taskMap = new Map<string, number>((taskCompletionRows as DailyRow[]).map((row) => [toIsoDateKey(row.day), Number(row.count)]));
+  const habitMap = new Map<string, number>((habitCompletionRows as DailyRow[]).map((row) => [toIsoDateKey(row.day), Number(row.count)]));
+  const goalMap = new Map<string, number>((goalCompletionRows as DailyRow[]).map((row) => [toIsoDateKey(row.day), Number(row.count)]));
   const totalHabits = Number(habitCountRows[0]?.count || 0);
   const totalMilestones = Number(totalMilestonesRows[0]?.count || 0);
   const completedMilestones = Number(milestoneCompletedRows[0]?.count || 0);
