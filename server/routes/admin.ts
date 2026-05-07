@@ -50,7 +50,7 @@ router.get('/stats', authenticateToken, isAdmin, async (req, res) => {
   try {
     const [userRows]: any = await pool.query('SELECT COUNT(*) as count FROM users');
     const [taskRows]: any = await pool.query('SELECT COUNT(*) as count FROM tasks');
-    res.json({ users: userRows[0].count, tasks: taskRows[0].count });
+    res.json({ users: { count: userRows[0].count }, tasks: { count: taskRows[0].count } });
   } catch (error) {
     res.status(500).json({ error: 'Internal server error' });
   }
