@@ -24,6 +24,7 @@ export interface Habit {
   streak: number;
   last_completed: string | null;
   category: string;
+  created_at?: string;
 }
 
 export interface Milestone {

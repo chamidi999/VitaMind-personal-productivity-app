@@ -73,7 +73,27 @@ function HabitItem({ habit, onComplete, onDelete, onUpdate }: {
     setIsEditing(false);
   };
 
-  const isDoneToday = habit.last_completed && (typeof habit.last_completed === 'string' ? habit.last_completed : (habit.last_completed as any).toISOString()).split('T')[0] === new Date().toISOString().split('T')[0];
+  const normalizeCompletionDate = (value: string | Date | null) => {
+    if (!value) return null;
+    if (value instanceof Date && !isNaN(value.valueOf())) {
+      return value.toISOString().split('T')[0];
+    }
+    const asString = String(value);
+    return asString.split('T')[0].split(' ')[0];
+  };
+
+  const getFormattedDate = (dateString: string | undefined) => {
+    if (!dateString) return '';
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+    } catch {
+      return '';
+    }
+  };
+
+  const todayKey = new Date().toISOString().split('T')[0];
+  const isDoneToday = normalizeCompletionDate(habit.last_completed) === todayKey;
 
   const handleExecute = async () => {
     if (isDoneToday || isCompleting) return;
@@ -100,14 +120,19 @@ function HabitItem({ habit, onComplete, onDelete, onUpdate }: {
             className="bg-background text-[#191970] font-bold text-lg px-2 py-1 rounded w-full border border-royal/50"
           />
         ) : (
-          <h4 
-            className="text-lg font-bold text-[#191970] cursor-pointer hover:text-royal transition-colors" 
-            onClick={() => setIsEditing(true)}
-          >
-            {habit.name}
-          </h4>
+          <div>
+            <h4 
+              className="text-lg font-bold text-[#191970] cursor-pointer hover:text-royal transition-colors" 
+              onClick={() => setIsEditing(true)}
+            >
+              {habit.name}
+            </h4>
+            {habit.created_at && (
+              <p className="text-xs text-gray-500 mt-1">Added {getFormattedDate(habit.created_at)}</p>
+            )}
+          </div>
         )}
-        <div className="flex items-center gap-2 mt-1">
+        <div className="flex items-center gap-2 mt-2">
           <Flame size={16} className={habit.streak > 0 ? "text-orange-500" : "text-gray-700"} />
           <span className="text-sm font-semibold text-gray-700">{habit.streak} day streak</span>
         </div>

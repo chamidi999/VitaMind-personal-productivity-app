@@ -63,15 +63,16 @@ export default function DashboardView({
   const activeTasks = safeTasks.filter((t) => t.status !== "completed");
   const habitCount = safeHabits.length;
   const goalCount = safeStats.goals.total;
-  const executedTodayCount = safeHabits.filter((habit) => {
-    const completed = habit.last_completed;
-    const completedDate =
-      typeof completed === "string"
-        ? completed
-        : Object.prototype.toString.call(completed) === "[object Date]"
-          ? (completed as unknown as Date).toISOString().slice(0, 10)
-          : "";
+  const normalizeCompletionDate = (value: string | Date | null) => {
+    if (!value) return null;
+    if (value instanceof Date && !isNaN(value.valueOf())) {
+      return value.toISOString().slice(0, 10);
+    }
+    return String(value).split('T')[0].split(' ')[0];
+  };
 
+  const executedTodayCount = safeHabits.filter((habit) => {
+    const completedDate = normalizeCompletionDate(habit.last_completed);
     return completedDate === new Date().toISOString().slice(0, 10);
   }).length;
 
