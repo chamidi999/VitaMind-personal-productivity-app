@@ -32,11 +32,6 @@ interface AnalyticsSummary {
   chartData: AnalyticsPoint[];
 }
 
-interface AnalyticsApiResponse {
-  weekly?: AnalyticsSummaryPayload;
-  monthly?: AnalyticsSummaryPayload;
-}
-
 interface AnalyticsSummaryPayload extends Partial<AnalyticsSummary> {
   labels?: string[];
   taskData?: number[];
@@ -45,9 +40,18 @@ interface AnalyticsSummaryPayload extends Partial<AnalyticsSummary> {
   milestoneData?: number[];
   efficiencyRate?: number;
   achievedGoals?: number;
-  milestoneCompletionRate?: number;
 }
 
+interface AnalyticsApiResponse {
+  weekly?: AnalyticsSummaryPayload;
+  monthly?: AnalyticsSummaryPayload;
+}
+
+const isAnalyticsApiResponse = (
+  data: AnalyticsSummaryPayload | AnalyticsApiResponse
+): data is AnalyticsApiResponse => {
+  return typeof data === 'object' && data !== null && ('weekly' in data || 'monthly' in data);
+};
 
 const COLOR_PROPERTIES = [
   'color',
@@ -67,9 +71,7 @@ const COLOR_PROPERTIES = [
 const clampColorChannel = (value: number) => Math.min(255, Math.max(0, Math.round(value * 255)));
 
 const parseOklchComponent = (component: string, isLightness = false) => {
-  if (component === 'none') {
-    return 0;
-  }
+  if (component === 'none') return 0;
 
   if (component.endsWith('%')) {
     const percentage = Number.parseFloat(component);
@@ -77,42 +79,30 @@ const parseOklchComponent = (component: string, isLightness = false) => {
   }
 
   const parsedValue = Number.parseFloat(component);
-  if (!Number.isFinite(parsedValue)) {
-    return 0;
-  }
+  if (!Number.isFinite(parsedValue)) return 0;
 
   return isLightness && parsedValue > 1 ? parsedValue / 100 : parsedValue;
 };
 
 const parseOklchHue = (hue: string) => {
-  if (hue === 'none') {
-    return 0;
-  }
+  if (hue === 'none') return 0;
 
   const parsedHue = Number.parseFloat(hue);
-  if (!Number.isFinite(parsedHue)) {
-    return 0;
-  }
+  if (!Number.isFinite(parsedHue)) return 0;
 
-  if (hue.endsWith('rad')) {
-    return parsedHue * (180 / Math.PI);
-  }
-
-  if (hue.endsWith('turn')) {
-    return parsedHue * 360;
-  }
+  if (hue.endsWith('rad')) return parsedHue * (180 / Math.PI);
+  if (hue.endsWith('turn')) return parsedHue * 360;
 
   return parsedHue;
 };
 
 const convertOklchToRgb = (oklchColor: string) => {
   const match = oklchColor.match(/oklch\(([^)]+)\)/i);
-  if (!match) {
-    return oklchColor;
-  }
+  if (!match) return oklchColor;
 
   const [colorComponents, alphaComponent] = match[1].split('/').map((part) => part.trim());
   const [lightness = '0', chroma = '0', hue = '0'] = colorComponents.split(/\s+/);
+
   const l = parseOklchComponent(lightness, true);
   const c = parseOklchComponent(chroma);
   const h = parseOklchHue(hue) * (Math.PI / 180);
@@ -125,32 +115,24 @@ const convertOklchToRgb = (oklchColor: string) => {
   const medium = l - 0.1055613458 * a - 0.0638541728 * b;
   const short = l - 0.0894841775 * a - 1.291485548 * b;
 
-  const longCubed = long ** 3;
-  const mediumCubed = medium ** 3;
-  const shortCubed = short ** 3;
+  const linearRed = 4.0767416621 * long ** 3 - 3.3077115913 * medium ** 3 + 0.2309699292 * short ** 3;
+  const linearGreen = -1.2684380046 * long ** 3 + 2.6097574011 * medium ** 3 - 0.3413193965 * short ** 3;
+  const linearBlue = -0.0041960863 * long ** 3 - 0.7034186147 * medium ** 3 + 1.707614701 * short ** 3;
 
-  const linearRed = 4.0767416621 * longCubed - 3.3077115913 * mediumCubed + 0.2309699292 * shortCubed;
-  const linearGreen = -1.2684380046 * longCubed + 2.6097574011 * mediumCubed - 0.3413193965 * shortCubed;
-  const linearBlue = -0.0041960863 * longCubed - 0.7034186147 * mediumCubed + 1.707614701 * shortCubed;
-
-  const toSrgb = (channel: number) => (
-    channel <= 0.0031308
-      ? 12.92 * channel
-      : 1.055 * (channel ** (1 / 2.4)) - 0.055
-  );
+  const toSrgb = (channel: number) =>
+    channel <= 0.0031308 ? 12.92 * channel : 1.055 * channel ** (1 / 2.4) - 0.055;
 
   const red = clampColorChannel(toSrgb(linearRed));
   const green = clampColorChannel(toSrgb(linearGreen));
   const blue = clampColorChannel(toSrgb(linearBlue));
 
-  if (alpha < 1) {
-    return `rgba(${red}, ${green}, ${blue}, ${Math.max(0, Math.min(1, alpha))})`;
-  }
-
-  return `rgb(${red}, ${green}, ${blue})`;
+  return alpha < 1
+    ? `rgba(${red}, ${green}, ${blue}, ${Math.max(0, Math.min(1, alpha))})`
+    : `rgb(${red}, ${green}, ${blue})`;
 };
 
-const replaceOklchColors = (colorValue: string) => colorValue.replace(/oklch\([^)]+\)/gi, convertOklchToRgb);
+const replaceOklchColors = (colorValue: string) =>
+  colorValue.replace(/oklch\([^)]+\)/gi, convertOklchToRgb);
 
 const defaultSummary: AnalyticsSummary = {
   taskEfficiency: 0,
@@ -179,32 +161,39 @@ export default function ReportsView() {
           headers: { Authorization: `Bearer ${token}` }
         });
 
-        if (!response.ok) {
-          return;
-        }
+        if (!response.ok) return;
 
         const data: AnalyticsSummaryPayload | AnalyticsApiResponse = await response.json();
-        const normalizedData = 'weekly' in data
-          ? data.weekly || defaultSummary
+
+        const normalizedData: AnalyticsSummaryPayload = isAnalyticsApiResponse(data)
+          ? data.weekly ?? data.monthly ?? {}
           : data;
+
+        const labels = normalizedData.labels ?? [];
 
         if (!isCancelled) {
           setSummary({
             ...defaultSummary,
             ...normalizedData,
-            taskEfficiency: Number(normalizedData?.taskEfficiency ?? normalizedData?.efficiencyRate) || 0,
-            goalAchievementRate: Number(normalizedData?.goalAchievementRate ?? normalizedData?.achievedGoals) || 0,
-            milestoneCompletionRate: Number(normalizedData?.milestoneCompletionRate) || 0,
+
+            taskEfficiency:
+              Number(normalizedData.taskEfficiency ?? normalizedData.efficiencyRate) || 0,
+
+            goalAchievementRate:
+              Number(normalizedData.goalAchievementRate ?? normalizedData.achievedGoals) || 0,
+
+            milestoneCompletionRate:
+              Number(normalizedData.milestoneCompletionRate) || 0,
+
             chartData:
-              normalizedData?.chartData ||
-              normalizedData?.labels?.map((label, index) => ({
+              normalizedData.chartData ??
+              labels.map((label, index) => ({
                 label,
-                taskData: Number(normalizedData?.taskData?.[index]) || 0,
-                habitData: Number(normalizedData?.habitData?.[index]) || 0,
-                goalData: Number(normalizedData?.goalData?.[index]) || 0,
-                milestoneData: Number(normalizedData?.milestoneData?.[index]) || 0
-              })) ||
-              []
+                taskData: Number(normalizedData.taskData?.[index]) || 0,
+                habitData: Number(normalizedData.habitData?.[index]) || 0,
+                goalData: Number(normalizedData.goalData?.[index]) || 0,
+                milestoneData: Number(normalizedData.milestoneData?.[index]) || 0
+              }))
           });
         }
       } catch (error) {
@@ -237,36 +226,33 @@ export default function ReportsView() {
 
   const handleDownloadPDF = async () => {
     const reportsContent = reportRef.current;
-    if (!reportsContent) {
-      console.error('Reports content is not available for PDF export');
-      return;
-    }
+    if (!reportsContent) return;
 
     try {
       setIsDownloadingPdf(true);
+
       const canvas = await html2canvas(reportsContent, {
         scale: 2,
         useCORS: true,
         backgroundColor: '#ffffff',
         ignoreElements: (element: { classList: { contains: (arg0: string) => any; }; }) => element.classList.contains('no-pdf'),
-        onclone: (clonedDocument: Document) => {
+        onclone: (clonedDocument: { getElementById: (arg0: string) => any; defaultView: any; }) => {
           const clonedReportsContent = clonedDocument.getElementById('reports-content');
-          if (!clonedReportsContent) {
-            return;
-          }
-
           const clonedWindow = clonedDocument.defaultView;
-          if (!clonedWindow) {
-            return;
-          }
 
-          const clonedElements = [clonedReportsContent, ...Array.from(clonedReportsContent.querySelectorAll('*'))] as HTMLElement[];
+          if (!clonedReportsContent || !clonedWindow) return;
+
+          const clonedElements = [
+            clonedReportsContent,
+            ...Array.from(clonedReportsContent.querySelectorAll('*'))
+          ] as HTMLElement[];
 
           clonedElements.forEach((element) => {
             const computedStyle = clonedWindow.getComputedStyle(element);
 
             COLOR_PROPERTIES.forEach((property) => {
               const propertyValue = computedStyle[property as any];
+
               if (typeof propertyValue === 'string' && propertyValue.includes('oklch(')) {
                 element.style[property as any] = replaceOklchColors(propertyValue);
               }
@@ -277,11 +263,13 @@ export default function ReportsView() {
 
       const imageData = canvas.toDataURL('image/png');
       const pdf = new jsPDF('p', 'mm', 'a4');
+
       const pageWidth = pdf.internal.pageSize.getWidth();
       const pageHeight = pdf.internal.pageSize.getHeight();
       const margin = 15;
       const printableWidth = pageWidth - margin * 2;
       const printableHeight = pageHeight - margin * 2;
+
       const scaledImageWidth = printableWidth;
       const scaledImageHeight = (canvas.height * scaledImageWidth) / canvas.width;
       const offsetX = (pageWidth - scaledImageWidth) / 2;
@@ -322,47 +310,58 @@ export default function ReportsView() {
       animate={{ opacity: 1, y: 0 }}
       className="space-y-6 max-w-300 ml-0"
     >
-
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
           <h2 className="text-2xl font-bold text-foreground">Reports &amp; Insights</h2>
           <p className="text-sm text-muted-foreground">Track your weekly performance and behavior trends.</p>
         </div>
+
         <button
           onClick={handleDownloadPDF}
           disabled={isDownloadingPdf}
           className="inline-flex items-center justify-center gap-2 h-10 px-4 rounded-lg bg-royal text-white font-semibold hover:bg-[#3559c7] transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
         >
-          <Download size={16} /> {isDownloadingPdf ? 'Generating PDF...' : 'Download PDF Report'}
+          <Download size={16} />
+          {isDownloadingPdf ? 'Generating PDF...' : 'Download PDF Report'}
         </button>
       </div>
 
       {isLoading ? (
-        <div className="bg-card backdrop-blur-xl border border-border rounded-2xl p-6 text-sm font-medium text-muted-foreground">Loading...</div>
+        <div className="bg-card backdrop-blur-xl border border-border rounded-2xl p-6 text-sm font-medium text-muted-foreground">
+          Loading...
+        </div>
       ) : null}
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {statCards.map((card) => (
-          <div
-            key={card.label}
-            className="bg-card backdrop-blur-xl border border-border rounded-2xl p-5"
-
-          >
+          <div key={card.label} className="bg-card backdrop-blur-xl border border-border rounded-2xl p-5">
             <div className="flex items-center justify-between mb-2">
-              <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">{card.label}</p>
-              <card.Icon size={18} className={card.iconColor === '#4169e1' ? 'text-royal' : card.iconColor === '#f97316' ? 'text-orange-500' : 'text-emerald-500'} />
+              <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+                {card.label}
+              </p>
+              <card.Icon
+                size={18}
+                className={
+                  card.iconColor === '#4169e1'
+                    ? 'text-royal'
+                    : card.iconColor === '#f97316'
+                      ? 'text-orange-500'
+                      : 'text-emerald-500'
+                }
+              />
             </div>
-            <p className="text-3xl font-bold text-foreground">{isLoading ? '--' : card.value}</p>
+            <p className="text-3xl font-bold text-foreground">
+              {isLoading ? '--' : card.value}
+            </p>
           </div>
         ))}
       </div>
 
-      <div
-        className="bg-card backdrop-blur-xl border border-border rounded-2xl p-5"
-      >
+      <div className="bg-card backdrop-blur-xl border border-border rounded-2xl p-5">
         <h3 className="text-base font-bold text-foreground mb-4">Performance Overview</h3>
+
         <div style={{ width: '100%', height: 320, minHeight: 300 }}>
-          <ResponsiveContainer width='100%' height='100%' minHeight={300}>
+          <ResponsiveContainer width="100%" height="100%" minHeight={300}>
             <ComposedChart data={chartData} margin={{ top: 10, right: 12, left: 0, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
               <XAxis dataKey="label" tick={{ fill: '#6b7280', fontSize: 12 }} />
@@ -371,11 +370,7 @@ export default function ReportsView() {
               <Tooltip
                 formatter={(value: any, name: any) => {
                   const displayValue = value ?? '';
-                  if (name.includes('%')) {
-                    return [`${displayValue}%`, name];
-                  }
-
-                  return [displayValue, name];
+                  return name.includes('%') ? [`${displayValue}%`, name] : [displayValue, name];
                 }}
                 contentStyle={{
                   borderRadius: '12px',
@@ -393,13 +388,13 @@ export default function ReportsView() {
         </div>
       </div>
 
-      <div
-        className="rounded-2xl border border-royal/20 bg-royal/5 px-5 py-4"
-      >
+      <div className="rounded-2xl border border-royal/20 bg-royal/5 px-5 py-4">
         <p className="text-xs uppercase tracking-[0.2em] text-royal font-semibold mb-2">
           Proactive Insight
         </p>
-        <p className="text-sm md:text-base text-foreground font-medium">{summary.aiInsight}</p>
+        <p className="text-sm md:text-base text-foreground font-medium">
+          {summary.aiInsight}
+        </p>
       </div>
     </motion.div>
   );

@@ -3,7 +3,6 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-// Create a connection pool using your .env credentials
 const pool = mysql.createPool({
   host: process.env.MYSQL_HOST,
   user: process.env.MYSQL_USER,
@@ -168,7 +167,7 @@ export const initDB = async () => {
       )
     `);
 
-    // Notifications Table (including your SQLite migration logic converted to MySQL)[cite: 1]
+    // Notifications Table
     await connection.query(`
       CREATE TABLE IF NOT EXISTS notifications (
         id INT PRIMARY KEY AUTO_INCREMENT,
@@ -190,17 +189,11 @@ export const initDB = async () => {
   }
 };
 
-/**
- * Custom query wrapper to maintain compatibility with your previous code
- * while using the native MySQL promise pool.
- */
 export const dbWrapper = {
   query: async (sql: string, params: any[] = []) => {
     try {
-      // MySQL uses '?' as placeholders naturally, no need for manual replace[cite: 1]
       const [rows, fields] = await pool.query(sql, params);
       
-      // Mimicking your previous SQLite return format[cite: 1]
       if (sql.trim().toUpperCase().startsWith('SELECT')) {
         return [rows];
       } else {

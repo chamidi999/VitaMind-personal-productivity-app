@@ -59,7 +59,7 @@ export default function SettingsPanel({ user, onUpdateUser, onClose, token }: Se
     { id: 'profile', icon: <User size={18} />, label: 'Profile' },
     { id: 'account', icon: <Shield size={18} />, label: 'Security' },
     { id: 'notifications', icon: <Bell size={18} />, label: 'Reminders' },
-    { id: 'billing', icon: <CreditCard size={18} />, label: 'Premium' },
+    // { id: 'billing', icon: <CreditCard size={18} />, label: 'Premium' },
   ];
 
   const [activeTab, setActiveTab] = useState('profile');
